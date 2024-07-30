@@ -16,12 +16,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Jwt 인증을 처리하는 필터 클래스
@@ -31,7 +34,7 @@ import java.time.LocalDateTime;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 인증검사를 하지 않는 url 설정
-    private final String[] blackListedUrls = new String[]{
+    private final String[] whiteListUrls = {
             "/swagger-ui/**", "/swagger", "/error/**"
     };
 
@@ -42,7 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if(CorsUtils.isPreFlightRequest(request))
+        // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
+        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI()))
             filterChain.doFilter(request, response);
 
         // Case 01) Access Token 재발급인 경우(Authorization Header Access Token 유효성 x)
@@ -65,6 +69,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 기존 필터 체인 호출
             filterChain.doFilter(request, response);
         }
+    }
+
+    private boolean isUriInWhiteList(String url) {
+        return PatternMatchUtils.simpleMatch(whiteListUrls, url);
     }
 
     private void reissueAccessTokenAndRefreshToken(HttpServletResponse response,

@@ -34,8 +34,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // TODO: Origin 도메인 수정 및 헤더값 설정
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5000")
-                .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
+                .allowedOrigins("http://localhost:5000") // 허용할 도메인 설정
+                .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정
+                .allowedHeaders("Content-Type", "Authorization", "Authorization-Refresh") // 허용할 헤더 설정
+                .exposedHeaders("Authorization", "Authorization-Refresh") // 클라이언트에 노출할 헤더 설정
+                .allowCredentials(true) // 자격 증명 허용
+                .maxAge(3600); // preflight 요청의 캐시 시간 설정 (초 단위)
     }
 
     /**

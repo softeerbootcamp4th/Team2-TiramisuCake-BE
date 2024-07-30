@@ -1,8 +1,0 @@
-
-jwt:
-  bearer: ${JWT_BEARER:Bearer}
-  secret: ${JWT_SECRET_KEY}
-  access-expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1?? (??: ms)
-  access-header: ${JWT_ACCESS_HEADER:Authorization} # Access Token ??
-  refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1? (??: ms)
-  refresh-header: ${JWT_REFRESH_HEADER:Authorization-Refresh} # Refresh Token ??

@@ -3,6 +3,7 @@ package com.softeer.backend.global.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.entity.AuthInfo;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.config.properties.JwtProperties;
@@ -83,8 +84,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          * 3. redis refresh 와 일치 여부 확인
          */
         checkAllConditions(accessToken, refreshToken);
-        String newAccessToken = jwtUtil.createAccessToken(jwtUtil.getUserIdFromRefreshToken(refreshToken));
-        String newRefreshToken = reIssueRefreshToken(jwtUtil.getUserIdFromRefreshToken(refreshToken));
+        String newAccessToken = jwtUtil.createAccessToken(jwtUtil.getAuthInfoFromRefreshToken(refreshToken));
+        String newRefreshToken = reIssueRefreshToken(jwtUtil.getAuthInfoFromRefreshToken(refreshToken));
         makeAndSendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
     }
 
@@ -113,7 +114,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void isRefreshTokenMatch(String refreshToken) {
-        if (!refreshToken.equals(redisUtil.getData(jwtUtil.getUserIdFromRefreshToken(refreshToken)))) {
+        AuthInfo authInfo = jwtUtil.getAuthInfoFromRefreshToken(refreshToken);
+
+        if (!refreshToken.equals(redisUtil.getData(redisUtil.getRedisKeyForJwt(authInfo)))) {
             throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_EXIST);
         }
     }
@@ -123,12 +126,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 1. 새로운 Refresh Token 발급
      * 2. 해당 Key 에 해당하는 Redis Value 업데이트
      **/
-    private String reIssueRefreshToken(String userId) {
+    private String reIssueRefreshToken(AuthInfo authInfo) {
         // 기존 refresh token 삭제
-        redisUtil.deleteData(userId);
-        String reIssuedRefreshToken = jwtUtil.createRefreshToken(userId);
+        redisUtil.deleteData(redisUtil.getRedisKeyForJwt(authInfo));
+        String reIssuedRefreshToken = jwtUtil.createRefreshToken(authInfo);
         // refresh token 저장
-        redisUtil.setDataExpire(userId, reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
+        redisUtil.setDataExpire(redisUtil.getRedisKeyForJwt(authInfo), reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
         return reIssuedRefreshToken;
     }
 
@@ -169,8 +172,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.extractAccessToken(request)
                 .orElseThrow(() -> new JwtAuthenticationException(ErrorStatus._JWT_ACCESS_TOKEN_IS_NOT_EXIST));
 
-        String userId = jwtUtil.getUserIdFromAccessToken(accessToken);
+        AuthInfo authInfo = jwtUtil.getAuthInfoFromAccessToken(accessToken);
 
-        request.setAttribute("userId", userId);
+        request.setAttribute("authInfo", authInfo);
     }
 }

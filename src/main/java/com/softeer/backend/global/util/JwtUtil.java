@@ -1,6 +1,8 @@
 package com.softeer.backend.global.util;
 
 import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RoleType;
+import com.softeer.backend.global.common.entity.AuthInfo;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.fo_domain.user.dto.UserTokenResponse;
@@ -36,47 +38,59 @@ public class JwtUtil {
     }
 
     // access token 생성
-    public String createAccessToken(String payload) {
-        return this.createToken(payload, jwtProperties.getAccessExpiration());
+    public String createAccessToken(AuthInfo authInfo) {
+        return this.createToken(authInfo, jwtProperties.getAccessExpiration());
     }
 
     // refresh token 생성
-    public String createRefreshToken(String payload) {
-        return this.createToken(payload, jwtProperties.getRefreshExpiration());
+    public String createRefreshToken(AuthInfo authInfo) {
+        return this.createToken(authInfo, jwtProperties.getRefreshExpiration());
 
     }
 
-    // access token 으로부터 회원 아이디 추출
-    public String getUserIdFromAccessToken(String token) {
+    // access token 으로부터 인증 정보 추출
+    public AuthInfo getAuthInfoFromAccessToken(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(jwtProperties.getSecret())
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("userId", String.class);
+
+            return getAuthInfoFromToken(token);
+
         } catch (Exception exception) {
             throw new JwtAuthenticationException(ErrorStatus._JWT_ACCESS_TOKEN_IS_NOT_VALID);
         }
     }
 
-    // refresh token 으로부터 회원 아이디 추출
-    public String getUserIdFromRefreshToken(String token) {
+    // refresh token 으로부터 인증 정보 추출
+    public AuthInfo getAuthInfoFromRefreshToken(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(jwtProperties.getSecret())
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("userId", String.class);
+
+            return getAuthInfoFromToken(token);
+
         } catch (Exception exception) {
             throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_VALID);
         }
     }
 
-    // 전화번호 로그인 시 jwt 응답 생성 + redis refresh 저장
-    public UserTokenResponse createServiceToken(String userId) {
-        redisUtil.deleteData(userId);
-        String accessToken = createAccessToken(userId);
-        String refreshToken = createRefreshToken(userId);
+    // Jwt Token 에서 AuthInfo 파싱하여 반환하는 메서드
+    private AuthInfo getAuthInfoFromToken(String token){
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtProperties.getSecret())
+                .parseClaimsJws(token)
+                .getBody();
+
+        int id = Integer.parseInt(claims.get("id", String.class));
+        RoleType roleType = RoleType.valueOf(claims.get("roleType", String.class));
+
+        return AuthInfo.builder()
+                .id(id)
+                .roleType(roleType)
+                .build();
+    }
+
+    // 전화번호 로그인 및 admin 로그인 시 jwt 응답 생성 + redis refresh 저장
+    public UserTokenResponse createServiceToken(AuthInfo authInfo) {
+        redisUtil.deleteData(redisUtil.getRedisKeyForJwt(authInfo));
+        String accessToken = createAccessToken(authInfo);
+        String refreshToken = createRefreshToken(authInfo);
 
         // 서비스 토큰 생성
         UserTokenResponse userTokenResponse = UserTokenResponse.builder()
@@ -86,7 +100,7 @@ public class JwtUtil {
                 .build();
 
         // redis refresh token 저장
-        redisUtil.setDataExpire(userId,
+        redisUtil.setDataExpire(redisUtil.getRedisKeyForJwt(authInfo),
                 userTokenResponse.getRefreshToken(), jwtProperties.getRefreshExpiration());
 
         return userTokenResponse;
@@ -114,9 +128,10 @@ public class JwtUtil {
     }
 
     // 실제 token 생성 로직
-    private String createToken(String payload, Long tokenExpiration) {
+    private String createToken(AuthInfo authInfo,  Long tokenExpiration) {
         Claims claims = Jwts.claims();
-        claims.put("userId", payload);
+        claims.put("id", authInfo.getId());
+        claims.put("roleType", authInfo.getRoleType().name());
         Date tokenExpiresIn = new Date(new Date().getTime() + tokenExpiration);
 
         return Jwts.builder()

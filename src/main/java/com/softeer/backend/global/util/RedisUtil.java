@@ -1,5 +1,7 @@
 package com.softeer.backend.global.util;
 
+import com.softeer.backend.global.common.constant.RoleType;
+import com.softeer.backend.global.common.entity.AuthInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -39,4 +41,19 @@ public class RedisUtil {
     private ValueOperations<String, String> getStringStringValueOperations() {
         return this.stringRedisTemplate.opsForValue();
     }
+
+    /**
+     * Refresh Token을 redis에 저장할 때, 접두사를 붙여서 redis key를 반환하는 메서드
+     *
+     * @param authInfo 유저의 인증 정보
+     * @return 일반 유저는 "USER_{id값}", 어드민 유저는 "ADMIN_{id값}"
+     */
+    public String getRedisKeyForJwt(AuthInfo authInfo) {
+
+        String id = String.valueOf(authInfo.getId());
+        RoleType roleType = authInfo.getRoleType();
+
+        return roleType.getRedisKeyPrefix() + id;
+    }
+
 }

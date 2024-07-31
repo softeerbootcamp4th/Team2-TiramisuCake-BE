@@ -2,7 +2,7 @@ package com.softeer.backend.global.util;
 
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RoleType;
-import com.softeer.backend.global.common.entity.AuthInfo;
+import com.softeer.backend.global.common.entity.JwtClaimsDto;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.fo_domain.user.dto.UserTokenResponse;
@@ -38,18 +38,18 @@ public class JwtUtil {
     }
 
     // access token 생성
-    public String createAccessToken(AuthInfo authInfo) {
-        return this.createToken(authInfo, jwtProperties.getAccessExpiration());
+    public String createAccessToken(JwtClaimsDto jwtClaimsDto) {
+        return this.createToken(jwtClaimsDto, jwtProperties.getAccessExpiration());
     }
 
     // refresh token 생성
-    public String createRefreshToken(AuthInfo authInfo) {
-        return this.createToken(authInfo, jwtProperties.getRefreshExpiration());
+    public String createRefreshToken(JwtClaimsDto jwtClaimsDto) {
+        return this.createToken(jwtClaimsDto, jwtProperties.getRefreshExpiration());
 
     }
 
-    // access token 으로부터 인증 정보 추출
-    public AuthInfo getAuthInfoFromAccessToken(String token) {
+    // access token 으로부터 jwt claim 정보 추출
+    public JwtClaimsDto getJwtClaimsFromAccessToken(String token) {
         try {
 
             return getAuthInfoFromToken(token);
@@ -59,8 +59,8 @@ public class JwtUtil {
         }
     }
 
-    // refresh token 으로부터 인증 정보 추출
-    public AuthInfo getAuthInfoFromRefreshToken(String token) {
+    // refresh token 으로부터 jwt claim 정보 추출
+    public JwtClaimsDto getJwtClaimsFromRefreshToken(String token) {
         try {
 
             return getAuthInfoFromToken(token);
@@ -70,8 +70,8 @@ public class JwtUtil {
         }
     }
 
-    // Jwt Token 에서 AuthInfo 파싱하여 반환하는 메서드
-    private AuthInfo getAuthInfoFromToken(String token){
+    // Jwt Token 에서 claim 정보를 파싱하여 반환하는 메서드
+    private JwtClaimsDto getAuthInfoFromToken(String token){
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtProperties.getSecret())
                 .parseClaimsJws(token)
@@ -80,17 +80,17 @@ public class JwtUtil {
         int id = Integer.parseInt(claims.get("id", String.class));
         RoleType roleType = RoleType.valueOf(claims.get("roleType", String.class));
 
-        return AuthInfo.builder()
+        return JwtClaimsDto.builder()
                 .id(id)
                 .roleType(roleType)
                 .build();
     }
 
     // 전화번호 로그인 및 admin 로그인 시 jwt 응답 생성 + redis refresh 저장
-    public UserTokenResponse createServiceToken(AuthInfo authInfo) {
-        redisUtil.deleteData(redisUtil.getRedisKeyForJwt(authInfo));
-        String accessToken = createAccessToken(authInfo);
-        String refreshToken = createRefreshToken(authInfo);
+    public UserTokenResponse createServiceToken(JwtClaimsDto jwtClaimsDto) {
+        redisUtil.deleteData(redisUtil.getRedisKeyForJwt(jwtClaimsDto));
+        String accessToken = createAccessToken(jwtClaimsDto);
+        String refreshToken = createRefreshToken(jwtClaimsDto);
 
         // 서비스 토큰 생성
         UserTokenResponse userTokenResponse = UserTokenResponse.builder()
@@ -100,7 +100,7 @@ public class JwtUtil {
                 .build();
 
         // redis refresh token 저장
-        redisUtil.setDataExpire(redisUtil.getRedisKeyForJwt(authInfo),
+        redisUtil.setDataExpire(redisUtil.getRedisKeyForJwt(jwtClaimsDto),
                 userTokenResponse.getRefreshToken(), jwtProperties.getRefreshExpiration());
 
         return userTokenResponse;
@@ -128,10 +128,10 @@ public class JwtUtil {
     }
 
     // 실제 token 생성 로직
-    private String createToken(AuthInfo authInfo,  Long tokenExpiration) {
+    private String createToken(JwtClaimsDto jwtClaimsDto,  Long tokenExpiration) {
         Claims claims = Jwts.claims();
-        claims.put("id", authInfo.getId());
-        claims.put("roleType", authInfo.getRoleType().name());
+        claims.put("id", jwtClaimsDto.getId());
+        claims.put("roleType", jwtClaimsDto.getRoleType().name());
         Date tokenExpiresIn = new Date(new Date().getTime() + tokenExpiration);
 
         return Jwts.builder()

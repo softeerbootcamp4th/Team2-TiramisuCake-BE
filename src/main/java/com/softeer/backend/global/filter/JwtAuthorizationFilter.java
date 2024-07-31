@@ -29,6 +29,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throw new JwtAuthorizationException(ErrorStatus._ACCESS_DENIED);
     }
 
+    // Admin 권한이 필요한 uri인지를 체크하는 메서드
     private boolean isAdminRequiredUri(String uri) {
         return PatternMatchUtils.simpleMatch(uri, "/admin/*");
     }

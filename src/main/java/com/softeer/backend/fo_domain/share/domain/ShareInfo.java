@@ -11,9 +11,6 @@ import lombok.Getter;
 @Table(name = "share_info")
 public class ShareInfo {
     @Id
-    @Column(name = "share_info_id")
-    private Integer shareInfoId;
-
     @Column(name = "user_id")
     private Integer userId;
 

@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ShareUrlResponseDto {
-    private String shareUrl;
+    private String sharedUrl;
 
     @Builder
     public ShareUrlResponseDto(String shareUrl) {
-        this.shareUrl = shareUrl;
+        this.sharedUrl = shareUrl;
     }
 }

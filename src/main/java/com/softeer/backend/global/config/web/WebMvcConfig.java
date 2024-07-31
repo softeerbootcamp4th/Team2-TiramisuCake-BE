@@ -1,17 +1,22 @@
 package com.softeer.backend.global.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softeer.backend.global.annotation.argumentresolver.AuthInfoArgumentResolver;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.filter.ExceptionHandlingFilter;
 import com.softeer.backend.global.filter.JwtAuthenticationFilter;
+import com.softeer.backend.global.filter.JwtAuthorizationFilter;
 import com.softeer.backend.global.util.JwtUtil;
 import com.softeer.backend.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * WebMvc 설정 클래스
@@ -24,6 +29,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final JwtProperties jwtProperties;
+
+    /**
+     * AuthInfo 애노테이션에 대한 Argument Resolver 등록
+     *
+     * @param resolvers
+     */
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new AuthInfoArgumentResolver());
+    }
 
     /**
      * CORS 설정 메서드
@@ -63,6 +77,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil, redisUtil, jwtProperties));
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(2);
+        return registrationBean;
+    }
+
+    /**
+     * JwtAuthorizationFilter를 필터에 등록
+     */
+    @Bean
+    public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter() {
+        FilterRegistrationBean<JwtAuthorizationFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new JwtAuthorizationFilter());
+        registrationBean.addUrlPatterns("/admin/*");
+        registrationBean.setOrder(3);
         return registrationBean;
     }
 

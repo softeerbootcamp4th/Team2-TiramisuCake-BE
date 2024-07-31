@@ -2,6 +2,7 @@ package com.softeer.backend.fo_domain.share.controller;
 
 import com.softeer.backend.fo_domain.share.dto.ShareUrlResponseDto;
 import com.softeer.backend.fo_domain.share.service.ShareService;
+import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ public class ShareController {
     private final ShareService shareService;
 
     @GetMapping("/share-shorten-url")
-    public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(Integer userId) {
+    public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(@AuthInfo Integer userId) {
         return shareService.getShortenShareUrl(userId);
     }
 }

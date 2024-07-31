@@ -24,8 +24,4 @@ public class ShareService {
             return ResponseDto.onFailure(ErrorStatus._BAD_REQUEST);
         }
     }
-
-    private String generateShortenUrl(Integer userId) {
-        return "";
-    }
 }

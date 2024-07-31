@@ -28,8 +28,8 @@ public class SharedUrlUtil {
         return hexString.toString();
     }
 
-    public String generateShortURL(String originalURL) throws NoSuchAlgorithmException {
-        String hash = generateSHA256Hash(originalURL);
+    public String generateShortURL(Integer userId) throws NoSuchAlgorithmException {
+        String hash = generateSHA256Hash(userId.toString());
         // 해시 값의 처음 16자를 사용하여 단축 URL 생성
         return hash.substring(0, 16);
     }

@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * User 또는 Admin 유저의 인증 정보
+ * JWT의 claim안에 있는 정보
  */
 @Getter
 @Builder
-public class AuthInfo {
+public class JwtClaimsDto {
     // User 또는 Admin 테이블의 primary key
     private int id;
     // 유저의 권한 정보

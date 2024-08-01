@@ -17,20 +17,16 @@ public class ShareInfo {
     @Column(name = "user_id")
     private int userId;
 
-    @Column(name = "shared_url")
-    private String sharedUrl;
-
     @Column(name = "invited_num")
     private Integer invitedNum;
 
-    @Column(name = "draw_remain_cnt")
-    private Integer drawRemainCnt;
+    @Column(name = "remain_draw_count")
+    private Integer remainDrawCount;
 
     @Builder
-    public ShareInfo(Integer userId, String sharedUrl, Integer invitedNum, Integer drawRemainCnt) {
+    public ShareInfo(Integer userId, Integer invitedNum, Integer remainDrawCount) {
         this.userId = userId;
-        this.sharedUrl = sharedUrl;
         this.invitedNum = invitedNum;
-        this.drawRemainCnt = drawRemainCnt;
+        this.remainDrawCount = remainDrawCount;
     }
 }

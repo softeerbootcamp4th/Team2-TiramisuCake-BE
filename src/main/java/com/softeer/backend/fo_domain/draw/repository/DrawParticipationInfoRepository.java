@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface DrawParticipationInfoRepository extends JpaRepository<DrawParticipationInfo, Integer> {
-    Optional<Integer> findDrawParticipationCountByUserId(Integer userId);
+    Optional<DrawParticipationInfo> findDrawParticipationInfoByUserId(Integer userId);
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShareService {
+public class ShareInfoService {
     private final ShareInfoRepository shareInfoRepository;
 
     public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(Integer userId) {

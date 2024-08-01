@@ -39,7 +39,10 @@ public enum ErrorStatus implements BaseErrorCode {
     // User & Auth Error
     _ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 요청에 대한 권한이 없습니다."),
     _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST", "인증 코드가 존재하지 않습니다."),
-    _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH", "인증 코드가 일치하지 않습니다.");
+    _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH", "인증 코드가 일치하지 않습니다."),
+
+    // Share Error
+    _SHARE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_URL_NOT_FOUND", "공유 url이 없습니다.");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

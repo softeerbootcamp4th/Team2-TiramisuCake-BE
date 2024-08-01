@@ -8,8 +8,6 @@ import com.softeer.backend.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class ShareInfoService {

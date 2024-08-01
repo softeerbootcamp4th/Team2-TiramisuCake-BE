@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ShareInfo {
     @Id
     @Column(name = "user_id")
-    private Integer userId;
+    private int userId;
 
     @Column(name = "shared_url")
     private String sharedUrl;

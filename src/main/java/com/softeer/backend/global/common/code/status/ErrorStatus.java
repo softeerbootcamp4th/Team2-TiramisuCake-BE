@@ -42,7 +42,11 @@ public enum ErrorStatus implements BaseErrorCode {
     _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH", "인증 코드가 일치하지 않습니다."),
 
     // Share Error
-    _SHARE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_URL_NOT_FOUND", "공유 url이 없습니다.");
+    _SHARE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_URL_NOT_FOUND", "공유 url이 없습니다."),
+    _SHARE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_INFO_NOT_FOUND", "공유 정보가 없습니다."),
+
+    // Draw Error
+    _DRAW_PARTICIPATION_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_PARTICIPATION_INFO_NOT_FOUND", "참여 정보가 없습니다.");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;
@@ -74,7 +78,7 @@ public enum ErrorStatus implements BaseErrorCode {
      * @return HttpStatus 객체
      */
     @Override
-    public HttpStatus getHttpStatus(){
+    public HttpStatus getHttpStatus() {
         return httpStatus;
     }
 
@@ -84,7 +88,7 @@ public enum ErrorStatus implements BaseErrorCode {
      * @return 커스텀 코드값
      */
     @Override
-    public String getCode(){
+    public String getCode() {
         return code;
     }
 
@@ -94,7 +98,7 @@ public enum ErrorStatus implements BaseErrorCode {
      * @return 예외 메시지
      */
     @Override
-    public String getErrorMsg(){
+    public String getErrorMsg() {
         return message;
     }
 }

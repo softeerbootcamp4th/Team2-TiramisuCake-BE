@@ -20,7 +20,7 @@ public class DrawService {
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
 
-    public ResponseDto<DrawResponseDto> getDrawPage(Integer userId) {
+    public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
                 .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));

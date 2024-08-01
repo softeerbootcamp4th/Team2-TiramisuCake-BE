@@ -14,7 +14,7 @@ public class DrawController {
     private final DrawService drawService;
 
     @GetMapping("/event/draw")
-    public ResponseDto<DrawResponseDto> getDrawPage(@AuthInfo Integer userId) {
-        return drawService.getDrawPage(userId);
+    public ResponseDto<DrawResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
+        return drawService.getDrawMainPageInfo(userId);
     }
 }

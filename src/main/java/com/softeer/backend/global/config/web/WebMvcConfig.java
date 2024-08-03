@@ -7,7 +7,7 @@ import com.softeer.backend.global.filter.ExceptionHandlingFilter;
 import com.softeer.backend.global.filter.JwtAuthenticationFilter;
 import com.softeer.backend.global.filter.JwtAuthorizationFilter;
 import com.softeer.backend.global.util.JwtUtil;
-import com.softeer.backend.global.util.RedisUtil;
+import com.softeer.backend.global.util.RefreshTokenRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final ObjectMapper objectMapper;
     private final JwtUtil jwtUtil;
-    private final RedisUtil redisUtil;
+    private final RefreshTokenRedisUtil refreshTokenRedisUtil;
     private final JwtProperties jwtProperties;
 
     /**
@@ -74,7 +74,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter() {
         FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil, redisUtil, jwtProperties));
+        registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil, refreshTokenRedisUtil, jwtProperties));
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(2);
         return registrationBean;

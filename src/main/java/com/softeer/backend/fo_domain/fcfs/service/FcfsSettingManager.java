@@ -49,6 +49,7 @@ public class FcfsSettingManager {
     @PostConstruct
     public void init(){
         loadInitialData();
+        scheduleTask();
     }
 
     /**

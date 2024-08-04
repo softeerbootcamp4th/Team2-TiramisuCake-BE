@@ -10,7 +10,7 @@ import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.LockPrefix;
+import com.softeer.backend.global.common.constant.RedisLockPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class FcfsService {
      */
     @EventLock(key = "FCFS_#{#round}")
     private FcfsResponse saveFcfsWinners(int userId, int round) {
-        int fcfsWinnerCount = eventLockRedisUtil.getData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+        int fcfsWinnerCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
 
         if(fcfsWinnerCount < fcfsSettingManager.getWinnerNum()){
             User user = userRepository.findById(userId)
@@ -61,7 +61,7 @@ public class FcfsService {
                     .build();
             fcfsRepository.save(fcfs);
 
-            eventLockRedisUtil.incrementData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+            eventLockRedisUtil.incrementData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
             if(fcfsWinnerCount + 1 == fcfsSettingManager.getWinnerNum()){
                 fcfsSettingManager.setFcfsClosed(true);
             }
@@ -74,7 +74,7 @@ public class FcfsService {
     }
 
     private FcfsFailResponse countFcfsLosers(int round){
-        eventLockRedisUtil.incrementData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+        eventLockRedisUtil.incrementData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
 
         return new FcfsFailResponse();
     }

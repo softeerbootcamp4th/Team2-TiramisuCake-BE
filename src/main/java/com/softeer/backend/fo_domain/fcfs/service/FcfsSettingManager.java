@@ -4,7 +4,7 @@ import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipatio
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
-import com.softeer.backend.global.common.constant.LockPrefix;
+import com.softeer.backend.global.common.constant.RedisLockPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
@@ -66,7 +65,7 @@ public class FcfsSettingManager {
             this.winnerNum = fcfsSetting.getWinnerNum();
             this.isFcfsClosed = false;
 
-            eventLockRedisUtil.setData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
+            eventLockRedisUtil.setData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
         }
         catch(Exception e){
             log.error("FcfsSetting not found by round {}", round);
@@ -98,12 +97,12 @@ public class FcfsSettingManager {
 
                 log.info("FcfsSetting updated to round {}", round);
 
-                int fcfsCount = eventLockRedisUtil.getData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+                int fcfsCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
                 EventParticipation eventParticipation = eventParticipationRepository.findSingleEventParticipation();
                 eventParticipation.addFcfsParticipantCount(fcfsCount);
 
-                eventLockRedisUtil.deleteData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round-1));
-                eventLockRedisUtil.setData(LockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
+                eventLockRedisUtil.deleteData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round-1));
+                eventLockRedisUtil.setData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
 
             } catch (Exception e) {
                 log.info("Updating FcfsSetting is final");

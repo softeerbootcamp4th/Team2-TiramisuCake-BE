@@ -7,6 +7,7 @@ import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -104,6 +105,14 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleGlobalException(Exception e, WebRequest request) {
 
         return handleGlobalExceptionInternal(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(), request, e.getMessage());
+    }
+
+    /**
+     * DB 관련 예외 처리
+     */
+    @ExceptionHandler
+    public void handleDataAccessException(DataAccessException e) {
+        log.error("DataAccessException occurred: {}", e.getMessage(), e);
     }
 
     // GeneralException에 대한 client 응답 객체를 생성하는 메서드

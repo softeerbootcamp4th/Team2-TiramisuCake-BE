@@ -30,6 +30,10 @@ public class EventLockRedisUtil {
         getStringIntegerValueOperations().set(key, value);
     }
 
+    public void deleteData(String key){
+        redisTemplate.delete(key);
+    }
+
     private ValueOperations<String, Integer> getStringIntegerValueOperations() {
         return redisTemplate.opsForValue();
     }

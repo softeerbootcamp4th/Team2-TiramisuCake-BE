@@ -49,8 +49,9 @@ jobs:
 
       - name: Create application.yml
         run: |
-          mkdir -p ${{ secrets.APPLICATION_PATH }}
-          envsubst < src/main/resources/application-template.yml > ${{ secrets.APPLICATION_PATH }}/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" | envsubst > application.yml
+        env:
+          APPLICATION_TEMPLATE_YML: ${{ secrets.APPLICATION_YML }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

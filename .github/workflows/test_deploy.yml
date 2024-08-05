@@ -41,6 +41,17 @@ jobs:
         run: |
           mysql -h 127.0.0.1 -P 3307 -u ${{ secrets.DB_USERNAME }} -e "SHOW DATABASES;"
 
+      - name: Set environment variables
+        run: |
+          echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_ENV
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Create application.yml
+        run: |
+          mkdir -p ${{ secrets.APPLICATION_PATH }}
+          envsubst < src/main/resources/application-template.yml > ${{ secrets.APPLICATION_PATH }}/application.yml
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 

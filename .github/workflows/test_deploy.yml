@@ -21,6 +21,19 @@ jobs:
           java-version: '17'
           distribution: 'oracle'
 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create SSH Tunnel
+        run: |
+          ${{ secrets.TUNNEL_SCRIPT }}
+
+      - name: Run Database Tests
+        run: |
+          mysql -h 127.0.0.1 -u ${{ secrets.DB_USERNAME }} -p ${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 

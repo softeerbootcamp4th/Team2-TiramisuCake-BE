@@ -36,8 +36,10 @@ jobs:
           ${{ secrets.TUNNEL_SCRIPT }}
 
       - name: Run Database Tests
+        env:
+          MYSQL_PWD: ${{ secrets.DB_PASSWORD }}
         run: |
-          mysql -h 127.0.0.1:3307 -u ${{ secrets.DB_USERNAME }} -p ${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -h 127.0.0.1 -P 3307 -u ${{ secrets.DB_USERNAME }} -e "SHOW DATABASES;"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

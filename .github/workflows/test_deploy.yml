@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Database Tests
         run: |
-          mysql -h 127.0.0.1 -u ${{ secrets.DB_USERNAME }} -p ${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
+          mysql -h 127.0.0.1:3307 -u ${{ secrets.DB_USERNAME }} -p ${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

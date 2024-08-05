@@ -37,6 +37,7 @@ public enum ErrorStatus implements BaseErrorCode {
             "Refresh Token 이 일치하지 않습니다."),
 
     // User & Auth Error
+    _USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "유저가 존재하지 않습니다."),
     _ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 요청에 대한 권한이 없습니다."),
     _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST", "인증 코드가 존재하지 않습니다."),
     _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH", "인증 코드가 일치하지 않습니다."),

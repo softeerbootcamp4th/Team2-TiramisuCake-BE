@@ -8,7 +8,7 @@ import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.util.JwtUtil;
-import com.softeer.backend.global.util.RedisUtil;
+import com.softeer.backend.global.util.RefreshTokenRedisUtil;
 import com.softeer.backend.fo_domain.user.dto.UserTokenResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,8 +24,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Jwt 인증을 처리하는 필터 클래스
@@ -40,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     };
 
     private final JwtUtil jwtUtil;
-    private final RedisUtil redisUtil;
+    private final RefreshTokenRedisUtil refreshTokenRedisUtil;
     private final JwtProperties jwtProperties;
 
     @Override
@@ -116,7 +114,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void isRefreshTokenMatch(String refreshToken) {
         JwtClaimsDto jwtClaimsDto = jwtUtil.getJwtClaimsFromRefreshToken(refreshToken);
 
-        if (!refreshToken.equals(redisUtil.getData(redisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
+        if (!refreshToken.equals(refreshTokenRedisUtil.getData(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
             throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_EXIST);
         }
     }
@@ -128,10 +126,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      **/
     private String reIssueRefreshToken(JwtClaimsDto jwtClaimsDto) {
         // 기존 refresh token 삭제
-        redisUtil.deleteData(redisUtil.getRedisKeyForJwt(jwtClaimsDto));
+        refreshTokenRedisUtil.deleteData(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
         String reIssuedRefreshToken = jwtUtil.createRefreshToken(jwtClaimsDto);
         // refresh token 저장
-        redisUtil.setDataExpire(redisUtil.getRedisKeyForJwt(jwtClaimsDto), reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
+        refreshTokenRedisUtil.setDataExpire(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto), reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
         return reIssuedRefreshToken;
     }
 

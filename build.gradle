@@ -24,7 +24,6 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -37,14 +36,17 @@ dependencies {
 	// JWT 설정
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-	// JPA
+	// JPA 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// DB
+	// MySql 설정
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
-	//Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// spring aop 설정
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// redisson 설정
+	implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -23,7 +22,7 @@ import java.util.Optional;
 @Component
 public class JwtUtil {
     private final JwtProperties jwtProperties;
-    private final RefreshTokenRedisUtil refreshTokenRedisUtil;
+    private final StringRedisUtil stringRedisUtil;
 
     // HttpServletRequest 부터 Access Token 추출
     public Optional<String> extractAccessToken(HttpServletRequest request) {
@@ -89,7 +88,7 @@ public class JwtUtil {
 
     // 전화번호 로그인 및 admin 로그인 시 jwt 응답 생성 + redis refresh 저장
     public UserTokenResponse createServiceToken(JwtClaimsDto jwtClaimsDto) {
-        refreshTokenRedisUtil.deleteData(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
+        stringRedisUtil.deleteData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
         String accessToken = createAccessToken(jwtClaimsDto);
         String refreshToken = createRefreshToken(jwtClaimsDto);
 
@@ -101,7 +100,7 @@ public class JwtUtil {
                 .build();
 
         // redis refresh token 저장
-        refreshTokenRedisUtil.setDataExpire(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto),
+        stringRedisUtil.setDataExpire(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto),
                 userTokenResponse.getRefreshToken(), jwtProperties.getRefreshExpiration());
 
         return userTokenResponse;

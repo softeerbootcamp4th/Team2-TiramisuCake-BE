@@ -46,6 +46,10 @@ jobs:
         with:
           redis-version: 7
 
+      - name: Check Redis status
+        run: |
+          redis-cli -h 127.0.0.1 -p 6379 ping
+
       - name: Set environment variables
         run: |
           echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_ENV

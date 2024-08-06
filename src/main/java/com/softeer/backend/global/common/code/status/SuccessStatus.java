@@ -21,7 +21,10 @@ public enum SuccessStatus implements BaseCode {
 
     // 전화번호 인증
     _VERIFICATION_SEND(HttpStatus.OK, "VERIFICATION_SEND", "전화번호 인증 코드 전송 성공"),
-    _VERIFICATION_CONFIRM(HttpStatus.OK, "VERIFICATION_CONFIRM", "전화번호 인증 코드 검증 성공");
+    _VERIFICATION_CONFIRM(HttpStatus.OK, "VERIFICATION_CONFIRM", "전화번호 인증 코드 검증 성공"),
+
+    // 로그인
+    _LOGIN_SUCCESS(HttpStatus.OK, "LOGIN_SUCCESS", "로그인 성공");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

@@ -2,11 +2,11 @@ name: CI/CD test
 
 on:
   pull_request:
-    types: [closed]
+    branches: "develop"
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
     runs-on: ubuntu-latest
 
     permissions:

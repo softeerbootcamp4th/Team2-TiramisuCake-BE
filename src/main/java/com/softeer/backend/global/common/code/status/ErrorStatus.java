@@ -50,6 +50,7 @@ public enum ErrorStatus implements BaseErrorCode {
             "인증 코드 발급 횟수를 초과하였습니다. 나중에 다시 시도하세요."),
     _AUTH_CODE_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "_AUTH_CODE_NOT_VERIFIED", "인증되지 않은 상태에서 로그인 할 수 없습니다."),
 
+
     // Share Error
     _SHARE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_URL_NOT_FOUND", "공유 url이 없습니다."),
     _SHARE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_INFO_NOT_FOUND", "공유 정보가 없습니다."),

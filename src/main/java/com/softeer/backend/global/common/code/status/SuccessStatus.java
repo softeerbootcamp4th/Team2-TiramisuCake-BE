@@ -26,6 +26,7 @@ public enum SuccessStatus implements BaseCode {
     // 로그인
     _LOGIN_SUCCESS(HttpStatus.OK, "LOGIN_SUCCESS", "로그인 성공");
 
+
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;
 

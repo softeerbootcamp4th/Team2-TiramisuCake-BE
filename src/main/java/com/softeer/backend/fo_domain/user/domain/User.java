@@ -11,7 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "users")
+@Table(name = "users",
+        indexes = {
+        @Index(name = "idx_users_phone_number", columnList = "phoneNumber")
+        })
 public class User {
     @Id
     @Column(name = "user_id")
@@ -23,6 +26,9 @@ public class User {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "privacy_consent")
+    private boolean privacyConsent;
 
     @Column(name = "marketing_consent")
     private boolean marketingConsent;

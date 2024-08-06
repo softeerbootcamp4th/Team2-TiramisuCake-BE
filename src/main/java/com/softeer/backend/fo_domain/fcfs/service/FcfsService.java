@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -35,7 +36,7 @@ public class FcfsService {
      */
     public FcfsResponse handleFcfsEvent(int userId){
         if(fcfsSettingManager.isFcfsClosed())
-            return countFcfsLosers(fcfsSettingManager.getRound());
+            return countFcfsParticipant(fcfsSettingManager.getRound());
 
         return saveFcfsWinners(userId, fcfsSettingManager.getRound());
     }
@@ -46,11 +47,12 @@ public class FcfsService {
      *    만약, 참여자 수가 총 당첨자 수와 같아졌으면, fcfsSettingManager의 setFcfsClosed를 true로 변환한다.
      * 2. setFcfsClosed가 true로 바뀌게 전에 요청이 들어왔다면, 선착순 실패 응답을 생성하여 반환한다.
      */
-    @EventLock(key = "FCFS_#{#round}")
+    @EventLock(key = "FCFS_WINNER_#{#round}")
     private FcfsResponse saveFcfsWinners(int userId, int round) {
-        int fcfsWinnerCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+        Set<Integer> participantIds= eventLockRedisUtil.getAllParticipantIds(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
 
-        if(fcfsWinnerCount < fcfsSettingManager.getWinnerNum()){
+        if(participantIds.size() < fcfsSettingManager.getWinnerNum() &&
+                !eventLockRedisUtil.isParticipantExists(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId)){
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new UserException(ErrorStatus._USER_NOT_FOUND));
 
@@ -61,22 +63,21 @@ public class FcfsService {
                     .build();
             fcfsRepository.save(fcfs);
 
-            eventLockRedisUtil.incrementData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
-            if(fcfsWinnerCount + 1 == fcfsSettingManager.getWinnerNum()){
+            eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+            if(participantIds.size() + 1 == fcfsSettingManager.getWinnerNum()){
                 fcfsSettingManager.setFcfsClosed(true);
             }
 
-            return new FcfsSuccessResponse();
+            return new FcfsSuccessResponse(1);
         }
-        else{
-            return new FcfsFailResponse();
-        }
+
+        return new FcfsFailResponse(1);
     }
 
-    private FcfsFailResponse countFcfsLosers(int round){
-        eventLockRedisUtil.incrementData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+    private FcfsFailResponse countFcfsParticipant(int round){
+        eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
 
-        return new FcfsFailResponse();
+        return new FcfsFailResponse(1);
     }
 
 }

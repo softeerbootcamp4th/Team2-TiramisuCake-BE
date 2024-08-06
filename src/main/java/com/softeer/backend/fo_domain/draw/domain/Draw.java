@@ -1,9 +1,8 @@
 package com.softeer.backend.fo_domain.draw.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.softeer.backend.fo_domain.user.domain.User;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,26 +13,21 @@ import java.sql.Date;
 @Entity
 @NoArgsConstructor
 @Table(name = "draw")
+@AllArgsConstructor
+@Builder
 public class Draw {
     @Id
     @Column(name = "draw_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer drawId;
 
-    @Id
-    @Column(name = "user_id")
-    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "rank")
-    private Integer rank;
+    @Column(name = "drawRank")
+    private Integer drawRank;
 
     @Column(name = "winning_date")
     private Date winningDate;
-
-    @Builder
-    public Draw(Integer drawId, Integer userId, Integer rank, Date winningDate) {
-        this.drawId = drawId;
-        this.userId = userId;
-        this.rank = rank;
-        this.winningDate = winningDate;
-    }
 }

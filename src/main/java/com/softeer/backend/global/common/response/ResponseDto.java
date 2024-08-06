@@ -33,6 +33,9 @@ public class ResponseDto<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T result;
 
+    public static <T> ResponseDto<T> onSuccess(BaseCode code) {
+        return new ResponseDto<>(true, code.getCode(), code.getMsg(), null);
+    }
 
     /**
      * client 요청 처리 성공 시의 응답값을 생성하는 메서드

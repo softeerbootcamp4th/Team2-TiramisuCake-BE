@@ -25,8 +25,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if(jwtClaimsDto == null || jwtClaimsDto.getRoleType()!= RoleType.ROLE_ADMIN)
             throw new JwtAuthorizationException(ErrorStatus._ACCESS_DENIED);
+
+        filterChain.doFilter(request, response);
     }
-
-
 
 }

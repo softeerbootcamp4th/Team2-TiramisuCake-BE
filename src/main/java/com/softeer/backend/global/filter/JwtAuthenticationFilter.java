@@ -8,7 +8,7 @@ import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.util.JwtUtil;
-import com.softeer.backend.global.util.RefreshTokenRedisUtil;
+import com.softeer.backend.global.util.StringRedisUtil;
 import com.softeer.backend.fo_domain.user.dto.UserTokenResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,19 +34,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 인증검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
-            "/swagger-ui/**", "/swagger", "/error/**"
+            "/swagger-ui/**", "/swagger", "/error/**",
+            "/verification/send", "/verification/confirm"
     };
 
     private final JwtUtil jwtUtil;
-    private final RefreshTokenRedisUtil refreshTokenRedisUtil;
+    private final StringRedisUtil stringRedisUtil;
     private final JwtProperties jwtProperties;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
-        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI()))
+        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())){
             filterChain.doFilter(request, response);
+            return;
+        }
+
 
         // Case 01) Access Token 재발급인 경우(Authorization Header Access Token 유효성 x)
         if (request.getRequestURI().contains("/reissue")) {
@@ -114,7 +118,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void isRefreshTokenMatch(String refreshToken) {
         JwtClaimsDto jwtClaimsDto = jwtUtil.getJwtClaimsFromRefreshToken(refreshToken);
 
-        if (!refreshToken.equals(refreshTokenRedisUtil.getData(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
+        if (!refreshToken.equals(stringRedisUtil.getData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
             throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_EXIST);
         }
     }
@@ -126,10 +130,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      **/
     private String reIssueRefreshToken(JwtClaimsDto jwtClaimsDto) {
         // 기존 refresh token 삭제
-        refreshTokenRedisUtil.deleteData(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
+        stringRedisUtil.deleteData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
         String reIssuedRefreshToken = jwtUtil.createRefreshToken(jwtClaimsDto);
         // refresh token 저장
-        refreshTokenRedisUtil.setDataExpire(refreshTokenRedisUtil.getRedisKeyForJwt(jwtClaimsDto), reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
+        stringRedisUtil.setDataExpire(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto), reIssuedRefreshToken, jwtProperties.getRefreshExpiration());
         return reIssuedRefreshToken;
     }
 

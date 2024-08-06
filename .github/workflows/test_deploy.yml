@@ -71,11 +71,15 @@ jobs:
           echo "DB_USERNAME=${DB_USERNAME}"
           echo "DB_PASSWORD=${DB_PASSWORD}"
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Create src/main/resources directory
+        run: mkdir -p src/main/resources
+
       - name: Create application.yml
         run: |
-          echo "${{ secrets.APPLICATION_YML }}" | envsubst > application.yml
-        env:
-          APPLICATION_TEMPLATE_YML: ${{ secrets.APPLICATION_YML }}
+          echo "${{ secrets.APPLICATION_YML }}" | envsubst > src/main/resources/application.yml
 
       - name: Display application.yml content
         run: |
@@ -84,9 +88,6 @@ jobs:
       - name: Display application.yml file path
         run: |
           ls -l application.yml
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build

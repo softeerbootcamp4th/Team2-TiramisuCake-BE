@@ -63,6 +63,14 @@ jobs:
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> $GITHUB_ENV
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
 
+      - name: Check environment variables
+        run: |
+          echo "REDIS_HOST=${REDIS_HOST}"
+          echo "REDIS_PORT=${REDIS_PORT}"
+          echo "DB_URL=${DB_URL}"
+          echo "DB_USERNAME=${DB_USERNAME}"
+          echo "DB_PASSWORD=${DB_PASSWORD}"
+
       - name: Create application.yml
         run: |
           echo "${{ secrets.APPLICATION_YML }}" | envsubst > application.yml

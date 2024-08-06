@@ -67,6 +67,14 @@ jobs:
         env:
           APPLICATION_TEMPLATE_YML: ${{ secrets.APPLICATION_YML }}
 
+      - name: Display application.yml content
+        run: |
+          cat application.yml
+
+      - name: Display application.yml file path
+        run: |
+          ls -l application.yml
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 

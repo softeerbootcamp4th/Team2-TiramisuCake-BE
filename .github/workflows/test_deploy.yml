@@ -100,3 +100,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ARN }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.AWS_S3_BUCKET }}/cicd/$GITHUB_SHA.zip

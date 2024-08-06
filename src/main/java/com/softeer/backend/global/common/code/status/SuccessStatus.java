@@ -17,7 +17,11 @@ public enum SuccessStatus implements BaseCode {
 
     // 선착순
     _FCFS_SUCCESS(HttpStatus.OK, "FCFS_SUCCESS", "선착순 당첨 성공 응답"),
-    _FCFS_FAIL(HttpStatus.OK, "FCFS_FAIL", "선착순 당첨 실패 응답");
+    _FCFS_FAIL(HttpStatus.OK, "FCFS_FAIL", "선착순 당첨 실패 응답"),
+
+    // 전화번호 인증
+    _VERIFICATION_SEND(HttpStatus.OK, "VERIFICATION_SEND", "전화번호 인증 코드 전송 성공"),
+    _VERIFICATION_CONFIRM(HttpStatus.OK, "VERIFICATION_CONFIRM", "전화번호 인증 코드 검증 성공");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

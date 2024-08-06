@@ -66,7 +66,6 @@ public class FcfsSettingManager {
             this.winnerNum = fcfsSetting.getWinnerNum();
             this.isFcfsClosed = false;
 
-            eventLockRedisUtil.setData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
         }
         catch(Exception e){
             log.error("FcfsSetting not found by round {}", round);
@@ -98,12 +97,12 @@ public class FcfsSettingManager {
 
                 log.info("FcfsSetting updated to round {}", round);
 
-                int fcfsCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+                int participantCount = eventLockRedisUtil.getParticipantCount(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
                 EventParticipation eventParticipation = eventParticipationRepository.findSingleEventParticipation();
-                eventParticipation.addFcfsParticipantCount(fcfsCount);
+                eventParticipation.addFcfsParticipantCount(participantCount);
 
-                eventLockRedisUtil.deleteData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round-1));
-                eventLockRedisUtil.setData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, 0);
+                eventLockRedisUtil.deleteParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+                eventLockRedisUtil.deleteParticipantIds(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round-1));
 
             } catch (Exception e) {
                 log.info("Updating FcfsSetting is final");

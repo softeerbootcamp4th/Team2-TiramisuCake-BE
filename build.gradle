@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -39,6 +40,7 @@ dependencies {
 	// JPA 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+
 	// MySql 설정
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -48,9 +50,15 @@ dependencies {
 	// redisson 설정
 	implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
 
+	// cool sms 설정
+	implementation 'net.nurigo:sdk:4.3.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
+
+	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

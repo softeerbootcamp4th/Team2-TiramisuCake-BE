@@ -142,7 +142,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         ResponseDto<Object> body = null;
 
         if(redissonKeyName.contains("FCFS"))
-            body = ResponseDto.onSuccess(SuccessStatus._FCFS_SUCCESS, new FcfsFailResponse());
+            body = ResponseDto.onSuccess(SuccessStatus._FCFS_FAIL, new FcfsFailResponse(1));
 
         //TODO
         // DRAW 관련 예외일 경우, body 구성하는 코드 필요

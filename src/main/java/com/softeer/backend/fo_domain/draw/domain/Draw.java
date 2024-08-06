@@ -25,8 +25,8 @@ public class Draw {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "drawRank")
-    private Integer drawRank;
+    @Column(name = "draw_rank")
+    private Integer rank;
 
     @Column(name = "winning_date")
     private Date winningDate;

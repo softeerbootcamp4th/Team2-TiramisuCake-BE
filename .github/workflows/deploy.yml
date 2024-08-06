@@ -2,12 +2,11 @@ name: CI/CD test
 
 on:
   pull_request:
-    branches:
-      - test
+    branches: "develop"
 
 jobs:
   build:
-    environment: aws
+    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,6 +20,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'oracle'
+
+      - name: echo test
+        run: |
+          echo ${{ secrets.EC2_PUBLIC_IP }}
+          echo ${{ secrets.DB_USERNAME }}
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0

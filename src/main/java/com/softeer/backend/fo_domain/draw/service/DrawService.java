@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DrawService {
-    private final DrawRepository drawRepository;
+    // private final DrawRepository drawRepository;
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
 

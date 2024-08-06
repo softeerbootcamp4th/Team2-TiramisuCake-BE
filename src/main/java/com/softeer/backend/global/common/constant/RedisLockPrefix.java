@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum RedisLockPrefix {
-    FCFS_LOCK_PREFIX("LOCK:FCFS_"),
-    DRAW_LOCK_PREFIX("LOCK:DRAW_");
+    FCFS_LOCK_PREFIX("LOCK:FCFS_WINNER"),
+    DRAW_LOCK_PREFIX("LOCK:DRAW_WINNER"),
+    FCFS_PARTICIPANT_COUNT_PREFIX("FCFS_PARTICIPANT_COUNT_");
 
     private final String prefix;
 

@@ -1,13 +1,13 @@
 name: CI/CD test
 
 on:
-  push:
-    branches:
-      - test
+  pull_request_target:
+    types: [closed]
 
 jobs:
   build:
     environment: aws
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
     runs-on: ubuntu-latest
 
     permissions:

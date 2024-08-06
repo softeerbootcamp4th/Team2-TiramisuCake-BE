@@ -24,6 +24,9 @@ public enum ErrorStatus implements BaseErrorCode {
     _METHOD_ARGUMENT_ERROR(HttpStatus.BAD_REQUEST, "METHOD_ARGUMENT_ERROR",
             "올바르지 않은 클라이언트 요청값입니다."),
 
+    // Validation Error
+    _VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "요청 필드에 대한 검증 예외가 발생했습니다."),
+
     // JWT Error
     _JWT_ACCESS_TOKEN_IS_NOT_EXIST(HttpStatus.UNAUTHORIZED,
             "JWT_ACCESS_TOKEN_IS_NOT_EXIST", "Authorization 헤더에 Access Token 정보가 존재하지 않습니다."),
@@ -39,8 +42,12 @@ public enum ErrorStatus implements BaseErrorCode {
     // User & Auth Error
     _USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "유저가 존재하지 않습니다."),
     _ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 요청에 대한 권한이 없습니다."),
-    _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST", "인증 코드가 존재하지 않습니다."),
+    _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST", "인증 코드가 존재하지 않습니다. 인증 코드 발급 API를 호출하세요."),
     _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH", "인증 코드가 일치하지 않습니다."),
+    _AUTH_CODE_ATTEMPTS_EXCEEDED(HttpStatus.BAD_REQUEST, "AUTH_CODE_ATTEMPTS_EXCEEDED",
+            "인증 코드의 인증 횟수를 초과하였습니다. 인증 코드 발급 API를 호출하세요."),
+    _AUTH_CODE_ISSUE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "AUTH_CODE_ISSUE_LIMIT_EXCEEDED",
+            "인증 코드 발급 횟수를 초과하였습니다. 나중에 다시 시도하세요."),
 
     // Share Error
     _SHARE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_URL_NOT_FOUND", "공유 url이 없습니다."),

@@ -17,12 +17,15 @@ public class EventParticipation {
     private Integer id;
 
     @Column(name = "total_visitors_count", nullable = false)
+    @Builder.Default
     private int totalVisitorsCount = 0;
 
     @Column(name = "fcfs_participant_count", nullable = false)
+    @Builder.Default
     private int fcfsParticipantCount = 0;
 
     @Column(name = "draw_participant_count", nullable = false)
+    @Builder.Default
     private int drawParticipantCount = 0;
 
     public void addTotalVisitorsCount(int totalVisitorsCount) {

@@ -46,6 +46,11 @@ jobs:
         with:
           redis-version: 6
 
+      - name: Install Redis CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y redis-tools
+
       - name: Check Redis status
         run: |
           redis-cli -h 127.0.0.1 -p 6379 ping

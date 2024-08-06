@@ -6,7 +6,8 @@ on:
 
 jobs:
   build:
-    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    environment: aws
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'test'
     runs-on: ubuntu-latest
 
     permissions:

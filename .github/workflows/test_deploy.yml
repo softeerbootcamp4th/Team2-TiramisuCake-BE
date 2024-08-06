@@ -98,5 +98,5 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.ARN }}
+          role-to-assume: ${{ secrets.AWS_ARN }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}

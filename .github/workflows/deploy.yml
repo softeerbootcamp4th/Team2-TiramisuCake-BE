@@ -1,7 +1,7 @@
 name: CI/CD test
 
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
 
 jobs:
@@ -21,7 +21,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'oracle'
-
+          
+      - name: echo test
+        run: |
+          echo "EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}"
+          echo "DB_USERNAME: ${{ secrets.DB_USERNAME }}"
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:

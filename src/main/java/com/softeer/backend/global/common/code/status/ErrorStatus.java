@@ -55,7 +55,8 @@ public enum ErrorStatus implements BaseErrorCode {
     _SHARE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARE_INFO_NOT_FOUND", "공유 정보가 없습니다."),
 
     // Draw Error
-    _DRAW_PARTICIPATION_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_PARTICIPATION_INFO_NOT_FOUND", "참여 정보가 없습니다.");
+    _DRAW_PARTICIPATION_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_PARTICIPATION_INFO_NOT_FOUND", "참여 정보가 없습니다."),
+    _DRAW_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_SETTING_NOT_FOUND", "추첨 세팅 정보가 없습니다.");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

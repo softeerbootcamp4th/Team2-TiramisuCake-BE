@@ -22,7 +22,6 @@ import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
 import java.util.Set;
 
 @Service

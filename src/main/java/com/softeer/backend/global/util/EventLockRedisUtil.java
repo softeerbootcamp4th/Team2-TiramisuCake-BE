@@ -16,7 +16,7 @@ public class EventLockRedisUtil {
     private final RedisTemplate<String, Integer> integerRedisTemplate;
 
     // key 에 해당하는 데이터 얻어오는 메서드
-    public Integer getParticipantCount(String key) {
+    public Integer getData(String key) {
         return getStringIntegerValueOperations().get(key);
     }
 
@@ -27,7 +27,7 @@ public class EventLockRedisUtil {
     }
 
     // key - value 데이터 설정하는 메서드
-    public void setParticipantCount(String key, int value) {
+    public void setData(String key, int value) {
         getStringIntegerValueOperations().set(key, value);
     }
 

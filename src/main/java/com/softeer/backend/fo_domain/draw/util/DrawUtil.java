@@ -2,13 +2,16 @@ package com.softeer.backend.fo_domain.draw.util;
 
 import com.softeer.backend.fo_domain.draw.dto.LoseModal;
 import com.softeer.backend.fo_domain.draw.dto.WinModal;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class DrawUtil {
+    @Getter
     private boolean isDrawWin = false;
+    @Getter
     private int ranking = 0;
     private final int first;
     private final int second;
@@ -43,10 +46,6 @@ public class DrawUtil {
             ranking = 3;
             directionForWinner = randomNum % 4;
         }
-    }
-
-    public boolean isDrawWin() {
-        return this.isDrawWin;
     }
 
     /**

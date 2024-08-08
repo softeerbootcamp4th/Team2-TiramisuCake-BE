@@ -59,7 +59,6 @@ public class FcfsService {
             Fcfs fcfs = Fcfs.builder()
                     .user(user)
                     .round(round)
-                    .winningDate(LocalDateTime.now())
                     .build();
             fcfsRepository.save(fcfs);
 

@@ -30,7 +30,7 @@ public class LoginService {
     public UserTokenResponse handleLogin(LoginRequest loginRequest) {
 
         // 인증번호가 인증 되지 않은 경우, 예외 발생
-        if(!loginRequest.isCodeVerified())
+        if(!loginRequest.getHasCodeVerified())
             throw new UserException(ErrorStatus._AUTH_CODE_NOT_VERIFIED);
 
         int userId;
@@ -41,8 +41,8 @@ public class LoginService {
             User user = User.builder()
                     .name(loginRequest.getName())
                     .phoneNumber(loginRequest.getPhoneNumber())
-                    .privacyConsent(loginRequest.isPrivacyConsent())
-                    .marketingConsent(loginRequest.isMarketingConsent())
+                    .privacyConsent(loginRequest.getPrivacyConsent())
+                    .marketingConsent(loginRequest.getMarketingConsent())
                     .build();
 
             User registeredUser = userRepository.save(user);

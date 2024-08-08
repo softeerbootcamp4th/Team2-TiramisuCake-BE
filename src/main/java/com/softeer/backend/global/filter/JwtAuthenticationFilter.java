@@ -35,7 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 인증검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
             "/swagger-ui/**", "/swagger", "/error/**",
-            "/verification/send", "/verification/confirm"
+            "/verification/send", "/verification/confirm",
+            "/login"
+    };
+
+    // Access Token이 header에 있으면 인증하고 없으면 인증하지 않는 url 설정
+    private final String[] optionalAuthUrls = {
+            "/comment"
     };
 
     private final JwtUtil jwtUtil;
@@ -47,6 +53,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
         if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // optionalAuthUrls에 등록된 url 중, access token이 header에 없으면 인증 x
+        if(isUriInOptionalAuthList(request.getRequestURI()) &&
+                jwtUtil.extractAccessToken(request).isEmpty()){
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -76,6 +90,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isUriInWhiteList(String url) {
         return PatternMatchUtils.simpleMatch(whiteListUrls, url);
+    }
+
+    private boolean isUriInOptionalAuthList(String url) {
+        return PatternMatchUtils.simpleMatch(optionalAuthUrls, url);
     }
 
     private void reissueAccessTokenAndRefreshToken(HttpServletResponse response,
@@ -178,4 +196,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         request.setAttribute("jwtClaims", jwtClaimsDto);
     }
+
 }

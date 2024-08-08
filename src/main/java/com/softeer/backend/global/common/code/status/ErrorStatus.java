@@ -56,7 +56,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Draw Error
     _DRAW_PARTICIPATION_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_PARTICIPATION_INFO_NOT_FOUND", "참여 정보가 없습니다."),
-    _DRAW_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "DRAW_SETTING_NOT_FOUND", "추첨 세팅 정보가 없습니다.");
+
+    // Comment Error
+    _COMMENT_NUM_INVALID(HttpStatus.BAD_REQUEST, "COMMENT_NUM_INVALID", "기대평 순서값이 유효하지 않습니다.(1~5)");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

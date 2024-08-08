@@ -22,6 +22,10 @@ public class DrawUtil {
         setRanking();
     }
 
+    /**
+     * 등수 지정
+     * 만약 1, 2, 3등 중 하나에 당첨되었다면 등수와 이미지 방향이 결정됨.
+     */
     private void setRanking() {
         Random random = new Random();
         int randomNum = random.nextInt(10000) + 1; // 랜덤 수
@@ -45,18 +49,12 @@ public class DrawUtil {
         return this.isDrawWin;
     }
 
-
+    /**
+     *
+     * @return 당첨자를 위한 방향 이미지 List 반환
+     */
     public List<String> generateWinImages() {
-        String directionImage;
-        if (directionForWinner == 0) {
-            directionImage = "up";
-        } else if (directionForWinner == 1) {
-            directionImage = "right";
-        } else if (directionForWinner == 2) {
-            directionImage = "down";
-        } else {
-            directionImage = "left";
-        }
+        String directionImage = getImageUrl(directionForWinner);
 
         ArrayList<String> images = new ArrayList<>(3);
         images.add(directionImage);
@@ -65,6 +63,10 @@ public class DrawUtil {
         return images;
     }
 
+    /**
+     *
+     * @return 낙첨자를 위한 랜덤 방향 이미지 List 반환
+     */
     public List<String> generateLoseImages() {
         ArrayList<String> images = new ArrayList<>(3);
         images.add("left");
@@ -73,6 +75,29 @@ public class DrawUtil {
         return images;
     }
 
+    /**
+     *
+     * @param direction 방향을 나타냄. 0, 1, 2, 3이 각각 위, 오른쪽, 밑, 왼쪽
+     * @return 방향에 따른 이미지 url을 반환
+     */
+    private String getImageUrl(int direction) {
+        String directionImage;
+        if (direction == 0) {
+            directionImage = "up";
+        } else if (direction == 1) {
+            directionImage = "right";
+        } else if (direction == 2) {
+            directionImage = "down";
+        } else {
+            directionImage = "left";
+        }
+        return directionImage;
+    }
+
+    /**
+     *
+     * @return 등수에 따른 WinModal을 반환
+     */
     public WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
@@ -83,6 +108,10 @@ public class DrawUtil {
         }
     }
 
+    /**
+     *
+     * @return 1등 WinModal 반환
+     */
     private WinModal generateFirstWinModal() {
         return WinModal.builder()
                 .title("축하합니다!")
@@ -92,6 +121,10 @@ public class DrawUtil {
                 .build();
     }
 
+    /**
+     *
+     * @return 2등 WinModal 반환
+     */
     private WinModal generateSecondWinModal() {
         return WinModal.builder()
                 .title("축하합니다!")
@@ -101,6 +134,10 @@ public class DrawUtil {
                 .build();
     }
 
+    /**
+     *
+     * @return 3등 WinModal 반환
+     */
     private WinModal generateThirdWinModal() {
         return WinModal.builder()
                 .title("축하합니다!")
@@ -110,6 +147,11 @@ public class DrawUtil {
                 .build();
     }
 
+    /**
+     *
+     * @param shareUrl 공유 url
+     * @return LoseModal 반환
+     */
     public LoseModal generateLoseModal(String shareUrl) {
         return LoseModal.builder()
                 .shareUrl(shareUrl)

@@ -3,57 +3,55 @@ package com.softeer.backend.fo_domain.draw.util;
 import com.softeer.backend.fo_domain.draw.dto.LoseModal;
 import com.softeer.backend.fo_domain.draw.dto.WinModal;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@NoArgsConstructor
 public class DrawUtil {
     @Getter
     private boolean isDrawWin = false;
     @Getter
+    @Setter
     private int ranking = 0;
-    private final int first;
-    private final int second;
-    private final int third;
-    private int directionForWinner;
-
-    public DrawUtil(int first, int second, int third) {
-        this.first = first;
-        this.second = second;
-        this.third = third;
-        setRanking();
-    }
+    @Setter
+    private int first;
+    @Setter
+    private int second;
+    @Setter
+    private int third;
 
     /**
-     * 등수 지정
+     * 추첨 로직 실행
      * 만약 1, 2, 3등 중 하나에 당첨되었다면 등수와 이미지 방향이 결정됨.
      */
-    private void setRanking() {
+    public void performDraw() {
         Random random = new Random();
         int randomNum = random.nextInt(10000) + 1; // 랜덤 수
 
         if (randomNum <= this.first) {
             isDrawWin = true;
             ranking = 1;
-            directionForWinner = randomNum % 4;
         } else if (randomNum <= this.second) {
             isDrawWin = true;
             ranking = 2;
-            directionForWinner = randomNum % 4;
         } else if (randomNum <= this.third) {
             isDrawWin = true;
             ranking = 3;
-            directionForWinner = randomNum % 4;
         }
     }
 
     /**
-     *
      * @return 당첨자를 위한 방향 이미지 List 반환
      */
     public List<String> generateWinImages() {
-        String directionImage = getImageUrl(directionForWinner);
+        Random random = new Random();
+        int direction = random.nextInt(4); // 랜덤 수
+
+        String directionImage = getImageUrl(direction);
 
         ArrayList<String> images = new ArrayList<>(3);
         images.add(directionImage);
@@ -63,7 +61,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @return 낙첨자를 위한 랜덤 방향 이미지 List 반환
      */
     public List<String> generateLoseImages() {
@@ -75,7 +72,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @param direction 방향을 나타냄. 0, 1, 2, 3이 각각 위, 오른쪽, 밑, 왼쪽
      * @return 방향에 따른 이미지 url을 반환
      */
@@ -94,7 +90,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @return 등수에 따른 WinModal을 반환
      */
     public WinModal generateWinModal() {
@@ -108,7 +103,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @return 1등 WinModal 반환
      */
     private WinModal generateFirstWinModal() {
@@ -121,7 +115,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @return 2등 WinModal 반환
      */
     private WinModal generateSecondWinModal() {
@@ -134,7 +127,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @return 3등 WinModal 반환
      */
     private WinModal generateThirdWinModal() {
@@ -147,7 +139,6 @@ public class DrawUtil {
     }
 
     /**
-     *
      * @param shareUrl 공유 url
      * @return LoseModal 반환
      */

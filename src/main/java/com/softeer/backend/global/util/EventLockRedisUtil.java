@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Set;
 
 /**
@@ -20,24 +21,29 @@ public class EventLockRedisUtil {
         return getStringIntegerValueOperations().get(key);
     }
 
-    // key에 해당하는 데이터의 값을 1 더하는 메서드
-    // 원자적으로 값을 증가시킨다.
-    public void incrementParticipantCount(String key){
-        getStringIntegerValueOperations().increment(key, 1);
-    }
-
     // key - value 데이터 설정하는 메서드
     public void setData(String key, int value) {
         getStringIntegerValueOperations().set(key, value);
     }
 
-    public void deleteParticipantCount(String key){
-        integerRedisTemplate.delete(key);
+    // 참가자의 ID를 Set으로 저장하고 관리하는 메서드
+    public void addValueToSet(String key, Integer userId) {
+        getStringSetIntegerValueOperations().add(key, userId);
     }
 
-    // 참가자의 ID를 Set으로 저장하고 관리하는 메서드
-    public void addParticipantId(String key, Integer participantId) {
-        getStringSetIntegerValueOperations().add(key, participantId);
+    // TTL 설정하는 메서드
+    public void setTTL(String key, long seconds) {
+        integerRedisTemplate.expire(key, Duration.ofSeconds(seconds));
+    }
+
+    // key에 해당하는 데이터의 값을 1 더하는 메서드
+    // 원자적으로 값을 증가시킨다.
+    public void incrementParticipantCount(String key) {
+        getStringIntegerValueOperations().increment(key, 1);
+    }
+
+    public void deleteParticipantCount(String key) {
+        integerRedisTemplate.delete(key);
     }
 
     public boolean isParticipantExists(String key, Integer participantId) {
@@ -52,7 +58,7 @@ public class EventLockRedisUtil {
         return getStringSetIntegerValueOperations().members(key);
     }
 
-    public void deleteParticipantIds(String key){
+    public void deleteParticipantIds(String key) {
         integerRedisTemplate.delete(key);
     }
 

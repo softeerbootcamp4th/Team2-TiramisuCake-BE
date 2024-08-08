@@ -34,6 +34,11 @@ public class DrawService {
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final EventLockRedisUtil eventLockRedisUtil;
 
+    /**
+     * 1. redis의 임시 당첨 목록에 존재하는지 확인
+     * 1-1. 있으면 해당 등수에 맞는 응답 만들어서 반환
+     * 1-2. 없으면 새로 등수 계산 후 레디스에 저장
+     */
     public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
@@ -43,25 +48,43 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._SHARE_INFO_NOT_FOUND));
 
-        // 추첨 게임 설정 정보 가져오기
-        DrawSetting drawSetting = drawSettingRepository.findById(1)
-                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
-
-        // 등수 결정하기
-        int first = drawSetting.getWinnerNum1(); // 1등 수
-        int second = drawSetting.getWinnerNum2(); // 2등 수
-        int third = drawSetting.getWinnerNum3(); // 3등 수
-
-        DrawUtil drawUtil = new DrawUtil(first, second, third);
-
-        boolean isDrawWin = drawUtil.isDrawWin();
-
         int drawParticipationCount = drawParticipationInfo.getDrawParticipationCount();
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
+        // 만약 임시 당첨 목록에 존재한다면 등수에 맞는 응답 만들어서 반환
+        int ranking = getRankingIfWinner(userId);
+        DrawUtil drawUtil = new DrawUtil();
+        if (ranking != 0) {
+            drawUtil.setRanking(ranking);
+            return ResponseDto.onSuccess(DrawWinResponseDto.builder()
+                    .invitedNum(invitedNum)
+                    .remainDrawCount(remainDrawCount)
+                    .drawParticipationCount(drawParticipationCount)
+                    .isDrawWin(true)
+                    .images(drawUtil.generateWinImages())
+                    .winModal(drawUtil.generateWinModal())
+                    .build());
+        }
 
-        if (isDrawWin) { // 당첨자일 경우
+        // 추첨 게임 설정 정보 가져오기
+        DrawSetting drawSetting = drawSettingRepository.findById(1)
+                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
+
+        // 당첨자 수 조회
+        int first = drawSetting.getWinnerNum1(); // 1등 수
+        int second = drawSetting.getWinnerNum2(); // 2등 수
+        int third = drawSetting.getWinnerNum3(); // 3등 수
+
+        // 당첨자 수 설정
+        drawUtil.setFirst(first);
+        drawUtil.setSecond(second);
+        drawUtil.setThird(third);
+
+        // 추첨 로직 실행
+        drawUtil.performDraw();
+
+        if (drawUtil.isDrawWin()) { // 당첨자일 경우
             // TODO
             // redis에 당첨자 정보 저장하기 (기한 12시간으로 설정)
             saveWinnerInfo(drawUtil.getRanking(), userId);
@@ -89,16 +112,31 @@ public class DrawService {
         }
     }
 
+    /**
+     * 1. redis에 12시간 기한으로 저장
+     *
+     * @param ranking redis의 키로 사용될 등수
+     * @param userId  사용자 아이디
+     */
     private void saveWinnerInfo(int ranking, int userId) {
-        // redis에 있는지 확인
-        // 없으면 redis에 12시간 기한으로 저장하고 return
-        // 있으면 그냥 return
         String drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
-        Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
-        if (drawTempSet.contains(userId)) { // 만약 당첨자 목록에 있다면
-            return;
-        } else {
-            eventLockRedisUtil.setData(drawTempKey, userId);
+        eventLockRedisUtil.setData(drawTempKey, userId);
+    }
+
+    /**
+     * userId가 임시 당첨자 목록에 있으면 등수, 없으면 0 반환
+     *
+     * @param userId
+     */
+    private int getRankingIfWinner(int userId) {
+        String drawTempKey;
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
+            if (drawTempSet.contains(userId)) {
+                return ranking;
+            }
         }
+        return 0;
     }
 }

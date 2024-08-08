@@ -12,7 +12,9 @@ import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
+import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
+import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class DrawService {
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
     private final DrawSettingRepository drawSettingRepository;
+    private final ShareUrlInfoRepository shareUrlInfoRepository;
 
     public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
@@ -56,6 +59,9 @@ public class DrawService {
 
 
         if (isDrawWin) { // 당첨자일 경우
+            // TODO
+            // redis에 당첨자 정보 저장하기 (기한 12시간으로 설정)
+
             return ResponseDto.onSuccess(DrawWinResponseDto.builder()
                     .invitedNum(invitedNum)
                     .remainDrawCount(remainDrawCount)
@@ -65,13 +71,18 @@ public class DrawService {
                     .winModal(drawUtil.generateWinModal())
                     .build());
         } else { // 낙첨자일 경우
+            // TODO
+            // 공유 url 받아오기
+            String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
+                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._SHARE_URL_NOT_FOUND));
+
             return ResponseDto.onSuccess(DrawLoseResponseDto.builder()
                     .invitedNum(invitedNum)
                     .remainDrawCount(remainDrawCount)
                     .drawParticipationCount(drawParticipationCount)
                     .isDrawWin(false)
                     .images(drawUtil.generateLoseImages())
-                    .loseModal(drawUtil.generateLoseModal("share url"))
+                    .loseModal(drawUtil.generateLoseModal(shareUrl))
                     .build());
         }
     }

@@ -16,11 +16,14 @@ import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RedisLockPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
+import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class DrawService {
     private final ShareInfoRepository shareInfoRepository;
     private final DrawSettingRepository drawSettingRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
+    private final EventLockRedisUtil eventLockRedisUtil;
 
     public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
@@ -61,6 +65,7 @@ public class DrawService {
         if (isDrawWin) { // 당첨자일 경우
             // TODO
             // redis에 당첨자 정보 저장하기 (기한 12시간으로 설정)
+            saveWinnerInfo(drawUtil.getRanking(), userId);
 
             return ResponseDto.onSuccess(DrawWinResponseDto.builder()
                     .invitedNum(invitedNum)
@@ -82,6 +87,19 @@ public class DrawService {
                     .images(drawUtil.generateLoseImages())
                     .loseModal(drawUtil.generateLoseModal(shareUrl))
                     .build());
+        }
+    }
+
+    private void saveWinnerInfo(int ranking, int userId) {
+        // redis에 있는지 확인
+        // 없으면 redis에 12시간 기한으로 저장하고 return
+        // 있으면 그냥 return
+        String drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+        Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
+        if (drawTempSet.contains(userId)) { // 만약 당첨자 목록에 있다면
+            return;
+        } else {
+            eventLockRedisUtil.setData(drawTempKey, userId);
         }
     }
 }

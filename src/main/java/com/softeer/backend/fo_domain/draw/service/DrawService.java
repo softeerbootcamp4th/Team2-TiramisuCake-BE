@@ -71,8 +71,6 @@ public class DrawService {
                     .winModal(drawUtil.generateWinModal())
                     .build());
         } else { // 낙첨자일 경우
-            // TODO
-            // 공유 url 받아오기
             String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
                     .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._SHARE_URL_NOT_FOUND));
 

@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.softeer.backend.global.common.constant.ValidationConstant;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -19,9 +20,9 @@ public class LoginRequest {
             message = ValidationConstant.PHONE_NUMBER_MSG)
     private String phoneNumber;
 
-    private boolean isCodeVerified;
+    private Boolean hasCodeVerified;
 
-    private boolean privacyConsent;
+    private Boolean privacyConsent;
 
-    private boolean marketingConsent;
+    private Boolean marketingConsent;
 }

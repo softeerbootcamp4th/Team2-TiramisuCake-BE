@@ -77,7 +77,7 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
 
-        int id = Integer.parseInt(claims.get("id", String.class));
+        int id = claims.get("id", Integer.class);
         RoleType roleType = RoleType.valueOf(claims.get("roleType", String.class));
 
         return JwtClaimsDto.builder()

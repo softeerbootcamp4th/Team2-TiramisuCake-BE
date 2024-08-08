@@ -22,6 +22,9 @@ public class AuthInfoArgumentResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)  {
         HttpServletRequest req = (HttpServletRequest) webRequest.getNativeRequest();
         JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) req.getAttribute("jwtClaims");
+        if(jwtClaimsDto == null){
+            return null;
+        }
         return jwtClaimsDto.getId();
     }
 }

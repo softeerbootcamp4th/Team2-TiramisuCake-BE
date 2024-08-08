@@ -48,7 +48,7 @@ public class EventLockRedisUtil {
         getStringSetIntegerValueOperations().remove(key, participantId);
     }
 
-    public Set<Integer> getAllParticipantIds(String key) {
+    public Set<Integer> getAllDataAsSet(String key) {
         return getStringSetIntegerValueOperations().members(key);
     }
 

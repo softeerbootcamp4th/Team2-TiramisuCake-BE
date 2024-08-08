@@ -2,11 +2,14 @@ package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
+import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
@@ -43,31 +46,33 @@ public class DrawService {
         int second = drawSetting.getWinnerNum2(); // 2등 수
         int third = drawSetting.getWinnerNum3(); // 3등 수
 
-        Random random = new Random();
-        int randomNum = random.nextInt(10000) + 1; // 랜덤 수
+        DrawUtil drawUtil = new DrawUtil(first, second, third);
 
-        boolean isDrawWin = false;
-        int ranking = 0;
-        if (randomNum <= first) {
-            isDrawWin = true;
-            ranking = 1;
-        } else if (randomNum <= second) {
-            isDrawWin = true;
-            ranking = 2;
-        } else if (randomNum <= third) {
-            isDrawWin = true;
-            ranking = 3;
-        }
+        boolean isDrawWin = drawUtil.isDrawWin();
 
         int drawParticipationCount = drawParticipationInfo.getDrawParticipationCount();
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
-        return ResponseDto.onSuccess(DrawResponseDto.builder()
-                .invitedNum(invitedNum)
-                .remainDrawCount(remainDrawCount)
-                .drawParticipationCount(drawParticipationCount)
-                .isDrawWin(isDrawWin)
-                .build());
+
+        if (isDrawWin) { // 당첨자일 경우
+            return ResponseDto.onSuccess(DrawWinResponseDto.builder()
+                    .invitedNum(invitedNum)
+                    .remainDrawCount(remainDrawCount)
+                    .drawParticipationCount(drawParticipationCount)
+                    .isDrawWin(true)
+                    .images(drawUtil.generateWinImages())
+                    .winModal(drawUtil.generateWinModal())
+                    .build());
+        } else { // 낙첨자일 경우
+            return ResponseDto.onSuccess(DrawLoseResponseDto.builder()
+                    .invitedNum(invitedNum)
+                    .remainDrawCount(remainDrawCount)
+                    .drawParticipationCount(drawParticipationCount)
+                    .isDrawWin(false)
+                    .images(drawUtil.generateLoseImages())
+                    .loseModal(drawUtil.generateLoseModal("share url"))
+                    .build());
+        }
     }
 }

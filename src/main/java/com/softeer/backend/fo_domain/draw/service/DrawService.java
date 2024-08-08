@@ -37,7 +37,9 @@ public class DrawService {
     /**
      * 1. redis의 임시 당첨 목록에 존재하는지 확인
      * 1-1. 있으면 해당 등수에 맞는 응답 만들어서 반환
-     * 1-2. 없으면 새로 등수 계산 후 레디스에 저장
+     * 1-2. 없으면 새로 등수 계산
+     * 2. 당첨되었다면 레디스에 저장 후 당첨 응답 반환
+     * 3. 낙첨되었다면 당첨 실패 응답 반환
      */
     public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
@@ -120,7 +122,7 @@ public class DrawService {
      */
     private void saveWinnerInfo(int ranking, int userId) {
         String drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
-        eventLockRedisUtil.setData(drawTempKey, userId);
+        eventLockRedisUtil.addValueToSet(drawTempKey, userId);
     }
 
     /**

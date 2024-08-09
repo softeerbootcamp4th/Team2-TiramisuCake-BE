@@ -30,7 +30,6 @@ public class DrawService {
     private final DrawRepository drawRepository;
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
-    private final DrawSettingRepository drawSettingRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final EventLockRedisUtil eventLockRedisUtil;
     private final DrawSettingManager drawSettingManager;

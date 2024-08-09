@@ -83,9 +83,7 @@ public class DrawService {
         drawUtil.performDraw();
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
-            // TODO
-            // redis에 당첨자 정보 저장하기 - 완료
-            // redis 임시 당첨자 set 23:59:59마다 비우도록 설정하기
+            // redis 임시 당첨자 목록에 저장
             saveWinnerInfo(drawUtil.getRanking(), userId);
 
             return ResponseDto.onSuccess(DrawWinResponseDto.builder()

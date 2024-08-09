@@ -58,6 +58,10 @@ public class EventLockRedisUtil {
         return getStringSetIntegerValueOperations().members(key);
     }
 
+    public void deleteTempWinnerList(String key) {
+        integerRedisTemplate.delete(key);
+    }
+
     public void deleteParticipantIds(String key) {
         integerRedisTemplate.delete(key);
     }

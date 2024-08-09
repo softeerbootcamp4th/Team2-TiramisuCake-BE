@@ -70,14 +70,10 @@ public class DrawService {
                     .build());
         }
 
-        // 추첨 게임 설정 정보 가져오기
-        DrawSetting drawSetting = drawSettingRepository.findById(1)
-                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
-
         // 당첨자 수 조회
-        int first = drawSetting.getWinnerNum1(); // 1등 수
-        int second = drawSetting.getWinnerNum2(); // 2등 수
-        int third = drawSetting.getWinnerNum3(); // 3등 수
+        int first = drawSettingManager.getWinnerNum1(); // 1등 수
+        int second = drawSettingManager.getWinnerNum2(); // 2등 수
+        int third = drawSettingManager.getWinnerNum3(); // 3등 수
 
         // 당첨자 수 설정
         drawUtil.setFirst(first);

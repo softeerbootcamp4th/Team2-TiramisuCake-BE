@@ -9,8 +9,8 @@ public class SchedularConfig {
     @Bean
     public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(1);
-        taskScheduler.setThreadNamePrefix("FcfsSettingScheduler-");
+        taskScheduler.setPoolSize(2);
+        taskScheduler.setThreadNamePrefix("EventScheduler-");
         return taskScheduler;
     }
 }

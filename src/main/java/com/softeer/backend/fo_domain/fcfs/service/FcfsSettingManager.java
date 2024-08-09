@@ -97,7 +97,7 @@ public class FcfsSettingManager {
 
                 log.info("FcfsSetting updated to round {}", round);
 
-                int participantCount = eventLockRedisUtil.getParticipantCount(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+                int participantCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
                 EventParticipation eventParticipation = eventParticipationRepository.findSingleEventParticipation();
                 eventParticipation.addFcfsParticipantCount(participantCount);
 

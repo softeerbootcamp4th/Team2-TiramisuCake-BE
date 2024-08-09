@@ -33,6 +33,7 @@ public class DrawService {
     private final DrawSettingRepository drawSettingRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final EventLockRedisUtil eventLockRedisUtil;
+    private final DrawSettingManager drawSettingManager;
 
     /**
      * 1. redis의 임시 당첨 목록에 존재하는지 확인

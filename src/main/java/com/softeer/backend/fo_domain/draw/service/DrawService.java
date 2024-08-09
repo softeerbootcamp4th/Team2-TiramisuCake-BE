@@ -113,7 +113,7 @@ public class DrawService {
     }
 
     /**
-     * 1. redis에 12시간 기한으로 저장
+     * redis 임시 당첨자 목록에 저장
      *
      * @param ranking redis의 키로 사용될 등수
      * @param userId  사용자 아이디

@@ -25,11 +25,11 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain){
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         try {
             filterChain.doFilter(request, response);
             // Jwt 인증 예외 처리
-        } catch (JwtAuthenticationException jwtAuthenticationException){
+        } catch (JwtAuthenticationException jwtAuthenticationException) {
 
             log.error("JwtAuthenticationException occurs in ExceptionHandlingFilter",
                     jwtAuthenticationException);
@@ -37,7 +37,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
             setErrorResponse(response, jwtAuthenticationException.getCode());
 
             // 나머지 예외 처리
-        } catch(Exception e){
+        } catch (Exception e) {
 
             log.error("Exception occurs in ExceptionHandlingFilter", e);
 
@@ -47,7 +47,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     // 인증 예외 처리 메서드
     private void setErrorResponse(HttpServletResponse response,
-                                  BaseErrorCode errorCode){
+                                  BaseErrorCode errorCode) {
 
 
         response.setStatus(errorCode.getHttpStatus().value());

@@ -2,7 +2,7 @@ package com.softeer.backend.global.filter;
 
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RoleType;
-import com.softeer.backend.global.common.entity.JwtClaimsDto;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.common.exception.JwtAuthorizationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

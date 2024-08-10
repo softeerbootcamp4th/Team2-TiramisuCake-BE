@@ -96,6 +96,7 @@ public class FcfsSettingManager {
 
                 log.info("FcfsSetting updated to round {}", round);
 
+                // TODO: 현재 날짜를 기준으로 하루 전 날짜로 방문자수, 추첨 및 선착순 참가자 수를 EventParticipation에 저장하는 로직 구현
                 int participantCount = eventLockRedisUtil.getData(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
                 EventParticipation eventParticipation = eventParticipationRepository.findSingleEventParticipation();
                 eventParticipation.addFcfsParticipantCount(participantCount);

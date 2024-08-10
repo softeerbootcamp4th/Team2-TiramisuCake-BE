@@ -1,4 +1,4 @@
-package com.softeer.backend.global.common.entity;
+package com.softeer.backend.global.common.dto;
 
 import com.softeer.backend.global.common.constant.RoleType;
 import lombok.Builder;

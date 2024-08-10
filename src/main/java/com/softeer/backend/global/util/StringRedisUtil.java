@@ -1,7 +1,7 @@
 package com.softeer.backend.global.util;
 
 import com.softeer.backend.global.common.constant.RoleType;
-import com.softeer.backend.global.common.entity.JwtClaimsDto;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -81,6 +81,12 @@ public class StringRedisUtil {
         RoleType roleType = jwtClaimsDto.getRoleType();
 
         return roleType.getRedisKeyPrefix() + id;
+    }
+
+    // redis에 저장된 Refresh Token을 삭제하는 메서드
+    public void deleteRefreshToken(JwtClaimsDto jwtClaimsDto) {
+
+        deleteData(getRedisKeyForJwt(jwtClaimsDto));
     }
 
 }

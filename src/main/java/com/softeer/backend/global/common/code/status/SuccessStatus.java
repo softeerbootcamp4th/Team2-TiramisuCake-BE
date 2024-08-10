@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum SuccessStatus implements BaseCode {
     // Success
-    _OK(HttpStatus.OK, "S-200", "요청 처리 성공");
+    _OK(HttpStatus.OK, "S200", "요청 처리 성공");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

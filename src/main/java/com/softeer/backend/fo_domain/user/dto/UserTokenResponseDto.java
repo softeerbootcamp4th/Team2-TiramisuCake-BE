@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserTokenResponse {
+public class UserTokenResponseDto {
 
     private String accessToken;
 

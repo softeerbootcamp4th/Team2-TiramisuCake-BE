@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 /**
  * JWT 속성 관리 클래스
- *
+ * <p>
  * bearer: JWT 토큰 타입
  * secret: JWT 비밀 키
  * accessHeader: Access Token 헤더 이름
@@ -26,7 +26,7 @@ public class JwtProperties {
 
     @ConstructorBinding
     public JwtProperties(String bearer, String secret, String accessHeader, String refreshHeader,
-                         Long accessExpiration, Long refreshExpiration){
+                         Long accessExpiration, Long refreshExpiration) {
         this.bearer = bearer;
         this.secret = secret;
         this.accessHeader = accessHeader;

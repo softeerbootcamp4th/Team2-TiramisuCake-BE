@@ -35,6 +35,6 @@ public enum ExpectationComment {
         }
 
         log.error("Invalid comment number: " + commentNum);
-        throw new CommentException(ErrorStatus._COMMENT_NUM_INVALID);
+        throw new CommentException(ErrorStatus._NOT_FOUND);
     }
 }

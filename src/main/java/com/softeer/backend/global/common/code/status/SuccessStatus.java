@@ -13,23 +13,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum SuccessStatus implements BaseCode {
     // Success
-    _OK(HttpStatus.OK, "SUCCESS_200", "OK"),
-
-    // 선착순
-    _FCFS_SUCCESS(HttpStatus.OK, "FCFS_SUCCESS", "선착순 당첨 성공 응답"),
-    _FCFS_FAIL(HttpStatus.OK, "FCFS_FAIL", "선착순 당첨 실패 응답"),
-
-    // 전화번호 인증
-    _VERIFICATION_SEND(HttpStatus.OK, "VERIFICATION_SEND", "전화번호 인증 코드 전송 성공"),
-    _VERIFICATION_CONFIRM(HttpStatus.OK, "VERIFICATION_CONFIRM", "전화번호 인증 코드 검증 성공"),
-
-    // 로그인
-    _LOGIN_SUCCESS(HttpStatus.OK, "LOGIN_SUCCESS", "로그인 성공"),
-
-    // 기대평
-    _COMMENT_SAVE_SUCCESS(HttpStatus.OK, "COMMENT_SAVE_SUCCESS", "기대평 등록 성공"),
-    _COMMENT_GET_SUCCESS(HttpStatus.OK, "COMMENT_GET_SUCCESS", "기대평 조회 성공"),
-    _COMMENT_GET_FINAL_SUCCESS(HttpStatus.OK, "COMMENT_GET_FINAL_SUCCESS", "마지막 기대평 조회 성공");
+    _OK(HttpStatus.OK, "S-200", "요청 처리 성공");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;
@@ -62,7 +46,7 @@ public enum SuccessStatus implements BaseCode {
      * @return 커스텀 코드값
      */
     @Override
-    public String getCode(){
+    public String getCode() {
         return this.code;
     }
 
@@ -72,7 +56,7 @@ public enum SuccessStatus implements BaseCode {
      * @return 예외 메시지
      */
     @Override
-    public String getMsg(){
+    public String getMsg() {
         return this.message;
     }
 }

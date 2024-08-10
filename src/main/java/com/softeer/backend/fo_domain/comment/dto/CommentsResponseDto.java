@@ -1,8 +1,6 @@
 package com.softeer.backend.fo_domain.comment.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.softeer.backend.fo_domain.comment.constant.CommentNickname;
-import com.softeer.backend.fo_domain.comment.constant.ExpectationComment;
 import com.softeer.backend.fo_domain.comment.domain.Comment;
 import com.softeer.backend.fo_domain.comment.util.ScrollPaginationUtil;
 import lombok.*;
@@ -13,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class CommentsResponse {
+public class CommentsResponseDto {
     public static final int LAST_CURSOR = -1;
 
     private int nextCursor;
@@ -34,24 +32,24 @@ public class CommentsResponse {
         private String comment;
     }
 
-    public static CommentsResponse of(ScrollPaginationUtil<Comment> commentsScroll, Integer userId) {
+    public static CommentsResponseDto of(ScrollPaginationUtil<Comment> commentsScroll, Integer userId) {
         if (commentsScroll.isLastScroll()) {
-            return CommentsResponse.newLastScroll(commentsScroll.getCurrentScrollItems(), userId);
+            return CommentsResponseDto.newLastScroll(commentsScroll.getCurrentScrollItems(), userId);
         }
-        return CommentsResponse.newScrollHasNext(commentsScroll.getCurrentScrollItems(), commentsScroll.getNextCursor().getId(),
+        return CommentsResponseDto.newScrollHasNext(commentsScroll.getCurrentScrollItems(), commentsScroll.getNextCursor().getId(),
                 userId);
     }
 
     // 마지막 스크롤일 때의 응답값을 구성하는 메서드
     // nextCursor 값을 -1로 설정한다.
-    private static CommentsResponse newLastScroll(List<Comment> commentsScroll, Integer userId) {
+    private static CommentsResponseDto newLastScroll(List<Comment> commentsScroll, Integer userId) {
         return newScrollHasNext(commentsScroll, LAST_CURSOR, userId);
     }
 
     // 마지막 스크롤이 아닐 때의 응답값을 구성하는 메서드
-    private static CommentsResponse newScrollHasNext(List<Comment> commentsScroll, int nextCursor,
-                                                     Integer userId) {
-        return CommentsResponse.builder()
+    private static CommentsResponseDto newScrollHasNext(List<Comment> commentsScroll, int nextCursor,
+                                                        Integer userId) {
+        return CommentsResponseDto.builder()
                 .nextCursor(nextCursor)
                 .totalComments(commentsScroll.size())
                 .comments(getContents(commentsScroll, userId))
@@ -68,8 +66,8 @@ public class CommentsResponse {
                     String nickname = _comment.getNickname();
                     String comment = _comment.getExpectationComment().getComment();
 
-                    if(userId != null && _comment.getUserId() != null &&
-                            _comment.getUserId().equals(userId)){
+                    if (userId != null && _comment.getUserId() != null &&
+                            _comment.getUserId().equals(userId)) {
                         isMine = true;
                         nickname = nickname + CommentNickname.MY_NICKNAME_SUFFIX;
                     }

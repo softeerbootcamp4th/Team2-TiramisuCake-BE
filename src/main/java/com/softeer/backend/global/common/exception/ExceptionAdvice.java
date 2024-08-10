@@ -1,8 +1,7 @@
 package com.softeer.backend.global.common.exception;
 
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsFailResponse;
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsFailResponseDtoDto;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.code.status.SuccessStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -34,7 +33,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
      * GeneralException을 처리하는 메서드
      *
      * @param generalException 커스텀 예외의 최고 조상 클래스
-     * @param webRequest client 요청 객체
+     * @param webRequest       client 요청 객체
      * @return client 응답 객체
      */
     @ExceptionHandler
@@ -52,7 +51,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
      * ConstraintViolationException을 처리하는 메서드
      *
      * @param constraintViolationException 검증 예외
-     * @param request client 요청 객체
+     * @param request                      client 요청 객체
      * @return client 응답 객체
      */
     @ExceptionHandler
@@ -67,13 +66,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     /**
      * MethodArgumentNotValidException을 처리하는 메서드
-     *
+     * <p>
      * ResponseEntityExceptionHandler의 메서드를 오버라이딩하여 사용한다.
      *
      * @param methodArgumentNotValidException 컨트롤러 메서드의 파라미터 객체에 대한 검증 예외
-     * @param headers 헤더 객체
-     * @param status HttpStatusCode 값
-     * @param request client 요청 객체
+     * @param headers                         헤더 객체
+     * @param status                          HttpStatusCode 값
+     * @param request                         client 요청 객체
      * @return client 응답 객체
      */
     @Override
@@ -91,13 +90,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                             -> existingErrorMessage + ", " + newErrorMessage);
                 });
 
-        return handleArgsExceptionInternal(methodArgumentNotValidException, HttpHeaders.EMPTY, ErrorStatus._BAD_REQUEST, request,errors);
+        return handleArgsExceptionInternal(methodArgumentNotValidException, HttpHeaders.EMPTY, ErrorStatus._VALIDATION_ERROR, request, errors);
     }
 
     /**
      * 나머지 모든 예외들을 처리하는 메서드
      *
-     * @param e Exception을 상속한 예외 객체
+     * @param e       Exception을 상속한 예외 객체
      * @param request client 요청 객체
      * @return client 응답 객체
      */
@@ -117,11 +116,11 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     // GeneralException에 대한 client 응답 객체를 생성하는 메서드
     private ResponseEntity<Object> handleGeneralExceptionInternal(Exception e, ResponseDto.ErrorReasonDto reason,
-                                                           HttpHeaders headers, WebRequest webRequest) {
+                                                                  HttpHeaders headers, WebRequest webRequest) {
 
         log.error("GeneralException captured in ExceptionAdvice", e);
 
-        ResponseDto<Object> body = ResponseDto.onFailure(reason.getCode(),reason.getMessage(),null);
+        ResponseDto<Object> body = ResponseDto.onFailure(reason.getCode(), reason.getMessage(), null);
 
         return super.handleExceptionInternal(
                 e,
@@ -141,8 +140,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         ResponseDto<Object> body = null;
 
-        if(redissonKeyName.contains("FCFS"))
-            body = ResponseDto.onSuccess(SuccessStatus._FCFS_FAIL, new FcfsFailResponse(1));
+        if (redissonKeyName.contains("FCFS"))
+            body = ResponseDto.onSuccess(new FcfsFailResponseDtoDto(1));
 
         //TODO
         // DRAW 관련 예외일 경우, body 구성하는 코드 필요
@@ -188,10 +187,10 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     // 나머지 모든 예외에 대한 client 응답 객체를 생성하는 메서드
     private ResponseEntity<Object> handleGlobalExceptionInternal(Exception e, ErrorStatus errorCommonStatus,
-                                                                HttpHeaders headers, HttpStatus status, WebRequest request, String errorPoint) {
+                                                                 HttpHeaders headers, HttpStatus status, WebRequest request, String errorPoint) {
         log.error("Exception captured in ExceptionAdvice", e);
 
-        ResponseDto<Object> body = ResponseDto.onFailure(errorCommonStatus.getCode(),errorCommonStatus.getMessage(),errorPoint);
+        ResponseDto<Object> body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
         return super.handleExceptionInternal(
                 e,
                 body,

@@ -47,7 +47,7 @@ public class FcfsSettingManager {
     private ScheduledFuture<?> scheduledFuture;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         loadInitialData();
         scheduleTask();
     }
@@ -56,7 +56,7 @@ public class FcfsSettingManager {
      * round 1에 해당하는 선착순 이벤트 속성으로 초기화
      */
     public void loadInitialData() {
-        try{
+        try {
             FcfsSetting fcfsSetting = fcfsSettingRepository.findByRound(1)
                     .orElseThrow(IllegalStateException::new);
 
@@ -66,8 +66,7 @@ public class FcfsSettingManager {
             this.winnerNum = fcfsSetting.getWinnerNum();
             this.isFcfsClosed = false;
 
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             log.error("FcfsSetting not found by round {}", round);
         }
     }
@@ -102,7 +101,7 @@ public class FcfsSettingManager {
                 eventParticipation.addFcfsParticipantCount(participantCount);
 
                 eventLockRedisUtil.deleteParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
-                eventLockRedisUtil.deleteParticipantIds(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round-1));
+                eventLockRedisUtil.deleteParticipantIds(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + (round - 1));
 
             } catch (Exception e) {
                 log.info("Updating FcfsSetting is final");
@@ -124,7 +123,7 @@ public class FcfsSettingManager {
      * Admin 기능으로 현재 round의 선착순 이벤트 정보를 변경했을 때, 변경 사항을 적용하기 위해 사용하는 메서드
      */
     public void setFcfsSetting(FcfsSetting fcfsSetting) {
-        if(fcfsSetting.getRound() == this.round){
+        if (fcfsSetting.getRound() == this.round) {
             this.startTime = fcfsSetting.getStartTime();
             this.endTime = fcfsSetting.getEndTime();
             this.winnerNum = fcfsSetting.getWinnerNum();

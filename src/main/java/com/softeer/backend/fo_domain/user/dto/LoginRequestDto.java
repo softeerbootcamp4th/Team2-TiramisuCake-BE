@@ -1,6 +1,5 @@
 package com.softeer.backend.fo_domain.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.softeer.backend.global.common.constant.ValidationConstant;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDto {
 
     private String name;
 

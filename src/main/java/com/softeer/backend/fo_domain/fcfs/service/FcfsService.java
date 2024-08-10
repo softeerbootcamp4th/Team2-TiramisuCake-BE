@@ -50,7 +50,7 @@ public class FcfsService {
      */
     @EventLock(key = "FCFS_WINNER_#{#round}")
     private FcfsResponseDto saveFcfsWinners(int userId, int round) {
-        Set<Integer> participantIds = eventLockRedisUtil.getAllParticipantIds(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+        Set<Integer> participantIds = eventLockRedisUtil.getAllDataAsSet(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
 
         if (participantIds.size() < fcfsSettingManager.getWinnerNum() &&
                 !eventLockRedisUtil.isParticipantExists(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId)) {

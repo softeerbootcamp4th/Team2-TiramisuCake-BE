@@ -54,11 +54,13 @@ public class SwaggerConfig {
                 .components(components)
                 .addSecurityItem(securityItem);
     }
+
     private SecurityScheme getJwtSecurityScheme() {
         return new SecurityScheme()
                 .type(SecurityScheme.Type.APIKEY)
                 .in(SecurityScheme.In.HEADER)
-                .name(jwtProperties.getAccessHeader());}
+                .name(jwtProperties.getAccessHeader());
+    }
 
     private SecurityScheme getJwtRefreshSecurityScheme() {
         return new SecurityScheme()

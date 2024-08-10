@@ -13,7 +13,7 @@ public enum VerificationProperty {
 
     private final int value;
 
-    VerificationProperty(int value){
+    VerificationProperty(int value) {
         this.value = value;
     }
 

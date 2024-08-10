@@ -45,10 +45,9 @@ public class Comment {
     //
     @PrePersist
     public void assignRandomNickname() {
-        if(userId != null) {
+        if (userId != null) {
             this.nickname = CommentNickname.getMyRandomNickname(userId);
-        }
-        else{
+        } else {
             this.nickname = CommentNickname.getRandomNickname();
         }
     }

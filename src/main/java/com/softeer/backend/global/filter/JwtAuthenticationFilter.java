@@ -9,7 +9,7 @@ import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.util.JwtUtil;
 import com.softeer.backend.global.util.StringRedisUtil;
-import com.softeer.backend.fo_domain.user.dto.UserTokenResponse;
+import com.softeer.backend.fo_domain.user.dto.UserTokenResponseDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,14 +52,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
-        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())){
+        if (CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // optionalAuthUrls에 등록된 url 중, access token이 header에 없으면 인증 x
-        if(isUriInOptionalAuthList(request.getRequestURI()) &&
-                jwtUtil.extractAccessToken(request).isEmpty()){
+        if (isUriInOptionalAuthList(request.getRequestURI()) &&
+                jwtUtil.extractAccessToken(request).isEmpty()) {
 
             filterChain.doFilter(request, response);
             return;
@@ -68,12 +68,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Case 01) Access Token 재발급인 경우(Authorization Header Access Token 유효성 x)
         if (request.getRequestURI().contains("/reissue")) {
-            String accessToken = jwtUtil.extractAccessToken(request).orElseThrow(
-                    () -> new JwtAuthenticationException(ErrorStatus._JWT_ACCESS_TOKEN_IS_NOT_EXIST)
-            );
-            String refreshToken = jwtUtil.extractRefreshToken(request).orElseThrow(
-                    () -> new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_EXIST)
-            );
+            String accessToken = jwtUtil.extractAccessToken(request).orElseThrow(() -> {
+                log.error("Access Token is missing in the Authorization header during the '/reissue' process.");
+                return new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);
+            });
+            String refreshToken = jwtUtil.extractRefreshToken(request).orElseThrow(() -> {
+                log.error("Refresh Token is missing in the Authorization header during the '/reissue' process.");
+                return new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);
+            });
 
             this.reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
         }
@@ -123,21 +125,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void validateAccessToken(String accessToken) {
         if (jwtUtil.validateToken(accessToken)) {
-            throw new JwtAuthenticationException(ErrorStatus._JWT_ACCESS_TOKEN_IS_NOT_VALID);
+            log.error("JWT Access Token is valid during the '/reissue' process.");
+            throw new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);
         }
     }
 
     private void validateRefreshToken(String refreshToken) {
         if (!this.jwtUtil.validateToken(refreshToken)) {
-            throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_VALID);
+            log.error("JWT Refresh Token is invalid during the '/reissue' process.");
+            throw new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);
         }
     }
 
     private void isRefreshTokenMatch(String refreshToken) {
         JwtClaimsDto jwtClaimsDto = jwtUtil.getJwtClaimsFromRefreshToken(refreshToken);
 
-        if (!refreshToken.equals(stringRedisUtil.getData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
-            throw new JwtAuthenticationException(ErrorStatus._JWT_REFRESH_TOKEN_IS_NOT_EXIST);
+        if (stringRedisUtil.getData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto)) == null ||
+                !refreshToken.equals(stringRedisUtil.getData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto)))) {
+
+            log.error("WT Refresh Token is either missing in Redis or does not match the token in Redis.");
+            throw new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);
         }
     }
 
@@ -165,23 +172,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                                        String refreshToken) throws IOException {
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
         // refresh token, access token 을 응답 본문에 넣어 응답
-        UserTokenResponse userTokenResponse = UserTokenResponse.builder()
+        UserTokenResponseDto userTokenResponseDto = UserTokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(expireTime)
                 .build();
-        makeResultResponse(response, userTokenResponse);
+        makeResultResponse(response, userTokenResponseDto);
     }
 
     private void makeResultResponse(HttpServletResponse response,
-                                    UserTokenResponse userTokenResponse) throws IOException {
+                                    UserTokenResponseDto userTokenResponseDto) throws IOException {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try (OutputStream os = response.getOutputStream()) {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-            ResponseDto<UserTokenResponse> responseDto = ResponseDto.onSuccess(userTokenResponse);
+            ResponseDto<UserTokenResponseDto> responseDto = ResponseDto.onSuccess(userTokenResponseDto);
             objectMapper.writeValue(os, responseDto);
             os.flush();
         }
@@ -190,7 +197,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void checkAccessToken(HttpServletRequest request) {
 
         String accessToken = jwtUtil.extractAccessToken(request)
-                .orElseThrow(() -> new JwtAuthenticationException(ErrorStatus._JWT_ACCESS_TOKEN_IS_NOT_EXIST));
+                .orElseThrow(() -> {
+                    log.error("Access Token is missing in the Authorization header.");
+                    return new JwtAuthenticationException(ErrorStatus._UNAUTHORIZED);
+                });
 
         JwtClaimsDto jwtClaimsDto = jwtUtil.getJwtClaimsFromAccessToken(accessToken);
 

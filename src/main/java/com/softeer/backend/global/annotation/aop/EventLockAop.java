@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class EventLockAop{
+public class EventLockAop {
     private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
     private final RedissonClient redissonClient;
@@ -33,7 +33,7 @@ public class EventLockAop{
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        EventLock eventLock= method.getAnnotation(EventLock.class);
+        EventLock eventLock = method.getAnnotation(EventLock.class);
 
         String key = REDISSON_LOCK_PREFIX + SpringELParser.getDynamicValue(signature.getParameterNames(), joinPoint.getArgs(), eventLock.key());
         RLock rLock = redissonClient.getLock(key);

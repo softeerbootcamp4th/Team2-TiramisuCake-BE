@@ -96,7 +96,7 @@ public class DrawService {
                     .build());
         } else { // 낙첨자일 경우
             String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
-                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._SHARE_URL_NOT_FOUND));
+                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
             return ResponseDto.onSuccess(DrawLoseResponseDto.builder()
                     .invitedNum(invitedNum)

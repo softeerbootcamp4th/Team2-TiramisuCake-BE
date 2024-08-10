@@ -35,7 +35,7 @@ public class DrawSettingManager {
     @PostConstruct
     public void initializeDrawSettingManager() {
         DrawSetting drawSetting = drawSettingRepository.findById(1)
-                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
+                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
         startTime = drawSetting.getStartTime();
         endTime = drawSetting.getEndTime();

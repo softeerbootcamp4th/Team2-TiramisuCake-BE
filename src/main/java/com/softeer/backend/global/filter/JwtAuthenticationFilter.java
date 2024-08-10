@@ -3,13 +3,13 @@ package com.softeer.backend.global.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.entity.JwtClaimsDto;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.util.JwtUtil;
 import com.softeer.backend.global.util.StringRedisUtil;
-import com.softeer.backend.fo_domain.user.dto.UserTokenResponseDto;
+import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -172,23 +172,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                                        String refreshToken) throws IOException {
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
         // refresh token, access token 을 응답 본문에 넣어 응답
-        UserTokenResponseDto userTokenResponseDto = UserTokenResponseDto.builder()
+        JwtTokenResponseDto jwtTokenResponseDto = JwtTokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(expireTime)
                 .build();
-        makeResultResponse(response, userTokenResponseDto);
+        makeResultResponse(response, jwtTokenResponseDto);
     }
 
     private void makeResultResponse(HttpServletResponse response,
-                                    UserTokenResponseDto userTokenResponseDto) throws IOException {
+                                    JwtTokenResponseDto jwtTokenResponseDto) throws IOException {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try (OutputStream os = response.getOutputStream()) {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-            ResponseDto<UserTokenResponseDto> responseDto = ResponseDto.onSuccess(userTokenResponseDto);
+            ResponseDto<JwtTokenResponseDto> responseDto = ResponseDto.onSuccess(jwtTokenResponseDto);
             objectMapper.writeValue(os, responseDto);
             os.flush();
         }

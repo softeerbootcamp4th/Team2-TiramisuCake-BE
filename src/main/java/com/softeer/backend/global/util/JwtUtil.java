@@ -2,10 +2,10 @@ package com.softeer.backend.global.util;
 
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RoleType;
-import com.softeer.backend.global.common.entity.JwtClaimsDto;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
 import com.softeer.backend.global.config.properties.JwtProperties;
-import com.softeer.backend.fo_domain.user.dto.UserTokenResponseDto;
+import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -89,13 +89,13 @@ public class JwtUtil {
     }
 
     // 전화번호 로그인 및 admin 로그인 시 jwt 응답 생성 + redis refresh 저장
-    public UserTokenResponseDto createServiceToken(JwtClaimsDto jwtClaimsDto) {
+    public JwtTokenResponseDto createServiceToken(JwtClaimsDto jwtClaimsDto) {
         stringRedisUtil.deleteData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto));
         String accessToken = createAccessToken(jwtClaimsDto);
         String refreshToken = createRefreshToken(jwtClaimsDto);
 
         // 서비스 토큰 생성
-        UserTokenResponseDto userTokenResponseDto = UserTokenResponseDto.builder()
+        JwtTokenResponseDto jwtTokenResponseDto = JwtTokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(LocalDateTime.now().plusSeconds(jwtProperties.getAccessExpiration() / 1000))
@@ -103,9 +103,9 @@ public class JwtUtil {
 
         // redis refresh token 저장
         stringRedisUtil.setDataExpire(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto),
-                userTokenResponseDto.getRefreshToken(), jwtProperties.getRefreshExpiration());
+                jwtTokenResponseDto.getRefreshToken(), jwtProperties.getRefreshExpiration());
 
-        return userTokenResponseDto;
+        return jwtTokenResponseDto;
     }
 
     // token 유효성 검증

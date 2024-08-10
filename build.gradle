@@ -36,8 +36,12 @@ dependencies {
 
 	// JWT 설정
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"                   // Google Simple JSON
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'		//DatatypeConverter
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
 
 	// JPA 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -54,6 +58,9 @@ dependencies {
 
 	// cool sms 설정
 	implementation 'net.nurigo:sdk:4.3.0'
+
+	// Bcrypt 설정
+	implementation 'org.mindrot:jbcrypt:0.4'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

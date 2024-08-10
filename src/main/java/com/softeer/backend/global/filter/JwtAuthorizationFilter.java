@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 /**
  * 유저의 권한을 검증하는 필터 클래스
  */
+@Slf4j
 @NoArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
@@ -23,8 +25,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) request.getAttribute("jwtClaims");
 
-        if(jwtClaimsDto == null || jwtClaimsDto.getRoleType()!= RoleType.ROLE_ADMIN)
-            throw new JwtAuthorizationException(ErrorStatus._ACCESS_DENIED);
+        if (jwtClaimsDto == null || jwtClaimsDto.getRoleType() != RoleType.ROLE_ADMIN) {
+
+            log.error("JwtAuthorizationException has occurred");
+            throw new JwtAuthorizationException(ErrorStatus._FORBIDDEN);
+        }
 
         filterChain.doFilter(request, response);
     }

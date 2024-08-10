@@ -44,11 +44,11 @@ public class DrawService {
     public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
-                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
+                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
         // 초대한 친구 수, 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
-                .orElseThrow(() -> new ShareInfoException(ErrorStatus._SHARE_INFO_NOT_FOUND));
+                .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
         int drawParticipationCount = drawParticipationInfo.getDrawParticipationCount();
         int invitedNum = shareInfo.getInvitedNum();

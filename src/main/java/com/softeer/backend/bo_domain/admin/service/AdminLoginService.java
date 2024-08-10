@@ -27,15 +27,15 @@ public class AdminLoginService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public JwtTokenResponseDto handleLogin(AdminLoginRequestDto adminLoginRequestDto){
+    public JwtTokenResponseDto handleLogin(AdminLoginRequestDto adminLoginRequestDto) {
 
         Admin admin = adminRepository.findByAccount(adminLoginRequestDto.getAccount())
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     log.error("Admin not found.");
                     return new AdminException(ErrorStatus._NOT_FOUND);
                 });
 
-        if(!passwordEncoder.matches(adminLoginRequestDto.getPassword(), admin.getPassword())){
+        if (!passwordEncoder.matches(adminLoginRequestDto.getPassword(), admin.getPassword())) {
             log.error("Admin password not match.");
             throw new AdminException(ErrorStatus._NOT_FOUND);
         }
@@ -47,7 +47,7 @@ public class AdminLoginService {
 
     }
 
-    public void handleLogout(int adminId){
+    public void handleLogout(int adminId) {
 
         stringRedisUtil.deleteRefreshToken(JwtClaimsDto.builder()
                 .id(adminId)

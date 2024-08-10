@@ -11,10 +11,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Constraint(validatedBy = DrawTimeRangeValidator.class)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidDrawTimeRange {
     String message() default "시작시간은 09:00 이후, 종료 시간은 11:59:59 이전이어야 합니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

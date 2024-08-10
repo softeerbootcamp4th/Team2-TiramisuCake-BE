@@ -34,21 +34,21 @@ public class WinnerPageService {
 
 
     @Transactional(readOnly = true)
-    public FcfsWinnerListResponseDto getFcfsWinnerList(int round){
+    public FcfsWinnerListResponseDto getFcfsWinnerList(int round) {
         List<Fcfs> fcfsList = fcfsRepository.findFcfsWithUser(round);
 
         return FcfsWinnerListResponseDto.of(fcfsList, round);
     }
 
     @Transactional(readOnly = true)
-    public DrawWinnerListResponseDto getDrawWinnerList(int rank){
+    public DrawWinnerListResponseDto getDrawWinnerList(int rank) {
         List<Draw> drawList = drawRepository.findDrawWithUser(rank);
 
         return DrawWinnerListResponseDto.of(drawList, rank);
     }
 
     @Transactional
-    public void updateFcfsWinnerNum(FcfsWinnerUpdateRequestDto fcfsWinnerUpdateRequestDto){
+    public void updateFcfsWinnerNum(FcfsWinnerUpdateRequestDto fcfsWinnerUpdateRequestDto) {
         FcfsSetting fcfsSetting = fcfsSettingRepository.findByRound(fcfsWinnerUpdateRequestDto.getRound())
                 .orElseThrow(() -> {
                     log.error("fcfsSetting not found");
@@ -59,7 +59,7 @@ public class WinnerPageService {
     }
 
     @Transactional
-    public void updateDrawWinnerNum(DrawWinnerUpdateRequestDto drawWinnerUpdateRequestDto){
+    public void updateDrawWinnerNum(DrawWinnerUpdateRequestDto drawWinnerUpdateRequestDto) {
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 
         drawSetting.setWinnerNum1(drawWinnerUpdateRequestDto.getFirstWinnerNum());

@@ -17,7 +17,7 @@ public class IndicatorPageController {
     private final IndicatorPageService indicatorPageService;
 
     @GetMapping("/indicator")
-    public ResponseDto<EventIndicatorResponseDto> getEventIndicator(){
+    public ResponseDto<EventIndicatorResponseDto> getEventIndicator() {
         EventIndicatorResponseDto eventIndicatorResponseDto = indicatorPageService.getEventIndicator();
 
         return ResponseDto.onSuccess(eventIndicatorResponseDto);

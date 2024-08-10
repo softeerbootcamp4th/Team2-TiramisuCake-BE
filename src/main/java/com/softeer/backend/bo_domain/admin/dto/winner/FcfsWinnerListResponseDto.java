@@ -22,7 +22,7 @@ public class FcfsWinnerListResponseDto {
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class FcfsWinner{
+    public static class FcfsWinner {
 
         private String name;
 
@@ -32,7 +32,7 @@ public class FcfsWinnerListResponseDto {
 
     public static FcfsWinnerListResponseDto of(List<Fcfs> fcfsList, int round) {
         List<FcfsWinner> fcfsWinnerList = fcfsList.stream()
-                .map((fcfs)-> FcfsWinner.builder()
+                .map((fcfs) -> FcfsWinner.builder()
                         .name(fcfs.getUser().getName())
                         .phoneNumber(fcfs.getUser().getPhoneNumber())
                         .build())

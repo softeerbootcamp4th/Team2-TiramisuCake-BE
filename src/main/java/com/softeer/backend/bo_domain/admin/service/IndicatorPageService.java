@@ -18,7 +18,7 @@ public class IndicatorPageService {
     private final EventParticipationRepository eventParticipationRepository;
     private final DrawSettingRepository drawSettingRepository;
 
-    public EventIndicatorResponseDto getEventIndicator(){
+    public EventIndicatorResponseDto getEventIndicator() {
 
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 

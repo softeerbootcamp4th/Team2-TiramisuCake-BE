@@ -22,7 +22,7 @@ public class DrawWinnerListResponseDto {
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class DrawWinner{
+    public static class DrawWinner {
 
         private String name;
 
@@ -32,7 +32,7 @@ public class DrawWinnerListResponseDto {
 
     public static DrawWinnerListResponseDto of(List<Draw> drawList, int rank) {
         List<DrawWinner> drawWinnerList = drawList.stream()
-                .map((draw)-> DrawWinner.builder()
+                .map((draw) -> DrawWinner.builder()
                         .name(draw.getUser().getName())
                         .phoneNumber(draw.getUser().getPhoneNumber())
                         .build())

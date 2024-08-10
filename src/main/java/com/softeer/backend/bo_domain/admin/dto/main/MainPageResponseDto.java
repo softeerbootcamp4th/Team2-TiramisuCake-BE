@@ -73,15 +73,15 @@ public class MainPageResponseDto {
         private double probability;
     }
 
-    public static MainPageResponseDto of(List<FcfsSetting> fcfsSettingList, List<DrawSetting> drawSettingList){
+    public static MainPageResponseDto of(List<FcfsSetting> fcfsSettingList, List<DrawSetting> drawSettingList) {
         List<FcfsEvent> fcfsEventList = fcfsSettingList.stream()
                 .map((fcfsSetting) ->
-                    FcfsEvent.builder()
-                            .round(fcfsSetting.getRound())
-                            .startTime(fcfsSetting.getStartTime())
-                            .endTime(fcfsSetting.getEndTime())
-                            .winnerNum(fcfsSetting.getWinnerNum())
-                            .build())
+                        FcfsEvent.builder()
+                                .round(fcfsSetting.getRound())
+                                .startTime(fcfsSetting.getStartTime())
+                                .endTime(fcfsSetting.getEndTime())
+                                .winnerNum(fcfsSetting.getWinnerNum())
+                                .build())
                 .toList();
 
         DrawSetting drawSetting = drawSettingList.get(0);
@@ -117,7 +117,7 @@ public class MainPageResponseDto {
 
     }
 
-    private static double calculateWinningProbability(int winnerNum){
-        return (double)winnerNum / (double)EXPECTED_PARTICIPANT_COUNT;
+    private static double calculateWinningProbability(int winnerNum) {
+        return (double) winnerNum / (double) EXPECTED_PARTICIPANT_COUNT;
     }
 }

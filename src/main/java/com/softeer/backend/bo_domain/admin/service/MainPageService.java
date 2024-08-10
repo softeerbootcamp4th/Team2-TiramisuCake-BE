@@ -20,7 +20,7 @@ public class MainPageService {
     private final DrawSettingRepository drawSettingRepository;
 
     @Transactional(readOnly = true)
-    public MainPageResponseDto getMainPage(){
+    public MainPageResponseDto getMainPage() {
         List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
         List<DrawSetting> drawSetting = drawSettingRepository.findAll();
 

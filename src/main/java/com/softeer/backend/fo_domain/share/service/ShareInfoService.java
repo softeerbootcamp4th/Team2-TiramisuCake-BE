@@ -15,13 +15,13 @@ public class ShareInfoService {
     private final ShareUrlInfoRepository shareUrlInfoRepository;
 
     public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(Integer userId) {
-        String sharedUrl = shareUrlInfoRepository.findShareUrlByUserId(userId).orElseThrow(
+        String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId).orElseThrow(
                 () -> new ShareInfoException(ErrorStatus._NOT_FOUND)
         );
 
         // DB에 이미 생성된 단축 url 반환
         return ResponseDto.onSuccess(ShareUrlResponseDto.builder()
-                .shareUrl(sharedUrl)
+                .shareUrl(shareUrl)
                 .build());
     }
 }

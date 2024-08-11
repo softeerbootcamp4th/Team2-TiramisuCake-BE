@@ -3,6 +3,7 @@ package com.softeer.backend.fo_domain.user.service;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
+import com.softeer.backend.fo_domain.share.domain.ShareUrlInfo;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.fo_domain.user.domain.User;
@@ -14,10 +15,16 @@ import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RoleType;
 import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.util.JwtUtil;
+import com.softeer.backend.global.util.RandomCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -92,7 +99,22 @@ public class LoginService {
     }
 
     private void createShareUrlInfo(Integer userId) {
+        List<String> shareUrlList = shareUrlInfoRepository.findAllShareUrl();
+        Set<String> shareUrlSet = new HashSet<>(shareUrlList);
 
+        RandomCodeUtil randomCodeUtil = new RandomCodeUtil();
+        String shareUrl;
+
+        do {
+            shareUrl = randomCodeUtil.generateRandomCode(4);
+        } while (shareUrlSet.contains(shareUrl));
+
+        ShareUrlInfo shareUrlInfo = ShareUrlInfo.builder()
+                .userId(userId)
+                .shareUrl(shareUrl)
+                .build();
+
+        shareUrlInfoRepository.save(shareUrlInfo);
     }
 
     private void createDrawParticipationInfo(Integer userId) {

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MainPageService {
+public class AdminMainPageService {
 
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;

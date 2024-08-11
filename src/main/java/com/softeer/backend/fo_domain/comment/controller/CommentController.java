@@ -29,10 +29,10 @@ public class CommentController {
     }
 
     @PostMapping("/comment")
-    ResponseDto<Void> saveComment(@RequestParam(name = "commentNum") int commentNum,
+    ResponseDto<Void> saveComment(@RequestParam(name = "commentType") int commentType,
                                   @AuthInfo Integer userId) {
 
-        commentService.saveComment(userId, commentNum);
+        commentService.saveComment(userId, commentType);
 
         return ResponseDto.onSuccess();
 

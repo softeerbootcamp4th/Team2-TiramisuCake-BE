@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 /**
@@ -56,12 +54,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler
     public ResponseEntity<Object> handleValidationException(ConstraintViolationException constraintViolationException, WebRequest request) {
-        String errorMessage = constraintViolationException.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
 
-        return handleConstraintExceptionInternal(constraintViolationException, ErrorStatus.valueOf(errorMessage), HttpHeaders.EMPTY, request);
+        List<String> errorMessages = constraintViolationException.getConstraintViolations().stream()
+                .map(violation -> Optional.ofNullable(violation.getMessage()).orElse(""))
+                .toList();
+
+        return handleConstraintExceptionInternal(constraintViolationException, ErrorStatus._VALIDATION_ERROR, HttpHeaders.EMPTY, request,
+                errorMessages);
     }
 
     /**
@@ -157,10 +156,12 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     // ConstraintViolationException에 대한 client 응답 객체를 생성하는 메서드
     private ResponseEntity<Object> handleConstraintExceptionInternal(Exception e, ErrorStatus errorCommonStatus,
-                                                                     HttpHeaders headers, WebRequest request) {
+                                                                     HttpHeaders headers, WebRequest request,
+                                                                     List<String> errorMessages) {
+
         log.error("ConstraintViolationException captured in ExceptionAdvice", e);
 
-        ResponseDto<Object> body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), null);
+        ResponseDto<Object> body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorMessages);
         return super.handleExceptionInternal(
                 e,
                 body,

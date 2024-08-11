@@ -27,8 +27,8 @@ public class FcfsDateRangeValidator implements ConstraintValidator<ValidFcfsDate
         LocalDate startDate = value.getStartDate();
         LocalDate endDate = value.getEndDate();
 
-        LocalDate startDateWeekStart = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-        LocalDate endDateWeekStart = endDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate startDateWeekStart = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endDateWeekStart = endDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
         boolean isSameWeek = startDateWeekStart.equals(endDateWeekStart);
 

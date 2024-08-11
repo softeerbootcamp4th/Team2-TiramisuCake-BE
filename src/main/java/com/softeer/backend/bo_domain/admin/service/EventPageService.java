@@ -60,10 +60,10 @@ public class EventPageService {
     }
 
     private void updateDrawSetting(DrawSetting drawSetting, LocalDate startDate, LocalDate endDate) {
-        LocalDate startDateOfDraw = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate startDateOfDraw = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
-        LocalDate endDateOfPreviousWeek = endDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-        LocalDate endDateOfDraw = endDateOfPreviousWeek.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
+        LocalDate endDateOfPreviousWeek = endDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        LocalDate endDateOfDraw = endDateOfPreviousWeek.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
 
         drawSetting.setStartDate(startDateOfDraw);
         drawSetting.setEndDate(endDateOfDraw);

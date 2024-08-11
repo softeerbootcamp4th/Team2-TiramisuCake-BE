@@ -27,7 +27,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class DrawService {
-    private final DrawRepository drawRepository;
+    // private final DrawRepository drawRepository;
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;

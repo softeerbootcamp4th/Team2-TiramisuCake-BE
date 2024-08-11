@@ -1,5 +1,7 @@
 package com.softeer.backend.fo_domain.user.dto;
 
+
+
 import com.softeer.backend.global.common.constant.ValidationConstant;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;

@@ -1,14 +1,13 @@
 package com.softeer.backend.fo_domain.share.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "share_url_info")
 public class ShareUrlInfo {
     @Id

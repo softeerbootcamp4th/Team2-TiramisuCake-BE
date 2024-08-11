@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.user.service;
 
+import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
@@ -95,6 +96,13 @@ public class LoginService {
     }
 
     private void createDrawParticipationInfo(Integer userId) {
+        DrawParticipationInfo drawParticipationInfo = DrawParticipationInfo.builder()
+                .userId(userId)
+                .drawWinningCount(0)
+                .drawLosingCount(0)
+                .drawParticipationCount(0)
+                .build();
 
+        drawParticipationInfoRepository.save(drawParticipationInfo);
     }
 }

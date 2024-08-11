@@ -36,7 +36,7 @@ public class StaticResourcesUtil {
     private final DrawSettingRepository drawSettingRepository;
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawRepository drawRepository;
-
+  
     private final Map<String, String> staticResourcesMap = new HashMap<>();
 
     @PostConstruct

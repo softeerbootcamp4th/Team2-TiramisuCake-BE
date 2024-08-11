@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ShareInfoService {
-    private final ShareInfoRepository shareInfoRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
 
     public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(Integer userId) {

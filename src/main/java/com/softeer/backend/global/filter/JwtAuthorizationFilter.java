@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.PatternMatchUtils;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,8 +22,20 @@ import java.io.IOException;
 @Slf4j
 @NoArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
+
+    // 인가검사를 하지 않는 url 설정
+    private final String[] whiteListUrls = {
+            "/admin/login", "/admin/signup"
+    };
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
 
         JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) request.getAttribute("jwtClaims");
 
@@ -32,6 +46,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isUriInWhiteList(String url) {
+        return PatternMatchUtils.simpleMatch(whiteListUrls, url);
     }
 
 }

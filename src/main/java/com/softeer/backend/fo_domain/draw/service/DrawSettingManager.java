@@ -9,11 +9,15 @@ import com.softeer.backend.global.util.EventLockRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Component
@@ -23,8 +27,10 @@ public class DrawSettingManager {
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
 
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private int winnerNum1;
     private int winnerNum2;
     private int winnerNum3;
@@ -35,8 +41,10 @@ public class DrawSettingManager {
     @PostConstruct
     public void initializeDrawSettingManager() {
         DrawSetting drawSetting = drawSettingRepository.findById(1)
-                .orElseThrow(() -> new DrawException(ErrorStatus._DRAW_PARTICIPATION_INFO_NOT_FOUND));
+                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
+        startDate = drawSetting.getStartDate();
+        endDate = drawSetting.getEndDate();
         startTime = drawSetting.getStartTime();
         endTime = drawSetting.getEndTime();
         winnerNum1 = drawSetting.getWinnerNum1();

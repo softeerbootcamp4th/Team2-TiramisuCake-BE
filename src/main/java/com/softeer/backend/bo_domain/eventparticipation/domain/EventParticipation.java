@@ -3,6 +3,8 @@ package com.softeer.backend.bo_domain.eventparticipation.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class EventParticipation {
 
     @Column(name = "total_visitors_count", nullable = false)
     @Builder.Default
-    private int totalVisitorsCount = 0;
+    private int visitorCount = 0;
 
     @Column(name = "fcfs_participant_count", nullable = false)
     @Builder.Default
@@ -28,8 +30,11 @@ public class EventParticipation {
     @Builder.Default
     private int drawParticipantCount = 0;
 
+    @Column(name = "event_date", nullable = false)
+    private LocalDate eventDate;
+
     public void addTotalVisitorsCount(int totalVisitorsCount) {
-        this.totalVisitorsCount += totalVisitorsCount;
+        this.visitorCount += totalVisitorsCount;
     }
 
     public void addFcfsParticipantCount(int fcfsParticipantCount) {

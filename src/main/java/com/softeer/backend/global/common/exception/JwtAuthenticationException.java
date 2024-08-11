@@ -8,7 +8,7 @@ import com.softeer.backend.global.common.code.BaseErrorCode;
  */
 public class JwtAuthenticationException extends GeneralException {
 
-    public JwtAuthenticationException(BaseErrorCode code){
+    public JwtAuthenticationException(BaseErrorCode code) {
         super(code);
     }
 }

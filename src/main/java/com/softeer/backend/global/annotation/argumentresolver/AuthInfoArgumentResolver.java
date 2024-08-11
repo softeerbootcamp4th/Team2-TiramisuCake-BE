@@ -1,7 +1,7 @@
 package com.softeer.backend.global.annotation.argumentresolver;
 
 import com.softeer.backend.global.annotation.AuthInfo;
-import com.softeer.backend.global.common.entity.JwtClaimsDto;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
@@ -14,15 +14,15 @@ public class AuthInfoArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(AuthInfo.class) !=null
+        return parameter.getParameterAnnotation(AuthInfo.class) != null
                 && parameter.getParameterType().equals(Integer.class);
     }
 
     @Override
-    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)  {
+    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest req = (HttpServletRequest) webRequest.getNativeRequest();
         JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) req.getAttribute("jwtClaims");
-        if(jwtClaimsDto == null){
+        if (jwtClaimsDto == null) {
             return null;
         }
         return jwtClaimsDto.getId();

@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 /**
  * Redis 속성 관리 클래스
- *
+ * <p>
  * host: Redis host 정보
  * port: Redis 포트 정보
  */
@@ -17,7 +17,7 @@ public class RedisProperties {
     private final Integer port;
 
     @ConstructorBinding
-    public RedisProperties(String host, Integer port){
+    public RedisProperties(String host, Integer port) {
         this.host = host;
         this.port = port;
     }

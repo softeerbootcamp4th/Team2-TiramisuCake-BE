@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.user.dto.verification;
+package com.softeer.backend.fo_domain.fcfs.dto;
 
 import lombok.*;
 
@@ -6,7 +6,6 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class VerificationCodeResponse {
-
-    private int timeLimit;
+public class FcfsSuccessResponseDto implements FcfsResponseDto {
+    private int a;
 }

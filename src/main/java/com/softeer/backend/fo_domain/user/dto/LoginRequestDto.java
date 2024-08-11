@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDto {
 
     private String name;
 

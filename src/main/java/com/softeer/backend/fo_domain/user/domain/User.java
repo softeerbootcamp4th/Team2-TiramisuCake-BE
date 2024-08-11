@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "users",
         indexes = {
-        @Index(name = "idx_users_phone_number", columnList = "phoneNumber")
+                @Index(name = "idx_users_phone_number", columnList = "phoneNumber")
         })
 public class User {
     @Id

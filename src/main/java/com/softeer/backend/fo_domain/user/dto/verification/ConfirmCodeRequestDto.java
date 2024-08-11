@@ -8,9 +8,13 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class VerificationCodeRequest {
+public class ConfirmCodeRequestDto {
 
     @Pattern(regexp = ValidationConstant.PHONE_NUMBER_REGEX,
             message = ValidationConstant.PHONE_NUMBER_MSG)
     private String phoneNumber;
+
+    @Pattern(regexp = ValidationConstant.VERIFICATION_CODE_REGEX,
+            message = ValidationConstant.VERIFICATION_CODE_MSG)
+    private String verificationCode;
 }

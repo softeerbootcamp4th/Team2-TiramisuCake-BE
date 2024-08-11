@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.user.dto;
+package com.softeer.backend.global.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserTokenResponse {
+public class JwtTokenResponseDto {
 
     private String accessToken;
 

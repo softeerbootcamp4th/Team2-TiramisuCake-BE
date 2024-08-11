@@ -65,14 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // optionalAuthUrls에 등록된 url 중, access token이 header에 없으면 인증 x
-        if(isUriInOptionalAuthList(request.getRequestURI()) &&
-                jwtUtil.extractAccessToken(request).isEmpty()){
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
 
         // Case 01) Access Token 재발급인 경우(Authorization Header Access Token 유효성 x)
         if (request.getRequestURI().contains("/reissue")) {

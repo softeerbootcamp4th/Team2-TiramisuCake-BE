@@ -20,4 +20,7 @@ public class ValidationConstant {
     public static final String ADMIN_PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&*!])[A-Za-z\\d@#$%^&*!]{8,20}$";
     public static final String ADMIN_PASSWORD_MSG = "잘못된 비밀번호 형식입니다.";
 
+    public static final String MIN_VALUE_MSG = "값은 최소 {value}이어야 합니다.";
+    public static final String MAX_VALUE_MSG = "값은 최대 {value}이어야 합니다.";
+
 }

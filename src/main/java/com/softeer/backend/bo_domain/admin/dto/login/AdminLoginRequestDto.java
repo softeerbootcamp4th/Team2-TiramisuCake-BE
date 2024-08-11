@@ -1,6 +1,7 @@
 package com.softeer.backend.bo_domain.admin.dto.login;
 
 import com.softeer.backend.global.common.constant.ValidationConstant;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -10,11 +11,9 @@ import lombok.*;
 @Getter
 public class AdminLoginRequestDto {
 
-    @Pattern(regexp = ValidationConstant.ADMIN_ACCOUNT_REGEX,
-            message = ValidationConstant.ADMIN_ACCOUNT_MSG)
+    @NotNull
     private String account;
 
-    @Pattern(regexp = ValidationConstant.ADMIN_PASSWORD_REGEX,
-            message = ValidationConstant.ADMIN_PASSWORD_MSG)
+    @NotNull
     private String password;
 }

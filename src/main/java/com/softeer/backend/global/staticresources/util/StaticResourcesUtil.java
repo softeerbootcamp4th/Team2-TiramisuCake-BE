@@ -18,7 +18,7 @@ public class StaticResourcesUtil {
 
     private final StaticResourcesRepository staticResourcesRepository;
 
-    private Map<String, String> s3Urls;
+    private final Map<String, String> s3Urls = new HashMap<>();
 
     @PostConstruct
     public void init() {

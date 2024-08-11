@@ -2,6 +2,7 @@ package com.softeer.backend.bo_domain.admin.service;
 
 import com.softeer.backend.bo_domain.admin.domain.Admin;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.login.AdminSignUpRequestDto;
 import com.softeer.backend.bo_domain.admin.exception.AdminException;
 import com.softeer.backend.bo_domain.admin.repository.AdminRepository;
 import com.softeer.backend.bo_domain.admin.util.PasswordEncoder;
@@ -52,6 +53,20 @@ public class AdminLoginService {
         stringRedisUtil.deleteRefreshToken(JwtClaimsDto.builder()
                 .id(adminId)
                 .roleType(RoleType.ROLE_ADMIN)
+                .build());
+    }
+
+    @Transactional
+    public void handleSignUp(AdminSignUpRequestDto adminSignUpRequestDto) {
+
+        if(adminRepository.existsByAccount(adminSignUpRequestDto.getAccount())){
+            log.error("Admin account already exist.");
+            throw new AdminException(ErrorStatus._BAD_REQUEST);
+        }
+
+        adminRepository.save(Admin.builder()
+                .account(adminSignUpRequestDto.getAccount())
+                .password(passwordEncoder.encode(adminSignUpRequestDto.getPassword()))
                 .build());
     }
 }

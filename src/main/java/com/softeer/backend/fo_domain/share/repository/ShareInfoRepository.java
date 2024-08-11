@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ShareInfoRepository extends JpaRepository<ShareInfo, Integer> {
-    Optional<String> findSharedUrlByUserId(Integer userId);
     Optional<ShareInfo> findShareInfoByUserId(Integer userId);
 }

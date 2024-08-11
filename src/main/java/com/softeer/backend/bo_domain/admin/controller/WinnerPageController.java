@@ -17,7 +17,7 @@ public class WinnerPageController {
     private final WinnerPageService winnerPageService;
 
     @GetMapping("/fcfs/{round}")
-    public ResponseDto<FcfsWinnerListResponseDto> getFcfsWinnerList(@PathVariable int round) {
+    public ResponseDto<FcfsWinnerListResponseDto> getFcfsWinnerList(@PathVariable Integer round) {
 
         FcfsWinnerListResponseDto fcfsWinnerListResponseDto = winnerPageService.getFcfsWinnerList(round);
 
@@ -25,7 +25,7 @@ public class WinnerPageController {
     }
 
     @GetMapping("/draw/{rank}")
-    public ResponseDto<DrawWinnerListResponseDto> getDrawWinnerList(@PathVariable int rank) {
+    public ResponseDto<DrawWinnerListResponseDto> getDrawWinnerList(@PathVariable Integer rank) {
 
         DrawWinnerListResponseDto drawWinnerListResponseDto = winnerPageService.getDrawWinnerList(rank);
 

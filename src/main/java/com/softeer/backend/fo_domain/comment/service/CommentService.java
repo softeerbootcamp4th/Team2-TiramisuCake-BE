@@ -41,7 +41,7 @@ public class CommentService {
      * 기대평을 저장하는 메서드
      */
     @Transactional
-    public void saveComment(Integer userId, int commentNum) {
+    public void saveComment(Integer userId, int commentType) {
 
         // 로그인 한 유저가 기대평을 등록했다면 User entity의 id값을 기반으로 닉네임을 설정한다.
         // 로그인 하지 않았다면, 랜덤으로 닉네임을 설정한다.
@@ -50,7 +50,7 @@ public class CommentService {
 
         commentRepository.save(Comment.builder()
                 .nickname(randomNickname)
-                .expectationComment(ExpectationComment.of(commentNum))
+                .expectationComment(ExpectationComment.of(commentType))
                 .userId(userId)
                 .build()
         );

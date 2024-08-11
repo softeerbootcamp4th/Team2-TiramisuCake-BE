@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-public class MainPageController {
+public class AdminMainPageController {
     private final MainPageService mainPageService;
 
     @GetMapping("/main")

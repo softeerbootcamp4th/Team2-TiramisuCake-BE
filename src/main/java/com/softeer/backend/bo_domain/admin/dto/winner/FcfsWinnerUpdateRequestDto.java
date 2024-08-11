@@ -13,10 +13,8 @@ import lombok.*;
 public class FcfsWinnerUpdateRequestDto {
 
     @NotNull
-    private Integer round;
-
-    @NotNull
     @Min(value = 1, message = ValidationConstant.MIN_VALUE_MSG)
     @Max(value = 50, message = ValidationConstant.MAX_VALUE_MSG)
     private Integer fcfsWinnerNum;
+
 }

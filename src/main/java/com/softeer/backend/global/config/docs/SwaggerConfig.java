@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "T라미숙해 api명세",
                 version = "v1"),
         servers = {
-                @Server(url = "https://vec-to.net"),
+                @Server(url = "https://softeer.shop"),
                 @Server(url = "http://localhost:5000")
         }
 )
@@ -44,11 +44,11 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI getOpenApi() {
         Components components = new Components()
-                .addSecuritySchemes("bearerAuth", getJwtSecurityScheme())
-                .addSecuritySchemes("refreshAuth", getJwtRefreshSecurityScheme());
+                .addSecuritySchemes("AccessToken", getJwtSecurityScheme())
+                .addSecuritySchemes("RefreshToken", getJwtRefreshSecurityScheme());
         SecurityRequirement securityItem = new SecurityRequirement()
-                .addList("bearerAuth")
-                .addList("refreshAuth");
+                .addList("AccessToken")
+                .addList("RefreshToken");
 
         return new OpenAPI()
                 .components(components)

@@ -1,6 +1,6 @@
 package com.softeer.backend.bo_domain.admin.service;
 
-import com.softeer.backend.bo_domain.admin.dto.main.MainPageResponseDto;
+import com.softeer.backend.bo_domain.admin.dto.main.AdminMainPageResponseDto;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
@@ -20,10 +20,10 @@ public class AdminMainPageService {
     private final DrawSettingRepository drawSettingRepository;
 
     @Transactional(readOnly = true)
-    public MainPageResponseDto getMainPage() {
+    public AdminMainPageResponseDto getMainPage() {
         List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
         List<DrawSetting> drawSetting = drawSettingRepository.findAll();
 
-        return MainPageResponseDto.of(fcfsSettingList, drawSetting);
+        return AdminMainPageResponseDto.of(fcfsSettingList, drawSetting);
     }
 }

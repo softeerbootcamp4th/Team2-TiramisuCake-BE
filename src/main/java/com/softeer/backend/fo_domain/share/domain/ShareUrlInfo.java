@@ -12,7 +12,6 @@ import lombok.*;
 public class ShareUrlInfo {
     @Id
     @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
     @Column(name = "share_url")

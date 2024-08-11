@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class MainPageResponseDto {
+public class AdminMainPageResponseDto {
     public static final int EXPECTED_PARTICIPANT_COUNT = 10000;
 
     private List<FcfsEvent> fcfsEventList;
@@ -73,7 +73,7 @@ public class MainPageResponseDto {
         private double probability;
     }
 
-    public static MainPageResponseDto of(List<FcfsSetting> fcfsSettingList, List<DrawSetting> drawSettingList) {
+    public static AdminMainPageResponseDto of(List<FcfsSetting> fcfsSettingList, List<DrawSetting> drawSettingList) {
         List<FcfsEvent> fcfsEventList = fcfsSettingList.stream()
                 .map((fcfsSetting) ->
                         FcfsEvent.builder()
@@ -110,7 +110,7 @@ public class MainPageResponseDto {
                 .drawInfoList(drawInfoList)
                 .build();
 
-        return MainPageResponseDto.builder()
+        return AdminMainPageResponseDto.builder()
                 .fcfsEventList(fcfsEventList)
                 .drawEvent(drawEvent)
                 .build();

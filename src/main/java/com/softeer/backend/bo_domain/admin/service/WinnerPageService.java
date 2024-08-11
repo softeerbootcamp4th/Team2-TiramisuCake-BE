@@ -49,13 +49,9 @@ public class WinnerPageService {
 
     @Transactional
     public void updateFcfsWinnerNum(FcfsWinnerUpdateRequestDto fcfsWinnerUpdateRequestDto) {
-        FcfsSetting fcfsSetting = fcfsSettingRepository.findByRound(fcfsWinnerUpdateRequestDto.getRound())
-                .orElseThrow(() -> {
-                    log.error("fcfsSetting not found");
-                    return new AdminException(ErrorStatus._NOT_FOUND);
-                });
+        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll();
 
-        fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum());
+        fcfsSettingList.forEach((fcfsSetting) -> fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum()));
     }
 
     @Transactional

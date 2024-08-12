@@ -1,6 +1,6 @@
 package com.softeer.backend.fo_domain.share.service;
 
-import com.softeer.backend.fo_domain.share.dto.ShareUrlResponseDto;
+import com.softeer.backend.fo_domain.share.dto.ShareUrlInfoResponseDto;
 import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShareInfoService {
+public class ShareUrlInfoService {
     private final ShareUrlInfoRepository shareUrlInfoRepository;
 
-    public ResponseDto<ShareUrlResponseDto> getShortenShareUrl(Integer userId) {
+    public ResponseDto<ShareUrlInfoResponseDto> getShortenShareUrl(Integer userId) {
         String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId).orElseThrow(
                 () -> new ShareInfoException(ErrorStatus._NOT_FOUND)
         );
 
         // DB에 이미 생성된 단축 url 반환
-        return ResponseDto.onSuccess(ShareUrlResponseDto.builder()
+        return ResponseDto.onSuccess(ShareUrlInfoResponseDto.builder()
                 .shareUrl(shareUrl)
                 .build());
     }

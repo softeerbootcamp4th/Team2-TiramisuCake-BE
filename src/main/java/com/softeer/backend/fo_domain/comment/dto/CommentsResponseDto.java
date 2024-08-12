@@ -29,7 +29,7 @@ public class CommentsResponseDto {
 
         private String nickName;
 
-        private String comment;
+        private int commentType;
     }
 
     public static CommentsResponseDto of(ScrollPaginationUtil<Comment> commentsScroll, Integer userId) {
@@ -64,7 +64,7 @@ public class CommentsResponseDto {
                 .map(_comment -> {
                     boolean isMine = false;
                     String nickname = _comment.getNickname();
-                    String comment = _comment.getExpectationComment().getComment();
+                    int commentType = _comment.getCommentType();
 
                     if (userId != null && _comment.getUserId() != null &&
                             _comment.getUserId().equals(userId)) {
@@ -75,7 +75,7 @@ public class CommentsResponseDto {
                     return CommentResponse.builder()
                             .isMine(isMine)
                             .nickName(nickname)
-                            .comment(comment)
+                            .commentType(commentType)
                             .build();
                 })
                 .toList();

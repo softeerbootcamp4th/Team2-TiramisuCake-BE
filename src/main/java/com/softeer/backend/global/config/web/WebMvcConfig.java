@@ -46,7 +46,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // TODO: Origin 도메인 수정 및 헤더값 설정
+
         registry.addMapping("/**")
                 .allowedOrigins("https://softeer.site", "http://localhost:5173", "https://softeer.shop") // 허용할 도메인 설정
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정

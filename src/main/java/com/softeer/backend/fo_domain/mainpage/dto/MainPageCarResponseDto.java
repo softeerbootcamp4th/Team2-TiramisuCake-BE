@@ -10,24 +10,7 @@ import java.util.List;
 @Getter
 public class MainPageCarResponseDto {
 
-    private CarVideoInfo carVideoInfo;
-
     private List<CarInfo> carInfoList;
-
-
-    @Getter
-    @AllArgsConstructor
-    @Builder
-    public static class CarVideoInfo{
-
-        private String title;
-
-        private String subTitle;
-
-        private String videoUrl;
-
-        private String backgroundImgUrl;
-    }
 
     @Getter
     @AllArgsConstructor

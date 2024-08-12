@@ -2,8 +2,6 @@ package com.softeer.backend.fo_domain.comment.domain;
 
 
 import com.softeer.backend.fo_domain.comment.constant.CommentNickname;
-import com.softeer.backend.fo_domain.comment.constant.ExpectationComment;
-import com.softeer.backend.fo_domain.comment.converter.ExpectationCommentConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,12 +26,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "comment")
-    @Convert(converter = ExpectationCommentConverter.class)
-    private ExpectationComment expectationComment;
+    @Column(name = "commentType", nullable = false)
+    private Integer commentType;
 
     @CreatedDate
     @Column(name = "upload_time", updatable = false)
@@ -42,7 +39,6 @@ public class Comment {
     @Column(name = "user_id", nullable = true)
     private Integer userId;
 
-    //
     @PrePersist
     public void assignRandomNickname() {
         if (userId != null) {

@@ -75,7 +75,14 @@ public enum StaticText {
     SAFE_ADVANCED_TITLE("후석 승객 알림"),
     SAFE_ADVANCED_SUBTITLE("어드밴스드 후석 승객 알림"),
     SAFE_ADVANCED_CONTENT("정밀한 레이더 센서가 실내의 승객을 감지하여, 운전자가 후석에 탑승한 유아를 인지하지 못하고 차를 떠나면\n" +
-            "알림을 주어 안전사고를 예방합니다.");
+            "알림을 주어 안전사고를 예방합니다."),
+
+    // 7일 연속 출석 모달
+    FULL_ATTEND_MODAL_TITLE("7일 연속 출석하셨네요!"),
+    FULL_ATTEND_MODAL_SUBTITLE("등록된 번호로 스타벅스 기프티콘을 보내드려요."),
+    FULL_ATTEND_MODAL_DESCRIPTION("본 이벤트는 The new IONIQ 5 출시 이벤트 기간 내 한 회선당 1회만 참여 가능합니다.\n" +
+            "이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+            "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.\n");
 
 
     private final String text;

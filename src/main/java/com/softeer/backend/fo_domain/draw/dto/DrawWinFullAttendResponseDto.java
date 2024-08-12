@@ -5,17 +5,17 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawWinResponseDto extends DrawResponseDto {
-    private WinModal winModal;
+public class DrawWinFullAttendResponseDto extends DrawWinResponseDto {
+    private FullAttendModal fullAttendModal;
 
     @Data
     @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class WinModal {
+    public static class FullAttendModal {
         private String title; // 제목
         private String subtitle; // 부제목
-        private String img; // 이미지 URL (S3 URL)
+        private String image; // 이미지 URL (S3 URL)
         private String description; // 설명
     }
 }

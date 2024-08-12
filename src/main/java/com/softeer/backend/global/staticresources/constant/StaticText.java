@@ -86,7 +86,7 @@ public enum StaticText {
 
     // 공유 url
     BASE_URL("https://softeer.shop/"),
-    NON_USER_SHARE_URL("https://softeer.site/main-page");
+    NON_USER_SHARE_URL("https://softeer.site");
 
 
     private final String text;

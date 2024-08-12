@@ -1,6 +1,8 @@
 package com.softeer.backend.fo_domain.draw.util;
 
+import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawWinFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.LoseModal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -92,7 +94,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public DrawWinFullAttendResponseDto.WinModal generateWinModal() {
+    public DrawWinResponseDto.WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -105,7 +107,7 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private DrawWinFullAttendResponseDto.WinModal generateFirstWinModal() {
+    private DrawWinResponseDto.WinModal generateFirstWinModal() {
         return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("아이패드 어쩌구")
@@ -117,7 +119,7 @@ public class DrawUtil {
     /**
      * @return 2등 WinModal 반환
      */
-    private DrawWinFullAttendResponseDto.WinModal generateSecondWinModal() {
+    private DrawWinResponseDto.WinModal generateSecondWinModal() {
         return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 10만원권 어쩌구")
@@ -129,7 +131,7 @@ public class DrawUtil {
     /**
      * @return 3등 WinModal 반환
      */
-    private DrawWinFullAttendResponseDto.WinModal generateThirdWinModal() {
+    private DrawWinResponseDto.WinModal generateThirdWinModal() {
         return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 1만원권 어쩌구")
@@ -142,8 +144,8 @@ public class DrawUtil {
      * @param shareUrl 공유 url
      * @return LoseModal 반환
      */
-    public LoseModal generateLoseModal(String shareUrl) {
-        return LoseModal.builder()
+    public DrawLoseResponseDto.LoseModal generateLoseModal(String shareUrl) {
+        return DrawLoseResponseDto.LoseModal.builder()
                 .shareUrl(shareUrl)
                 .build();
     }

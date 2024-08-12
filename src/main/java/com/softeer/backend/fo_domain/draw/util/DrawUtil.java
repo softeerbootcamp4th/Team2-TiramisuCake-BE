@@ -3,7 +3,6 @@ package com.softeer.backend.fo_domain.draw.util;
 import com.softeer.backend.fo_domain.draw.dto.*;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;

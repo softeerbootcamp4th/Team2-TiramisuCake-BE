@@ -1,9 +1,6 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.DrawWinFullAttendResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.LoseModal;
+import com.softeer.backend.fo_domain.draw.dto.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -147,6 +144,22 @@ public class DrawUtil {
     public DrawLoseResponseDto.LoseModal generateLoseModal(String shareUrl) {
         return DrawLoseResponseDto.LoseModal.builder()
                 .shareUrl(shareUrl)
+                .build();
+    }
+
+    public DrawWinFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
+        return DrawWinFullAttendResponseDto.FullAttendModal.builder()
+                .title("7일 연속 출석하셨네요!")
+                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
+                .description("본 이벤트는 블라블라")
+                .build();
+    }
+
+    public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
+        return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
+                .title("7일 연속 출석하셨네요!")
+                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
+                .description("본 이벤트는 블라블라")
                 .build();
     }
 }

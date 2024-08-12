@@ -1,7 +1,7 @@
 package com.softeer.backend.fo_domain.draw.util;
 
+import com.softeer.backend.fo_domain.draw.dto.DrawWinFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.LoseModal;
-import com.softeer.backend.fo_domain.draw.dto.WinModal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -92,7 +92,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public WinModal generateWinModal() {
+    public DrawWinFullAttendResponseDto.WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -105,8 +105,8 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private WinModal generateFirstWinModal() {
-        return WinModal.builder()
+    private DrawWinFullAttendResponseDto.WinModal generateFirstWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("아이패드 어쩌구")
                 .img("image url")
@@ -117,8 +117,8 @@ public class DrawUtil {
     /**
      * @return 2등 WinModal 반환
      */
-    private WinModal generateSecondWinModal() {
-        return WinModal.builder()
+    private DrawWinFullAttendResponseDto.WinModal generateSecondWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 10만원권 어쩌구")
                 .img("image url")
@@ -129,8 +129,8 @@ public class DrawUtil {
     /**
      * @return 3등 WinModal 반환
      */
-    private WinModal generateThirdWinModal() {
-        return WinModal.builder()
+    private DrawWinFullAttendResponseDto.WinModal generateThirdWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 1만원권 어쩌구")
                 .img("image url")

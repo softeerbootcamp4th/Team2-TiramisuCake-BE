@@ -1,10 +1,7 @@
 package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
-import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.DrawResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.DrawWinFullAttendResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.*;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -96,7 +93,7 @@ public class DrawService {
             String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
                     .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
-            return ResponseDto.onSuccess(DrawLoseResponseDto.builder()
+            return ResponseDto.onSuccess(DrawLoseFullAttendResponseDto.builder()
                     .invitedNum(invitedNum)
                     .remainDrawCount(remainDrawCount)
                     .drawParticipationCount(drawParticipationCount)

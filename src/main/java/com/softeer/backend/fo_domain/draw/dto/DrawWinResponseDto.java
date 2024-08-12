@@ -3,8 +3,6 @@ package com.softeer.backend.fo_domain.draw.dto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 @Data
 @SuperBuilder
 @NoArgsConstructor

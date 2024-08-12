@@ -147,6 +147,10 @@ public class DrawUtil {
                 .build();
     }
 
+    /**
+     * 7일 연속 출석자 상품 정보 반환 메서드
+     * @return FullAttendModal 반환
+     */
     public DrawWinFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
         return DrawWinFullAttendResponseDto.FullAttendModal.builder()
                 .title("7일 연속 출석하셨네요!")
@@ -155,6 +159,10 @@ public class DrawUtil {
                 .build();
     }
 
+    /**
+     * 7일 연속 출석자 상품 정보 반환 메서드
+     * @return FullAttendModal 반환
+     */
     public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
         return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
                 .title("7일 연속 출석하셨네요!")

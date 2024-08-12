@@ -1,8 +1,10 @@
 package com.softeer.backend.fo_domain.draw.util;
 
 import com.softeer.backend.fo_domain.draw.dto.*;
+import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -10,7 +12,9 @@ import java.util.List;
 import java.util.Random;
 
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class DrawUtil {
+    private static StaticResourcesUtil staticResourcesUtil;
     @Getter
     private boolean isDrawWin = false;
     @Getter
@@ -149,25 +153,29 @@ public class DrawUtil {
 
     /**
      * 7일 연속 출석자 상품 정보 반환 메서드
+     *
      * @return FullAttendModal 반환
      */
     public DrawWinFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
         return DrawWinFullAttendResponseDto.FullAttendModal.builder()
-                .title("7일 연속 출석하셨네요!")
-                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
-                .description("본 이벤트는 블라블라")
+                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
+                .image(staticResourcesUtil.getData("attendance_reward_image"))
+                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
                 .build();
     }
 
     /**
      * 7일 연속 출석자 상품 정보 반환 메서드
+     *
      * @return FullAttendModal 반환
      */
     public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
         return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
-                .title("7일 연속 출석하셨네요!")
-                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
-                .description("본 이벤트는 블라블라")
+                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
+                .image(staticResourcesUtil.getData("attendance_reward_image"))
+                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
                 .build();
     }
 }

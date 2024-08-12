@@ -6,15 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@NoArgsConstructor
+@Component
 @RequiredArgsConstructor
 public class DrawUtil {
-    private static StaticResourcesUtil staticResourcesUtil;
+    private final StaticResourcesUtil staticResourcesUtil;
     @Getter
     private boolean isDrawWin = false;
     @Getter

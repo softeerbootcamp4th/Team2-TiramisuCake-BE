@@ -3,6 +3,7 @@ package com.softeer.backend.fo_domain.draw.service;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.DrawWinFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
@@ -56,7 +57,7 @@ public class DrawService {
         DrawUtil drawUtil = new DrawUtil();
         if (ranking != 0) {
             drawUtil.setRanking(ranking);
-            return ResponseDto.onSuccess(DrawWinResponseDto.builder()
+            return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
                     .invitedNum(invitedNum)
                     .remainDrawCount(remainDrawCount)
                     .drawParticipationCount(drawParticipationCount)
@@ -83,7 +84,7 @@ public class DrawService {
             // redis 임시 당첨자 목록에 저장
             saveWinnerInfo(drawUtil.getRanking(), userId);
 
-            return ResponseDto.onSuccess(DrawWinResponseDto.builder()
+            return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
                     .invitedNum(invitedNum)
                     .remainDrawCount(remainDrawCount)
                     .drawParticipationCount(drawParticipationCount)

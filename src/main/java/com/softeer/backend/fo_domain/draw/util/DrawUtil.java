@@ -1,17 +1,20 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.draw.dto.LoseModal;
-import com.softeer.backend.fo_domain.draw.dto.WinModal;
+import com.softeer.backend.fo_domain.draw.dto.*;
+import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@NoArgsConstructor
+@Component
+@RequiredArgsConstructor
 public class DrawUtil {
+    private final StaticResourcesUtil staticResourcesUtil;
     @Getter
     private boolean isDrawWin = false;
     @Getter
@@ -92,7 +95,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public WinModal generateWinModal() {
+    public DrawWinResponseDto.WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -105,8 +108,8 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private WinModal generateFirstWinModal() {
-        return WinModal.builder()
+    private DrawWinResponseDto.WinModal generateFirstWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("아이패드 어쩌구")
                 .img("image url")
@@ -117,8 +120,8 @@ public class DrawUtil {
     /**
      * @return 2등 WinModal 반환
      */
-    private WinModal generateSecondWinModal() {
-        return WinModal.builder()
+    private DrawWinResponseDto.WinModal generateSecondWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 10만원권 어쩌구")
                 .img("image url")
@@ -129,8 +132,8 @@ public class DrawUtil {
     /**
      * @return 3등 WinModal 반환
      */
-    private WinModal generateThirdWinModal() {
-        return WinModal.builder()
+    private DrawWinResponseDto.WinModal generateThirdWinModal() {
+        return DrawWinFullAttendResponseDto.WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 1만원권 어쩌구")
                 .img("image url")
@@ -142,9 +145,37 @@ public class DrawUtil {
      * @param shareUrl 공유 url
      * @return LoseModal 반환
      */
-    public LoseModal generateLoseModal(String shareUrl) {
-        return LoseModal.builder()
+    public DrawLoseResponseDto.LoseModal generateLoseModal(String shareUrl) {
+        return DrawLoseResponseDto.LoseModal.builder()
                 .shareUrl(shareUrl)
+                .build();
+    }
+
+    /**
+     * 7일 연속 출석자 상품 정보 반환 메서드
+     *
+     * @return FullAttendModal 반환
+     */
+    public DrawWinFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
+        return DrawWinFullAttendResponseDto.FullAttendModal.builder()
+                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
+                .image(staticResourcesUtil.getData("attendance_reward_image"))
+                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
+                .build();
+    }
+
+    /**
+     * 7일 연속 출석자 상품 정보 반환 메서드
+     *
+     * @return FullAttendModal 반환
+     */
+    public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
+        return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
+                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
+                .image(staticResourcesUtil.getData("attendance_reward_image"))
+                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
                 .build();
     }
 }

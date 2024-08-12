@@ -44,7 +44,15 @@ public class MainPageService {
 
     public MainPageCarResponseDto getCarPage(){
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo1_1 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarInfo carInfo1 = MainPageCarResponseDto.CarInfo.builder()
+                .id(1)
+                .title(staticResourcesUtil.getData("MAIN_TITLE"))
+                .subTitle(staticResourcesUtil.getData("MAIN_SUBTITLE"))
+                .imgUrl(staticResourcesUtil.getData("ioniq_video"))
+                .backgroundImgUrl(staticResourcesUtil.getData("main_background_image"))
+                .build();
+
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo2_1 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(1)
                 .title(staticResourcesUtil.getData("INTERIOR_OPENNESS_TITLE"))
                 .subTitle(staticResourcesUtil.getData("INTERIOR_OPENNESS_SUBTITLE"))
@@ -52,7 +60,7 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("interior_openness_image"))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo1_2 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo2_2 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(2)
                 .title(staticResourcesUtil.getData("INTERIOR_WELLNESS_TITLE"))
                 .subTitle(staticResourcesUtil.getData("INTERIOR_WELLNESS_SUBTITLE"))
@@ -60,18 +68,18 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("interior_wellness_image"))
                 .build();
 
-        MainPageCarResponseDto.CarInfo carInfo1 = MainPageCarResponseDto.CarInfo.builder()
-                .id(1)
+        MainPageCarResponseDto.CarInfo carInfo2 = MainPageCarResponseDto.CarInfo.builder()
+                .id(2)
                 .title(staticResourcesUtil.getData("INTERIOR_TITLE"))
                 .subTitle(staticResourcesUtil.getData("INTERIOR_SUBTITLE"))
                 .imgTitle(staticResourcesUtil.getData("INTERIOR_IMAGE_TITLE"))
                 .imgContent(staticResourcesUtil.getData("INTERIOR_IMAGE_CONTENT"))
                 .imgUrl(staticResourcesUtil.getData("interior_thumbnail_image"))
                 .backgroundImgUrl(staticResourcesUtil.getData("interior_background_image"))
-                .carDetailInfoList(Arrays.asList(carDetailInfo1_1, carDetailInfo1_2))
+                .carDetailInfoList(Arrays.asList(carDetailInfo2_1, carDetailInfo2_2))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo2_1 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo3_1 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(1)
                 .title(staticResourcesUtil.getData("PERFORMANCE_BRAKING_TITLE"))
                 .subTitle(staticResourcesUtil.getData("PERFORMANCE_BRAKING_SUBTITLE"))
@@ -79,7 +87,7 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("performance_braking_image"))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo2_2 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo3_2 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(2)
                 .title(staticResourcesUtil.getData("PERFORMANCE_DRIVING_TITLE"))
                 .subTitle(staticResourcesUtil.getData("PERFORMANCE_DRIVING_SUBTITLE"))
@@ -87,18 +95,18 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("performance_driving_image"))
                 .build();
 
-        MainPageCarResponseDto.CarInfo carInfo2 = MainPageCarResponseDto.CarInfo.builder()
-                .id(2)
+        MainPageCarResponseDto.CarInfo carInfo3 = MainPageCarResponseDto.CarInfo.builder()
+                .id(3)
                 .title(staticResourcesUtil.getData("PERFORMANCE_TITLE"))
                 .subTitle(staticResourcesUtil.getData("PERFORMANCE_SUBTITLE"))
                 .imgTitle(staticResourcesUtil.getData("PERFORMANCE_IMAGE_TITLE"))
                 .imgContent(staticResourcesUtil.getData("PERFORMANCE_IMAGE_CONTENT"))
                 .imgUrl(staticResourcesUtil.getData("performance_thumbnail_image"))
                 .backgroundImgUrl(staticResourcesUtil.getData("performance_background_image"))
-                .carDetailInfoList(Arrays.asList(carDetailInfo2_1, carDetailInfo2_2))
+                .carDetailInfoList(Arrays.asList(carDetailInfo3_1, carDetailInfo3_2))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo3_1 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo4_1 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(1)
                 .title(staticResourcesUtil.getData("CHARGING_FAST_TITLE"))
                 .subTitle(staticResourcesUtil.getData("CHARGING_FAST_SUBTITLE"))
@@ -106,7 +114,7 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("charging_fast_image"))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo3_2 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo4_2 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(2)
                 .title(staticResourcesUtil.getData("CHARGING_V2L_TITLE"))
                 .subTitle(staticResourcesUtil.getData("CHARGING_V2L_SUBTITLE"))
@@ -114,8 +122,8 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("charging_v2l_image"))
                 .build();
 
-        MainPageCarResponseDto.CarInfo carInfo3 = MainPageCarResponseDto.CarInfo.builder()
-                .id(3)
+        MainPageCarResponseDto.CarInfo carInfo4 = MainPageCarResponseDto.CarInfo.builder()
+                .id(4)
                 .title(staticResourcesUtil.getData("CHARGING_TITLE"))
                 .subTitle(staticResourcesUtil.getData("CHARGING_SUBTITLE"))
                 .imgTitle(staticResourcesUtil.getData("CHARGING_IMAGE_TITLE"))
@@ -125,7 +133,7 @@ public class MainPageService {
                 .carDetailInfoList(Arrays.asList(carDetailInfo3_1, carDetailInfo3_2))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo4_1 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo5_1 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(1)
                 .title(staticResourcesUtil.getData("SAFE_DRIVING_TITLE"))
                 .subTitle(staticResourcesUtil.getData("SAFE_DRIVING_SUBTITLE"))
@@ -133,7 +141,7 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("safe_driving_image"))
                 .build();
 
-        MainPageCarResponseDto.CarDetailInfo carDetailInfo4_2 = MainPageCarResponseDto.CarDetailInfo.builder()
+        MainPageCarResponseDto.CarDetailInfo carDetailInfo5_2 = MainPageCarResponseDto.CarDetailInfo.builder()
                 .id(2)
                 .title(staticResourcesUtil.getData("SAFE_ADVANCED_TITLE"))
                 .subTitle(staticResourcesUtil.getData("SAFE_ADVANCED_SUBTITLE"))
@@ -141,8 +149,8 @@ public class MainPageService {
                 .imgUrl(staticResourcesUtil.getData("safe_advanced_image"))
                 .build();
 
-        MainPageCarResponseDto.CarInfo carInfo4 = MainPageCarResponseDto.CarInfo.builder()
-                .id(4)
+        MainPageCarResponseDto.CarInfo carInfo5 = MainPageCarResponseDto.CarInfo.builder()
+                .id(5)
                 .title(staticResourcesUtil.getData("SAFE_TITLE"))
                 .subTitle(staticResourcesUtil.getData("SAFE_SUBTITLE"))
                 .imgTitle(staticResourcesUtil.getData("SAFE_IMAGE_TITLE"))
@@ -152,19 +160,8 @@ public class MainPageService {
                 .carDetailInfoList(Arrays.asList(carDetailInfo4_1, carDetailInfo4_2))
                 .build();
 
-
-
-
-        MainPageCarResponseDto.CarVideoInfo carVideoInfo = MainPageCarResponseDto.CarVideoInfo.builder()
-                .title(staticResourcesUtil.getData("MAIN_TITLE"))
-                .subTitle(staticResourcesUtil.getData("MAIN_SUBTITLE"))
-                .videoUrl(staticResourcesUtil.getData("ioniq_video"))
-                .backgroundImgUrl(staticResourcesUtil.getData("main_background_image"))
-                .build();
-
         return MainPageCarResponseDto.builder()
-                .carVideoInfo(carVideoInfo)
-                .carInfoList(Arrays.asList(carInfo1, carInfo2, carInfo3, carInfo4))
+                .carInfoList(Arrays.asList(carInfo1, carInfo2, carInfo3, carInfo4, carInfo5))
                 .build();
     }
 }

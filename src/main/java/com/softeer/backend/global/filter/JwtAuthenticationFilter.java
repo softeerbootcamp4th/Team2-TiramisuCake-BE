@@ -43,7 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // Access Token이 header에 있으면 인증하고 없으면 인증하지 않는 url 설정
     private final String[] optionalAuthUrls = {
-            "/comment"
+            "/comment",
+            "/share-shorten-url"
     };
 
     private final JwtUtil jwtUtil;

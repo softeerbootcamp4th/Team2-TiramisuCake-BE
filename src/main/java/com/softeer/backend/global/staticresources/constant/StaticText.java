@@ -82,7 +82,11 @@ public enum StaticText {
     FULL_ATTEND_MODAL_SUBTITLE("등록된 번호로 스타벅스 기프티콘을 보내드려요."),
     FULL_ATTEND_MODAL_DESCRIPTION("본 이벤트는 The new IONIQ 5 출시 이벤트 기간 내 한 회선당 1회만 참여 가능합니다.\n" +
             "이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-            "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.\n");
+            "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.\n"),
+
+    // 공유 url
+    BASE_URL("https://softeer.shop/"),
+    NON_USER_SHARE_URL("https://softeer.site/main-page");
 
 
     private final String text;

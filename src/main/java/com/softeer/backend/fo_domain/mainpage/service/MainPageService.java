@@ -1,43 +1,49 @@
 package com.softeer.backend.fo_domain.mainpage.service;
 
+import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
+import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageCarResponseDto;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
 public class MainPageService {
+    private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     private final StaticResourcesUtil staticResourcesUtil;
+    private final DrawSettingRepository drawSettingRepository;
 
     public MainPageEventResponseDto getEventPage(){
 
-        MainPageEventResponseDto.FcfsInfo fcfsInfo = MainPageEventResponseDto.FcfsInfo.builder()
-                .fcfsInfo(staticResourcesUtil.getData("FCFS_INFO"))
-                .fcfsTitle(staticResourcesUtil.getData("FCFS_TITLE"))
-                .fcfsContent(staticResourcesUtil.getData("FCFS_CONTENT"))
-                .fcfsRewardImage1(staticResourcesUtil.getData("fcfs_reward_image_1"))
-                .fcfsRewardImage2(staticResourcesUtil.getData("fcfs_reward_image_2"))
+        MainPageEventResponseDto.EventInfo fcfsInfo = MainPageEventResponseDto.EventInfo.builder()
+                .title(staticResourcesUtil.getData("FCFS_TITLE"))
+                .content(staticResourcesUtil.getData("FCFS_CONTENT"))
+                .rewardImage1(staticResourcesUtil.getData("fcfs_reward_image_1"))
+                .rewardImage2(staticResourcesUtil.getData("fcfs_reward_image_2"))
                 .build();
 
-        MainPageEventResponseDto.DrawInfo drawInfo = MainPageEventResponseDto.DrawInfo.builder()
-                .totalDrawWinner(staticResourcesUtil.getData("TOTAL_DRAW_WINNER"))
-                .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))
-                .drawTitle(staticResourcesUtil.getData("DRAW_TITLE"))
-                .drawContent(staticResourcesUtil.getData("DRAW_CONTENT"))
-                .drawRewardImage1(staticResourcesUtil.getData("draw_reward_image_1"))
-                .drawRewardImage2(staticResourcesUtil.getData("draw_reward_image_2"))
-                .drawRewardImage3(staticResourcesUtil.getData("draw_reward_image_3"))
+        MainPageEventResponseDto.EventInfo drawInfo = MainPageEventResponseDto.EventInfo.builder()
+                .title(staticResourcesUtil.getData("DRAW_TITLE"))
+                .content(staticResourcesUtil.getData("DRAW_CONTENT"))
+                .rewardImage1(staticResourcesUtil.getData("draw_reward_image_1"))
+                .rewardImage2(staticResourcesUtil.getData("draw_reward_image_2_3"))
                 .build();
+
+        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 
         return MainPageEventResponseDto.builder()
-                .eventPeriod(staticResourcesUtil.getData("EVENT_PERIOD"))
-                .fcfsInfo(fcfsInfo)
-                .drawInfo(drawInfo)
+                .startDate(drawSetting.getStartDate().format(eventTimeFormatter))
+                .endDate(drawSetting.getEndDate().format(eventTimeFormatter))
+                .fcfsInfo(staticResourcesUtil.getData("FCFS_INFO"))
+                .totalDrawWinner(staticResourcesUtil.getData("TOTAL_DRAW_WINNER"))
+                .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))
+                .eventInfoList(Arrays.asList(fcfsInfo, drawInfo))
                 .build();
 
     }

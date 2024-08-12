@@ -1,7 +1,6 @@
 package com.softeer.backend.fo_domain.comment.service;
 
 import com.softeer.backend.fo_domain.comment.constant.CommentNickname;
-import com.softeer.backend.fo_domain.comment.constant.ExpectationComment;
 import com.softeer.backend.fo_domain.comment.domain.Comment;
 import com.softeer.backend.fo_domain.comment.dto.CommentsResponseDto;
 import com.softeer.backend.fo_domain.comment.repository.CommentRepository;
@@ -50,7 +49,7 @@ public class CommentService {
 
         commentRepository.save(Comment.builder()
                 .nickname(randomNickname)
-                .expectationComment(ExpectationComment.of(commentType))
+                .commentType(commentType)
                 .userId(userId)
                 .build()
         );

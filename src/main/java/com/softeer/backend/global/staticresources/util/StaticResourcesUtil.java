@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class StaticResourcesUtil {
-    private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("a h", Locale.KOREAN);
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
@@ -70,13 +70,7 @@ public class StaticResourcesUtil {
                         Enum::name,
                         enumValue -> {
                             switch (enumValue) {
-                                case EVENT_PERIOD:
-
-                                    return enumValue.format(drawSetting.getStartDate().format(eventTimeFormatter),
-                                            drawSetting.getEndDate().format(eventTimeFormatter));
-
                                 case FCFS_INFO:
-
                                     return enumValue.format(getKoreanDayOfWeek(firstFcfsSetting.getStartTime().getDayOfWeek()),
                                             getKoreanDayOfWeek(secondFcfsSetting.getStartTime().getDayOfWeek()),
                                             firstFcfsSetting.getStartTime().format(timeFormatter),

@@ -2,53 +2,39 @@ package com.softeer.backend.fo_domain.mainpage.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
 public class MainPageEventResponseDto {
 
-    private String eventPeriod;
+    private String startDate;
 
-    private FcfsInfo fcfsInfo;
+    private String endDate;
 
-    private DrawInfo drawInfo;
+    private String fcfsInfo;
 
-    @Getter
-    @AllArgsConstructor
-    @Builder
-    public static class FcfsInfo{
+    private String totalDrawWinner;
 
-        private String fcfsInfo;
+    private String remainDrawCount;
 
-        private String fcfsTitle;
-
-        private String fcfsContent;
-
-        private String fcfsRewardImage1;
-
-        private String fcfsRewardImage2;
-
-    }
+    private List<EventInfo> eventInfoList;
 
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class DrawInfo{
+    public static class EventInfo{
 
-        private String totalDrawWinner;
+        private String title;
 
-        private String remainDrawCount;
+        private String content;
 
-        private String drawTitle;
+        private String rewardImage1;
 
-        private String drawContent;
+        private String rewardImage2;
 
-        private String drawRewardImage1;
-
-        private String drawRewardImage2;
-
-        private String drawRewardImage3;
     }
 
 }

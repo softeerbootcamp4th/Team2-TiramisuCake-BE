@@ -4,8 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum StaticText {
-
-    EVENT_PERIOD("%s ~ %s"),
     FCFS_INFO("매주 %s, %s %s시 선착순 %s명"),
     FCFS_TITLE("'24시 내 차' 이벤트"),
     FCFS_CONTENT("하단의 The new IONIQ 5 정보를 바탕으로 빠르게 문장 퀴즈를 맞춰\n" +

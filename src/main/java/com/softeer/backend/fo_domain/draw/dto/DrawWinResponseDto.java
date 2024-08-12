@@ -1,17 +1,21 @@
 package com.softeer.backend.fo_domain.draw.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DrawWinResponseDto extends DrawResponseDto {
     private WinModal winModal;
 
     @Data
-    @Builder
+    @SuperBuilder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WinModal {
         private String title; // 제목
         private String subtitle; // 부제목

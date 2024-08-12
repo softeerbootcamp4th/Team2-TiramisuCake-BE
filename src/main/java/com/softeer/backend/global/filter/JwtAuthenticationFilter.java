@@ -34,9 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 인증검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
-            "/swagger-ui/**", "/swagger", "/error/**",
+            "/swagger-ui/**", "/swagger", "/v3/**", "/error/**",
             "/verification/send", "/verification/confirm",
-            "/login"
+            "/login",
+            "/main/event", "/main/car",
+            "/admin/login", "/admin/signup"
     };
 
     // Access Token이 header에 있으면 인증하고 없으면 인증하지 않는 url 설정

@@ -27,14 +27,14 @@ public enum ExpectationComment {
         return this.ordinal() + 1;
     }
 
-    public static ExpectationComment of(int commentNum) {
+    public static ExpectationComment of(int commentType) {
         for (ExpectationComment comment : values()) {
-            if (comment.getCommentOrder() == commentNum) {
+            if (comment.getCommentOrder() == commentType) {
                 return comment;
             }
         }
 
-        log.error("Invalid comment number: " + commentNum);
+        log.error("Invalid comment number: " + commentType);
         throw new CommentException(ErrorStatus._NOT_FOUND);
     }
 }

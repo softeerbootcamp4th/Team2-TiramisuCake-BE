@@ -1,6 +1,7 @@
 package com.softeer.backend.bo_domain.admin.controller;
 
 import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.login.AdminSignUpRequestDto;
 import com.softeer.backend.bo_domain.admin.service.AdminLoginService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
@@ -29,6 +30,14 @@ public class AdminLoginController {
     @PostMapping("/logout")
     ResponseDto<Void> handleLogout(@AuthInfo Integer adminId) {
         adminLoginService.handleLogout(adminId);
+
+        return ResponseDto.onSuccess();
+    }
+
+    @PostMapping("/signup")
+    ResponseDto<Void> handleSignUp(@Valid @RequestBody AdminSignUpRequestDto adminSignUpRequestDto) {
+
+        adminLoginService.handleSignUp(adminSignUpRequestDto);
 
         return ResponseDto.onSuccess();
     }

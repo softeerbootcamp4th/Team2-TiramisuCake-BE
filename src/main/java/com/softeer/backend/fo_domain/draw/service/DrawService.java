@@ -28,6 +28,7 @@ public class DrawService {
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final EventLockRedisUtil eventLockRedisUtil;
     private final DrawSettingManager drawSettingManager;
+    private final DrawUtil drawUtil;
 
     /**
      * 1. redis의 임시 당첨 목록에 존재하는지 확인
@@ -57,7 +58,6 @@ public class DrawService {
 
         // 만약 임시 당첨 목록에 존재한다면 등수에 맞는 응답 만들어서 반환
         int ranking = getRankingIfWinner(userId);
-        DrawUtil drawUtil = new DrawUtil();
         if (ranking != 0) {
             drawUtil.setRanking(ranking);
 

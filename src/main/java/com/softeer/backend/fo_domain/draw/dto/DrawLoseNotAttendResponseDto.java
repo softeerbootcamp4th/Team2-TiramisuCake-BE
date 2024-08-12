@@ -7,7 +7,5 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DrawLoseNotAttendResponseDto extends DrawLoseResponseDto {
 }

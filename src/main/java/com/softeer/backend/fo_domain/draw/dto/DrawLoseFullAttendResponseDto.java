@@ -8,8 +8,6 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DrawLoseFullAttendResponseDto extends DrawLoseResponseDto {
     private FullAttendModal fullAttendModal;
 

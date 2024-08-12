@@ -7,8 +7,6 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DrawLoseResponseDto extends DrawResponseDto {
     private LoseModal loseModal; // LoseModal 정보
 

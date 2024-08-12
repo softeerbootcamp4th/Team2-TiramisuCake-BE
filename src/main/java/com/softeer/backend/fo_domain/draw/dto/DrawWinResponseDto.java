@@ -5,8 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DrawWinResponseDto extends DrawResponseDto {
     private WinModal winModal;
 

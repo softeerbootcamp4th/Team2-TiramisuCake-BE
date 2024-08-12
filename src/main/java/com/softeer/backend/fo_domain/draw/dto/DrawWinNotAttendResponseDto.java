@@ -7,7 +7,5 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DrawWinNotAttendResponseDto extends DrawWinResponseDto {
 }

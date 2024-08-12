@@ -29,7 +29,7 @@ public class Comment {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "commentType", nullable = false)
+    @Column(name = "comment_type", nullable = false)
     private Integer commentType;
 
     @CreatedDate

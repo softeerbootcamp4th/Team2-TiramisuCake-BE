@@ -1,14 +1,11 @@
 package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
-import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.dto.DrawLoseResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawWinResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
-import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
-import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.exception.ShareInfoException;

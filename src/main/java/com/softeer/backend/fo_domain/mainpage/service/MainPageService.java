@@ -130,7 +130,7 @@ public class MainPageService {
                 .imgContent(staticResourcesUtil.getData("CHARGING_IMAGE_CONTENT"))
                 .imgUrl(staticResourcesUtil.getData("charging_thumbnail_image"))
                 .backgroundImgUrl(staticResourcesUtil.getData("charging_background_image"))
-                .carDetailInfoList(Arrays.asList(carDetailInfo3_1, carDetailInfo3_2))
+                .carDetailInfoList(Arrays.asList(carDetailInfo4_1, carDetailInfo4_2))
                 .build();
 
         MainPageCarResponseDto.CarDetailInfo carDetailInfo5_1 = MainPageCarResponseDto.CarDetailInfo.builder()
@@ -157,7 +157,7 @@ public class MainPageService {
                 .imgContent(staticResourcesUtil.getData("SAFE_IMAGE_CONTENT"))
                 .imgUrl(staticResourcesUtil.getData("safe_thumbnail_image"))
                 .backgroundImgUrl(staticResourcesUtil.getData("safe_background_image"))
-                .carDetailInfoList(Arrays.asList(carDetailInfo4_1, carDetailInfo4_2))
+                .carDetailInfoList(Arrays.asList(carDetailInfo5_1, carDetailInfo5_2))
                 .build();
 
         return MainPageCarResponseDto.builder()

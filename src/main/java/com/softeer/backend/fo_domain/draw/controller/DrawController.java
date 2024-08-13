@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.draw.controller;
 
+import com.softeer.backend.fo_domain.draw.dto.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.DrawResponseDto;
 import com.softeer.backend.fo_domain.draw.service.DrawService;
@@ -16,7 +17,7 @@ public class DrawController {
     private final DrawService drawService;
 
     @GetMapping("/event/draw")
-    public ResponseDto<DrawResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
+    public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
         return drawService.getDrawMainPageInfo(userId);
     }
 

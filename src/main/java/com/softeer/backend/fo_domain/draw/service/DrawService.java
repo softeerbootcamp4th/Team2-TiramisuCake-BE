@@ -43,7 +43,7 @@ public class DrawService {
      * 3-1. 만약 7일 연속 출석했다면 그에 맞는 응답 만들어서 반환
      * 3-2. 만약 연속 출석을 못했다면 그에 맞는 응답 만들어서 반환
      */
-    public ResponseDto<DrawResponseDto> getDrawMainPageInfo(Integer userId) {
+    public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
                 .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
@@ -56,104 +56,128 @@ public class DrawService {
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
-        // 만약 임시 당첨 목록에 존재한다면 등수에 맞는 응답 만들어서 반환
-        int ranking = getRankingIfWinner(userId);
-        if (ranking != 0) {
-            drawUtil.setRanking(ranking);
-
-
-            if (drawParticipationCount < 7) {
-                // 만약 연속 출석하지 못했다면
-                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(true)
-                        .images(drawUtil.generateWinImages())
-                        .winModal(drawUtil.generateWinModal())
-                        .build());
-            } else {
-                // 7일 연속 출석했다면
-                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(true)
-                        .images(drawUtil.generateWinImages())
-                        .winModal(drawUtil.generateWinModal())
-                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
-                        .build());
-            }
+        if (drawParticipationCount == 7) {
+            // 7일 연속 출석자라면
+            return ResponseDto.onSuccess(responseMainFullAttend(invitedNum, remainDrawCount, drawParticipationCount));
+        } else {
+            // 연속 출석자가 아니라면
+            return ResponseDto.onSuccess(responseMainNotAttend(invitedNum, remainDrawCount, drawParticipationCount));
         }
+//        // 만약 임시 당첨 목록에 존재한다면 등수에 맞는 응답 만들어서 반환
+//        int ranking = getRankingIfWinner(userId);
+//        if (ranking != 0) {
+//            drawUtil.setRanking(ranking);
+//
+//
+//            if (drawParticipationCount < 7) {
+//                // 만약 연속 출석하지 못했다면
+//                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(true)
+//                        .images(drawUtil.generateWinImages())
+//                        .winModal(drawUtil.generateWinModal())
+//                        .build());
+//            } else {
+//                // 7일 연속 출석했다면
+//                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(true)
+//                        .images(drawUtil.generateWinImages())
+//                        .winModal(drawUtil.generateWinModal())
+//                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
+//                        .build());
+//            }
+//        }
+//
+//        // 당첨자 수 조회
+//        int first = drawSettingManager.getWinnerNum1(); // 1등 수
+//        int second = drawSettingManager.getWinnerNum2(); // 2등 수
+//        int third = drawSettingManager.getWinnerNum3(); // 3등 수
+//
+//        // 당첨자 수 설정
+//        drawUtil.setFirst(first);
+//        drawUtil.setSecond(second);
+//        drawUtil.setThird(third);
+//
+//        // 추첨 로직 실행
+//        drawUtil.performDraw();
+//
+//        if (drawUtil.isDrawWin()) { // 당첨자일 경우
+//            // redis 임시 당첨자 목록에 저장
+//            saveWinnerInfo(drawUtil.getRanking(), userId);
+//
+//            if (drawParticipationCount < 7) {
+//                // 만약 연속 출석하지 못했다면
+//                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(true)
+//                        .images(drawUtil.generateWinImages())
+//                        .winModal(drawUtil.generateWinModal())
+//                        .build());
+//            } else {
+//                // 7일 연속 출석했다면
+//                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(true)
+//                        .images(drawUtil.generateWinImages())
+//                        .winModal(drawUtil.generateWinModal())
+//                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
+//                        .build());
+//            }
+//
+//        } else { // 낙첨자일 경우
+//            String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
+//                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+//
+//            if (drawParticipationCount < 7) {
+//                // 만약 연속 출석하지 못했다면
+//                return ResponseDto.onSuccess(DrawLoseNotAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(false)
+//                        .images(drawUtil.generateLoseImages())
+//                        .loseModal(drawUtil.generateLoseModal(shareUrl))
+//                        .build());
+//            } else {
+//                // 7일 연속 출석했다면
+//                return ResponseDto.onSuccess(DrawLoseFullAttendResponseDto.builder()
+//                        .invitedNum(invitedNum)
+//                        .remainDrawCount(remainDrawCount)
+//                        .drawParticipationCount(drawParticipationCount)
+//                        .isDrawWin(false)
+//                        .images(drawUtil.generateLoseImages())
+//                        .loseModal(drawUtil.generateLoseModal(shareUrl))
+//                        .fullAttendModal(drawUtil.generateLoseFullAttendModal())
+//                        .build());
+//            }
+//
+//        }
+    }
 
-        // 당첨자 수 조회
-        int first = drawSettingManager.getWinnerNum1(); // 1등 수
-        int second = drawSettingManager.getWinnerNum2(); // 2등 수
-        int third = drawSettingManager.getWinnerNum3(); // 3등 수
+    private DrawMainFullAttendResponseDto responseMainFullAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+        return DrawMainFullAttendResponseDto.builder()
+                .invitedNum(invitedNum)
+                .remainDrawCount(remainDrawCount)
+                .drawParticipationCount(drawParticipationCount)
+                .fullAttendModal(drawUtil.generateFullAttendModal())
+                .build();
+    }
 
-        // 당첨자 수 설정
-        drawUtil.setFirst(first);
-        drawUtil.setSecond(second);
-        drawUtil.setThird(third);
-
-        // 추첨 로직 실행
-        drawUtil.performDraw();
-
-        if (drawUtil.isDrawWin()) { // 당첨자일 경우
-            // redis 임시 당첨자 목록에 저장
-            saveWinnerInfo(drawUtil.getRanking(), userId);
-
-            if (drawParticipationCount < 7) {
-                // 만약 연속 출석하지 못했다면
-                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(true)
-                        .images(drawUtil.generateWinImages())
-                        .winModal(drawUtil.generateWinModal())
-                        .build());
-            } else {
-                // 7일 연속 출석했다면
-                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(true)
-                        .images(drawUtil.generateWinImages())
-                        .winModal(drawUtil.generateWinModal())
-                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
-                        .build());
-            }
-
-        } else { // 낙첨자일 경우
-            String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
-                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
-
-            if (drawParticipationCount < 7) {
-                // 만약 연속 출석하지 못했다면
-                return ResponseDto.onSuccess(DrawLoseNotAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(false)
-                        .images(drawUtil.generateLoseImages())
-                        .loseModal(drawUtil.generateLoseModal(shareUrl))
-                        .build());
-            } else {
-                // 7일 연속 출석했다면
-                return ResponseDto.onSuccess(DrawLoseFullAttendResponseDto.builder()
-                        .invitedNum(invitedNum)
-                        .remainDrawCount(remainDrawCount)
-                        .drawParticipationCount(drawParticipationCount)
-                        .isDrawWin(false)
-                        .images(drawUtil.generateLoseImages())
-                        .loseModal(drawUtil.generateLoseModal(shareUrl))
-                        .fullAttendModal(drawUtil.generateLoseFullAttendModal())
-                        .build());
-            }
-
-        }
+    private DrawMainResponseDto responseMainNotAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+        return DrawMainResponseDto.builder()
+                .invitedNum(invitedNum)
+                .remainDrawCount(remainDrawCount)
+                .drawParticipationCount(drawParticipationCount)
+                .build();
     }
 
     public ResponseDto<DrawModalResponseDto> participateDrawEvent(Integer userId) {
@@ -201,6 +225,7 @@ public class DrawService {
 
     /**
      * 낙첨자 응답 만들어서 반환
+     *
      * @param userId 를 이용하여 공유 url 조회
      * @return 낙첨자 응답
      */
@@ -216,6 +241,7 @@ public class DrawService {
 
     /**
      * 당첨자 응답 만들어서 반환
+     *
      * @return 당첨자 응답
      */
     private DrawWinModalResponseDto responseWinModal() {
@@ -224,8 +250,9 @@ public class DrawService {
 
     /**
      * 참여 횟수 1회 차감
-     * @param userId 그대로 저장
-     * @param invitedNum 그대로 저장
+     *
+     * @param userId          그대로 저장
+     * @param invitedNum      그대로 저장
      * @param remainDrawCount 1회 차감 후 저장
      */
     private void decreaseRemainDrawCount(Integer userId, int invitedNum, int remainDrawCount) {

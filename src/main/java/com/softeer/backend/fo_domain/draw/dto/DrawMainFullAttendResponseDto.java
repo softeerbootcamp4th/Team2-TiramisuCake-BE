@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 public class DrawMainFullAttendResponseDto extends DrawMainResponseDto {
-    private DrawWinFullAttendResponseDto.FullAttendModal fullAttendModal;
+    private DrawMainFullAttendResponseDto.FullAttendModal fullAttendModal;
 
     @Data
     @SuperBuilder

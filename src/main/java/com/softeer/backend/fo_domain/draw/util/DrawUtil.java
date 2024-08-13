@@ -95,7 +95,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public DrawWinResponseDto.WinModal generateWinModal() {
+    public DrawWinModalResponseDto generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -108,8 +108,8 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateFirstWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
+    private DrawWinModalResponseDto generateFirstWinModal() {
+        return DrawWinModalResponseDto.builder()
                 .title("축하합니다!")
                 .subtitle("아이패드 어쩌구")
                 .img("image url")
@@ -120,8 +120,8 @@ public class DrawUtil {
     /**
      * @return 2등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateSecondWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
+    private DrawWinModalResponseDto generateSecondWinModal() {
+        return DrawWinModalResponseDto.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 10만원권 어쩌구")
                 .img("image url")
@@ -132,8 +132,8 @@ public class DrawUtil {
     /**
      * @return 3등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateThirdWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
+    private DrawWinModalResponseDto generateThirdWinModal() {
+        return DrawWinModalResponseDto.builder()
                 .title("축하합니다!")
                 .subtitle("현대백화점 1만원권 어쩌구")
                 .img("image url")

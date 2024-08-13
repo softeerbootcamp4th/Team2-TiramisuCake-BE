@@ -191,6 +191,7 @@ public class DrawService {
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            saveWinnerInfo(drawUtil.getRanking(), userId); // redis 당첨자 목록에 저장
             return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
         } else { // 낙첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감

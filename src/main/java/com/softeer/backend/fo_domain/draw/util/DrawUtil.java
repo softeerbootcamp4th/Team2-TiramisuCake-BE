@@ -96,7 +96,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public DrawWinModalResponseDto generateWinModal() {
+    public DrawWinModalResponseDto.WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -109,8 +109,8 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private DrawWinModalResponseDto generateFirstWinModal() {
-        return DrawWinModalResponseDto.builder()
+    private DrawWinModalResponseDto.WinModal generateFirstWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
                 .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
                 .subtitle(staticResourcesUtil.getData("DRAW_FIRST_WINNER_MODAL_SUBTITLE"))
                 .img(staticResourcesUtil.getData("draw_reward_image_1"))
@@ -121,8 +121,8 @@ public class DrawUtil {
     /**
      * @return 2등 WinModal 반환
      */
-    private DrawWinModalResponseDto generateSecondWinModal() {
-        return DrawWinModalResponseDto.builder()
+    private DrawWinModalResponseDto.WinModal generateSecondWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
                 .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
                 .subtitle(staticResourcesUtil.getData("DRAW_SECOND_WINNER_MODAL_SUBTITLE"))
                 .img(staticResourcesUtil.getData("draw_reward_image_2"))
@@ -133,8 +133,8 @@ public class DrawUtil {
     /**
      * @return 3등 WinModal 반환
      */
-    private DrawWinModalResponseDto generateThirdWinModal() {
-        return DrawWinModalResponseDto.builder()
+    private DrawWinModalResponseDto.WinModal generateThirdWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
                 .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
                 .subtitle(staticResourcesUtil.getData("DRAW_THIRD_WINNER_MODAL_SUBTITLE"))
                 .img(staticResourcesUtil.getData("draw_reward_image_3"))

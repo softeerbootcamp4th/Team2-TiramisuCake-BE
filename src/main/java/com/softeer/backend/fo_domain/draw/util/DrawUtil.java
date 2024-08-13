@@ -156,29 +156,6 @@ public class DrawUtil {
      *
      * @return FullAttendModal 반환
      */
-    public DrawMainFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
-        return DrawMainFullAttendResponseDto.FullAttendModal.builder()
-                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
-                .image(staticResourcesUtil.getData("attendance_reward_image"))
-                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
-                .build();
-    }
-
-    /**
-     * 7일 연속 출석자 상품 정보 반환 메서드
-     *
-     * @return FullAttendModal 반환
-     */
-    public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
-        return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
-                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
-                .image(staticResourcesUtil.getData("attendance_reward_image"))
-                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
-                .build();
-    }
-
     public DrawMainFullAttendResponseDto.FullAttendModal generateFullAttendModal() {
         return DrawMainFullAttendResponseDto.FullAttendModal.builder()
                 .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))

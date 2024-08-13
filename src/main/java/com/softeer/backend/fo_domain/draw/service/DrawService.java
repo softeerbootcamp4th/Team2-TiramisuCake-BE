@@ -63,104 +63,6 @@ public class DrawService {
             // 연속 출석자가 아니라면
             return ResponseDto.onSuccess(responseMainNotAttend(invitedNum, remainDrawCount, drawParticipationCount));
         }
-//        // 만약 임시 당첨 목록에 존재한다면 등수에 맞는 응답 만들어서 반환
-//        int ranking = getRankingIfWinner(userId);
-//        if (ranking != 0) {
-//            drawUtil.setRanking(ranking);
-//
-//
-//            if (drawParticipationCount < 7) {
-//                // 만약 연속 출석하지 못했다면
-//                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(true)
-//                        .images(drawUtil.generateWinImages())
-//                        .winModal(drawUtil.generateWinModal())
-//                        .build());
-//            } else {
-//                // 7일 연속 출석했다면
-//                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(true)
-//                        .images(drawUtil.generateWinImages())
-//                        .winModal(drawUtil.generateWinModal())
-//                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
-//                        .build());
-//            }
-//        }
-//
-//        // 당첨자 수 조회
-//        int first = drawSettingManager.getWinnerNum1(); // 1등 수
-//        int second = drawSettingManager.getWinnerNum2(); // 2등 수
-//        int third = drawSettingManager.getWinnerNum3(); // 3등 수
-//
-//        // 당첨자 수 설정
-//        drawUtil.setFirst(first);
-//        drawUtil.setSecond(second);
-//        drawUtil.setThird(third);
-//
-//        // 추첨 로직 실행
-//        drawUtil.performDraw();
-//
-//        if (drawUtil.isDrawWin()) { // 당첨자일 경우
-//            // redis 임시 당첨자 목록에 저장
-//            saveWinnerInfo(drawUtil.getRanking(), userId);
-//
-//            if (drawParticipationCount < 7) {
-//                // 만약 연속 출석하지 못했다면
-//                return ResponseDto.onSuccess(DrawWinNotAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(true)
-//                        .images(drawUtil.generateWinImages())
-//                        .winModal(drawUtil.generateWinModal())
-//                        .build());
-//            } else {
-//                // 7일 연속 출석했다면
-//                return ResponseDto.onSuccess(DrawWinFullAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(true)
-//                        .images(drawUtil.generateWinImages())
-//                        .winModal(drawUtil.generateWinModal())
-//                        .fullAttendModal(drawUtil.generateWinFullAttendModal())
-//                        .build());
-//            }
-//
-//        } else { // 낙첨자일 경우
-//            String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
-//                    .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
-//
-//            if (drawParticipationCount < 7) {
-//                // 만약 연속 출석하지 못했다면
-//                return ResponseDto.onSuccess(DrawLoseNotAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(false)
-//                        .images(drawUtil.generateLoseImages())
-//                        .loseModal(drawUtil.generateLoseModal(shareUrl))
-//                        .build());
-//            } else {
-//                // 7일 연속 출석했다면
-//                return ResponseDto.onSuccess(DrawLoseFullAttendResponseDto.builder()
-//                        .invitedNum(invitedNum)
-//                        .remainDrawCount(remainDrawCount)
-//                        .drawParticipationCount(drawParticipationCount)
-//                        .isDrawWin(false)
-//                        .images(drawUtil.generateLoseImages())
-//                        .loseModal(drawUtil.generateLoseModal(shareUrl))
-//                        .fullAttendModal(drawUtil.generateLoseFullAttendModal())
-//                        .build());
-//            }
-//
-//        }
     }
 
     private DrawMainFullAttendResponseDto responseMainFullAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
@@ -268,7 +170,7 @@ public class DrawService {
     }
 
     /**
-     * redis 임시 당첨자 목록에 저장
+     * redis 당첨자 목록에 저장
      *
      * @param ranking redis의 키로 사용될 등수
      * @param userId  사용자 아이디

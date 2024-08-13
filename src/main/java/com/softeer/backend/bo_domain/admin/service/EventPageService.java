@@ -7,8 +7,10 @@ import com.softeer.backend.bo_domain.admin.dto.event.FcfsEventTimeRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.main.AdminMainPageResponseDto;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,15 @@ import java.util.List;
 public class EventPageService {
 
     private final FcfsSettingRepository fcfsSettingRepository;
-
     private final DrawSettingRepository drawSettingRepository;
+
+    private final FcfsSettingManager fcfsSettingManager;
+    private final DrawSettingManager drawSettingManager;
 
     @Transactional(readOnly = true)
     public EventPageResponseDto getEventPage() {
-        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
-        List<DrawSetting> drawSetting = drawSettingRepository.findAll();
 
-        return EventPageResponseDto.of(fcfsSettingList, drawSetting);
+        return EventPageResponseDto.of(fcfsSettingManager, drawSettingManager);
     }
 
     public void updateFcfsEventTime(FcfsEventTimeRequestDto fcfsEventTimeRequestDto) {
@@ -58,6 +60,8 @@ public class EventPageService {
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
         updateDrawSetting(drawSetting, startDate, endDate);
 
+        fcfsSettingManager.setFcfsTime(fcfsSettingList);
+
     }
 
     private void updateFcfsSetting(FcfsSetting setting, LocalDate date, LocalTime time) {
@@ -67,6 +71,7 @@ public class EventPageService {
 
         setting.setStartTime(newStartTime);
         setting.setEndTime(newEndTime);
+
     }
 
     private void updateDrawSetting(DrawSetting drawSetting, LocalDate startDate, LocalDate endDate) {
@@ -84,5 +89,9 @@ public class EventPageService {
 
         drawSetting.setStartTime(drawEventTimeRequestDto.getStartTime());
         drawSetting.setEndTime(drawEventTimeRequestDto.getEndTime());
+
+        drawSettingManager.setDrawTime(drawSetting);
     }
+
+
 }

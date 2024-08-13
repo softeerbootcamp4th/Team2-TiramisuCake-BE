@@ -206,20 +206,9 @@ public class DrawService {
     }
 
     /**
-     * redis 당첨자 목록에 저장
-     *
-     * @param ranking redis의 키로 사용될 등수
-     * @param userId  사용자 아이디
-     */
-    private void saveWinnerInfo(int ranking, int userId) {
-        String drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
-        eventLockRedisUtil.addValueToSet(drawTempKey, userId);
-    }
-
-    /**
      * userId가 임시 당첨자 목록에 있으면 등수, 없으면 0 반환
      *
-     * @param userId
+     * @param userId 사용자 아이디
      */
     private int getRankingIfWinner(int userId) {
         String drawTempKey;

@@ -156,6 +156,32 @@ public class DrawService {
         }
     }
 
+    public ResponseDto<DrawModalResponseDto> participateDrawEvent(Integer userId) {
+        // 복권 기회 조회
+        ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
+                .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
+
+        int remainDrawCount = shareInfo.getRemainDrawCount();
+
+        // 만약 남은 참여 기회가 0이라면
+        if (remainDrawCount == 0) {
+            return ResponseDto.onSuccess(responseLoseModal(userId));
+        }
+
+
+        return ResponseDto.onSuccess(DrawWinModalResponseDto.builder().build());
+    }
+
+    private DrawLoseModalResponseDto responseLoseModal(Integer userId) {
+        String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
+                .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+
+        return DrawLoseModalResponseDto.builder()
+                .isDrawWin(false)
+                .shareUrl(shareUrl)
+                .build();
+    }
+
     /**
      * redis 임시 당첨자 목록에 저장
      *

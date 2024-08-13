@@ -133,6 +133,7 @@ public class DrawService {
 
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
+                .images(drawUtil.generateLoseImages())
                 .shareUrl(shareUrl)
                 .build();
     }
@@ -143,7 +144,11 @@ public class DrawService {
      * @return 당첨자 응답
      */
     private DrawWinModalResponseDto responseWinModal() {
-        return drawUtil.generateWinModal();
+        return DrawWinModalResponseDto.builder()
+                .isDrawWin(true)
+                .images(drawUtil.generateWinImages())
+                .winModal(drawUtil.generateWinModal())
+                .build();
     }
 
     /**

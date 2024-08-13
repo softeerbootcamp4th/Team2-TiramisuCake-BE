@@ -199,6 +199,11 @@ public class DrawService {
         }
     }
 
+    /**
+     * 낙첨자 응답 만들어서 반환
+     * @param userId 를 이용하여 공유 url 조회
+     * @return 낙첨자 응답
+     */
     private DrawLoseModalResponseDto responseLoseModal(Integer userId) {
         String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
                 .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
@@ -209,10 +214,20 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 당첨자 응답 만들어서 반환
+     * @return 당첨자 응답
+     */
     private DrawWinModalResponseDto responseWinModal() {
         return drawUtil.generateWinModal();
     }
 
+    /**
+     * 참여 횟수 1회 차감
+     * @param userId 그대로 저장
+     * @param invitedNum 그대로 저장
+     * @param remainDrawCount 1회 차감 후 저장
+     */
     private void decreaseRemainDrawCount(Integer userId, int invitedNum, int remainDrawCount) {
         // 횟수 1회 차감
         int newRemainDrawCount = remainDrawCount - 1;

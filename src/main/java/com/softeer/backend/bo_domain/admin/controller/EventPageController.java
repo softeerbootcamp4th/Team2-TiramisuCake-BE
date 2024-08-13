@@ -17,7 +17,7 @@ public class EventPageController {
     private final EventPageService eventPageService;
 
     @GetMapping
-    public ResponseDto<EventPageResponseDto> getEventPage(){
+    public ResponseDto<EventPageResponseDto> getEventPage() {
         EventPageResponseDto eventPageResponseDto = eventPageService.getEventPage();
 
         return ResponseDto.onSuccess(eventPageResponseDto);

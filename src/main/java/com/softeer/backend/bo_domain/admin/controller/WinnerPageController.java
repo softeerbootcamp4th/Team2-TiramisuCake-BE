@@ -15,7 +15,7 @@ public class WinnerPageController {
     private final WinnerPageService winnerPageService;
 
     @GetMapping
-    public ResponseDto<WinnerPageResponseDto> getWinnerPage(){
+    public ResponseDto<WinnerPageResponseDto> getWinnerPage() {
         WinnerPageResponseDto winnerPageResponseDto = winnerPageService.getWinnerPage();
 
         return ResponseDto.onSuccess(winnerPageResponseDto);

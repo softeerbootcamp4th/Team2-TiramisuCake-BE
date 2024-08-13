@@ -1,15 +1,13 @@
 package com.softeer.backend.bo_domain.admin.controller;
 
 import com.softeer.backend.bo_domain.admin.dto.event.DrawEventTimeRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
 import com.softeer.backend.bo_domain.admin.dto.event.FcfsEventTimeRequestDto;
 import com.softeer.backend.bo_domain.admin.service.EventPageService;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventPageController {
 
     private final EventPageService eventPageService;
+
+    @GetMapping
+    public ResponseDto<EventPageResponseDto> getEventPage(){
+        EventPageResponseDto eventPageResponseDto = eventPageService.getEventPage();
+
+        return ResponseDto.onSuccess(eventPageResponseDto);
+    }
 
     @PostMapping("/fcfs")
     public ResponseDto<Void> updateFcfsEventTime(@Valid @RequestBody FcfsEventTimeRequestDto fcfsEventTimeRequestDto) {

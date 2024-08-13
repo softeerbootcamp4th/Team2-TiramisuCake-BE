@@ -11,7 +11,7 @@ import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.RedisLockPrefix;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -163,7 +163,7 @@ public class DrawService {
      * @param userId  사용자 아이디
      */
     private void saveWinnerInfo(int ranking, int userId) {
-        String drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+        String drawTempKey = RedisKeyPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
         eventLockRedisUtil.addValueToSet(drawTempKey, userId);
     }
 
@@ -175,7 +175,7 @@ public class DrawService {
     private int getRankingIfWinner(int userId) {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisKeyPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
             Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
             if (drawTempSet.contains(userId)) {
                 return ranking;

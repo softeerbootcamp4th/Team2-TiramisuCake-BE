@@ -142,16 +142,6 @@ public class DrawUtil {
     }
 
     /**
-     * @param shareUrl 공유 url
-     * @return LoseModal 반환
-     */
-    public DrawLoseResponseDto.LoseModal generateLoseModal(String shareUrl) {
-        return DrawLoseResponseDto.LoseModal.builder()
-                .shareUrl(shareUrl)
-                .build();
-    }
-
-    /**
      * 7일 연속 출석자 상품 정보 반환 메서드
      *
      * @return FullAttendModal 반환

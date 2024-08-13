@@ -171,12 +171,12 @@ public class DrawService {
 
     @EventLock(key = "DRAW_WINNER_#{#ranking}")
     private boolean isWinner(Integer userId, int ranking, int winnerNum) {
-        String drawWinnerKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+        String drawWinnerKey = RedisLockPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
         Set<Integer> drawWinnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
 
         // 레디스에서 해당 랭킹에 자리가 있는지 확인
         if (drawWinnerSet.size() < winnerNum) {
-            // 자리가 있다면 당첨 성공
+            // 자리가 있다면 당첨 성공. 당첨자 리스트에 추가
             eventLockRedisUtil.addValueToSet(drawWinnerKey, userId);
             return true;
         } else {
@@ -212,7 +212,7 @@ public class DrawService {
     private int getRankingIfWinner(int userId) {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisLockPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
             if (drawTempSet.contains(userId)) {
                 return ranking;

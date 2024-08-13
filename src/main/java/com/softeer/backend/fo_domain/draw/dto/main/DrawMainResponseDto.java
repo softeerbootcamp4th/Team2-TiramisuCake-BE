@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.draw.dto;
+package com.softeer.backend.fo_domain.draw.dto.main;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

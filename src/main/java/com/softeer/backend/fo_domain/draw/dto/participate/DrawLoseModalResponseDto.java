@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.draw.dto;
+package com.softeer.backend.fo_domain.draw.dto.participate;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

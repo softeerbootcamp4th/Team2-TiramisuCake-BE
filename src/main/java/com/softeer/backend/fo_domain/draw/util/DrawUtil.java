@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.draw.dto.*;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

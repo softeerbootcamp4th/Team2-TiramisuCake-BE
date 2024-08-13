@@ -1,7 +1,11 @@
 package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
-import com.softeer.backend.fo_domain.draw.dto.*;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;

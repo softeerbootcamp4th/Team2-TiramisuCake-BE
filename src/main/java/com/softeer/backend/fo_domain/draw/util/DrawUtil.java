@@ -69,9 +69,18 @@ public class DrawUtil {
      */
     public List<String> generateLoseImages() {
         ArrayList<String> images = new ArrayList<>(3);
-        images.add("left");
-        images.add("right");
-        images.add("up");
+        Random random = new Random();
+        int firstDirection, secondDirection, thirdDirection;
+
+        do {
+            firstDirection = random.nextInt(4);
+            secondDirection = random.nextInt(4);
+            thirdDirection = random.nextInt(4);
+        } while (firstDirection == secondDirection && secondDirection == thirdDirection);
+
+        images.add(getImageUrl(firstDirection));
+        images.add(getImageUrl(secondDirection));
+        images.add(getImageUrl(thirdDirection));
         return images;
     }
 

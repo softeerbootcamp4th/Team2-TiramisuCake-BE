@@ -190,11 +190,11 @@ public class DrawService {
         drawUtil.performDraw();
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);
-            return ResponseDto.onSuccess(responseWinModal());
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
         } else { // 낙첨자일 경우
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);
-            return ResponseDto.onSuccess(responseLoseModal(userId));
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            return ResponseDto.onSuccess(responseLoseModal(userId));  // LoseModal 반환
         }
     }
 

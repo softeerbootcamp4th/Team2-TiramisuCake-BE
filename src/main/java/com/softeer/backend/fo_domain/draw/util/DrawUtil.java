@@ -82,13 +82,13 @@ public class DrawUtil {
     private String getImageUrl(int direction) {
         String directionImage;
         if (direction == 0) {
-            directionImage = "up";
+            directionImage = staticResourcesUtil.getData("draw_block_up_image");
         } else if (direction == 1) {
-            directionImage = "right";
+            directionImage = staticResourcesUtil.getData("draw_block_right_image");
         } else if (direction == 2) {
-            directionImage = "down";
+            directionImage = staticResourcesUtil.getData("draw_block_down_image");
         } else {
-            directionImage = "left";
+            directionImage = staticResourcesUtil.getData("draw_block_left_image");
         }
         return directionImage;
     }
@@ -111,10 +111,10 @@ public class DrawUtil {
      */
     private DrawWinModalResponseDto generateFirstWinModal() {
         return DrawWinModalResponseDto.builder()
-                .title("축하합니다!")
-                .subtitle("아이패드 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_FIRST_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_1"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 
@@ -123,10 +123,10 @@ public class DrawUtil {
      */
     private DrawWinModalResponseDto generateSecondWinModal() {
         return DrawWinModalResponseDto.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 10만원권 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_SECOND_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_2"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 
@@ -135,10 +135,10 @@ public class DrawUtil {
      */
     private DrawWinModalResponseDto generateThirdWinModal() {
         return DrawWinModalResponseDto.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 1만원권 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_THIRD_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_3"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 

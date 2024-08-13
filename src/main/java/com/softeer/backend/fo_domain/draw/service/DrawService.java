@@ -161,6 +161,7 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
+        int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
         // 만약 남은 참여 기회가 0이라면
@@ -171,11 +172,30 @@ public class DrawService {
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
         int ranking = getRankingIfWinner(userId);
         if (ranking != 0) {
-            return ResponseDto.onSuccess(processAlreadyWin(userId, shareInfo.getInvitedNum(), remainDrawCount));
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
 
+        // 당첨자 수 조회
+        int first = drawSettingManager.getWinnerNum1(); // 1등 수
+        int second = drawSettingManager.getWinnerNum2(); // 2등 수
+        int third = drawSettingManager.getWinnerNum3(); // 3등 수
 
-        return ResponseDto.onSuccess(DrawWinModalResponseDto.builder().build());
+        // 당첨자 수 설정
+        drawUtil.setFirst(first);
+        drawUtil.setSecond(second);
+        drawUtil.setThird(third);
+
+        // 추첨 로직 실행
+        drawUtil.performDraw();
+
+        if (drawUtil.isDrawWin()) { // 당첨자일 경우
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);
+            return ResponseDto.onSuccess(responseWinModal());
+        } else { // 낙첨자일 경우
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);
+            return ResponseDto.onSuccess(responseLoseModal(userId));
+        }
     }
 
     private DrawLoseModalResponseDto responseLoseModal(Integer userId) {
@@ -188,8 +208,11 @@ public class DrawService {
                 .build();
     }
 
+    private DrawWinModalResponseDto responseWinModal() {
+        return drawUtil.generateWinModal();
+    }
 
-    private DrawLoseModalResponseDto processAlreadyWin(Integer userId, int invitedNum, int remainDrawCount) {
+    private void decreaseRemainDrawCount(Integer userId, int invitedNum, int remainDrawCount) {
         // 횟수 1회 차감
         int newRemainDrawCount = remainDrawCount - 1;
         ShareInfo shareInfo = ShareInfo.builder()
@@ -199,9 +222,6 @@ public class DrawService {
                 .build();
 
         shareInfoRepository.save(shareInfo);
-
-        // LoseModal 반환
-        return responseLoseModal(userId);
     }
 
     /**

@@ -9,14 +9,11 @@ import com.softeer.backend.global.util.EventLockRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -58,7 +55,7 @@ public class DrawSettingManager {
     private void deleteTempWinnerSetFromRedis() {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisLockPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
         }
     }

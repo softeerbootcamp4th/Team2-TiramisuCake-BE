@@ -38,11 +38,11 @@ public class EventLockRedisUtil {
 
     // key에 해당하는 데이터의 값을 1 더하는 메서드
     // 원자적으로 값을 증가시킨다.
-    public void incrementParticipantCount(String key) {
+    public void incrementData(String key) {
         getStringIntegerValueOperations().increment(key, 1);
     }
 
-    public void deleteParticipantCount(String key) {
+    public void deleteData(String key) {
         integerRedisTemplate.delete(key);
     }
 
@@ -62,9 +62,7 @@ public class EventLockRedisUtil {
         integerRedisTemplate.delete(key);
     }
 
-    public void deleteParticipantIds(String key) {
-        integerRedisTemplate.delete(key);
-    }
+
 
     private ValueOperations<String, Integer> getStringIntegerValueOperations() {
         return integerRedisTemplate.opsForValue();

@@ -40,6 +40,8 @@ public class MainPageService {
         return MainPageEventResponseDto.builder()
                 .startDate(drawSetting.getStartDate().format(eventTimeFormatter))
                 .endDate(drawSetting.getEndDate().format(eventTimeFormatter))
+                .eventTitle(staticResourcesUtil.getData("EVENT_TITLE"))
+                .eventDescription(staticResourcesUtil.getData("EVENT_DESCRIPTION"))
                 .fcfsInfo(staticResourcesUtil.getData("FCFS_INFO"))
                 .totalDrawWinner(staticResourcesUtil.getData("TOTAL_DRAW_WINNER"))
                 .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))

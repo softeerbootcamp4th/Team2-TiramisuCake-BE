@@ -2,7 +2,9 @@ package com.softeer.backend.bo_domain.admin.service;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.softeer.backend.bo_domain.admin.dto.event.DrawEventTimeRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
 import com.softeer.backend.bo_domain.admin.dto.event.FcfsEventTimeRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.main.AdminMainPageResponseDto;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
@@ -24,9 +26,17 @@ import java.util.List;
 @Transactional
 public class EventPageService {
 
-    private FcfsSettingRepository fcfsSettingRepository;
+    private final FcfsSettingRepository fcfsSettingRepository;
 
-    private DrawSettingRepository drawSettingRepository;
+    private final DrawSettingRepository drawSettingRepository;
+
+    @Transactional(readOnly = true)
+    public EventPageResponseDto getEventPage() {
+        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
+        List<DrawSetting> drawSetting = drawSettingRepository.findAll();
+
+        return EventPageResponseDto.of(fcfsSettingList, drawSetting);
+    }
 
     public void updateFcfsEventTime(FcfsEventTimeRequestDto fcfsEventTimeRequestDto) {
 

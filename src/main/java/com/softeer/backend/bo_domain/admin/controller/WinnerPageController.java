@@ -1,9 +1,7 @@
 package com.softeer.backend.bo_domain.admin.controller;
 
-import com.softeer.backend.bo_domain.admin.dto.winner.DrawWinnerListResponseDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.DrawWinnerUpdateRequestDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.FcfsWinnerListResponseDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.FcfsWinnerUpdateRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
+import com.softeer.backend.bo_domain.admin.dto.winner.*;
 import com.softeer.backend.bo_domain.admin.service.WinnerPageService;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.Valid;
@@ -15,6 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/winner")
 public class WinnerPageController {
     private final WinnerPageService winnerPageService;
+
+    @GetMapping
+    public ResponseDto<WinnerPageResponseDto> getWinnerPage() {
+        WinnerPageResponseDto winnerPageResponseDto = winnerPageService.getWinnerPage();
+
+        return ResponseDto.onSuccess(winnerPageResponseDto);
+    }
 
     @GetMapping("/fcfs/{round}")
     public ResponseDto<FcfsWinnerListResponseDto> getFcfsWinnerList(@PathVariable Integer round) {

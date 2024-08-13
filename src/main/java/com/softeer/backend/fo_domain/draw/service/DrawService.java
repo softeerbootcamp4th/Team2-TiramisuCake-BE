@@ -168,6 +168,12 @@ public class DrawService {
             return ResponseDto.onSuccess(responseLoseModal(userId));
         }
 
+        // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
+        int ranking = getRankingIfWinner(userId);
+        if (ranking != 0) {
+            return ResponseDto.onSuccess(processAlreadyWin(userId, shareInfo.getInvitedNum(), remainDrawCount));
+        }
+
 
         return ResponseDto.onSuccess(DrawWinModalResponseDto.builder().build());
     }
@@ -180,6 +186,22 @@ public class DrawService {
                 .isDrawWin(false)
                 .shareUrl(shareUrl)
                 .build();
+    }
+
+
+    private DrawLoseModalResponseDto processAlreadyWin(Integer userId, int invitedNum, int remainDrawCount) {
+        // 횟수 1회 차감
+        int newRemainDrawCount = remainDrawCount - 1;
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(invitedNum)
+                .remainDrawCount(newRemainDrawCount)
+                .build();
+
+        shareInfoRepository.save(shareInfo);
+
+        // LoseModal 반환
+        return responseLoseModal(userId);
     }
 
     /**

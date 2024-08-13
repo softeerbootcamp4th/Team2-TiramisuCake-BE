@@ -1,22 +1,13 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
-import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsFailResponseDtoDto;
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsResponseDto;
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsSuccessResponseDto;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
-import com.softeer.backend.fo_domain.user.domain.User;
-import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
-import com.softeer.backend.global.annotation.EventLock;
-import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.RedisLockPrefix;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -78,7 +69,7 @@ public class FcfsService {
 //    }
 
     private FcfsFailResponseDtoDto countFcfsParticipant(int round) {
-        eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+        eventLockRedisUtil.incrementData(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
 
         return new FcfsFailResponseDtoDto(1);
     }

@@ -62,4 +62,15 @@ public class DrawSettingManager {
             eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
         }
     }
+
+    public void setDrawTime(DrawSetting drawSetting) {
+        this.startTime = drawSetting.getStartTime();
+        this.endTime = drawSetting.getEndTime();
+    }
+
+    public void setDrawWinnerNum(int winnerNum1, int winnerNum2, int winnerNum3) {
+        this.winnerNum1 = winnerNum1;
+        this.winnerNum2 = winnerNum2;
+        this.winnerNum3 = winnerNum3;
+    }
 }

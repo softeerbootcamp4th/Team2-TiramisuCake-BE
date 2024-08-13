@@ -1,11 +1,8 @@
 package com.softeer.backend.global.staticresources.util;
 
-import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
-import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
-import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
-import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.exception.GeneralException;
@@ -33,8 +30,8 @@ public class StaticResourcesUtil {
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
     private final StaticResourcesRepository staticResourcesRepository;
-    private final DrawSettingRepository drawSettingRepository;
-    private final FcfsSettingRepository fcfsSettingRepository;
+    private final DrawSettingManager drawSettingManager;
+    private final FcfsSettingManager fcfsSettingManager;
     private final DrawRepository drawRepository;
   
     private final Map<String, String> staticResourcesMap = new HashMap<>();
@@ -55,14 +52,12 @@ public class StaticResourcesUtil {
                         ))
         );
 
-        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 
-        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll();
-        FcfsSetting firstFcfsSetting = fcfsSettingList.get(0);
-        FcfsSetting secondFcfsSetting = fcfsSettingList.get(1);
+        FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);
+        FcfsSettingDto secondFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(2);
 
-        int totalDrawWinner = drawSetting.getWinnerNum1()
-                + drawSetting.getWinnerNum2() + drawSetting.getWinnerNum3();
+        int totalDrawWinner = drawSettingManager.getWinnerNum1()
+                + drawSettingManager.getWinnerNum2() + drawSettingManager.getWinnerNum3();
         int remainDrawCount = totalDrawWinner - (int)drawRepository.count();
 
         Map<String, String> formattedTexts = Arrays.stream(StaticText.values())

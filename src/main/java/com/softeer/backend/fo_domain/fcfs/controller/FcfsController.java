@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class FcfsController {
     private final FcfsService fcfsService;
 
-    @PostMapping("/fcfs")
-    public ResponseDto<FcfsResponseDto> handleFCFS(@Parameter(hidden = true) @AuthInfo Integer userId) {
-        FcfsResponseDto fcfsResponse = fcfsService.handleFcfsEvent(userId);
-
-        if (fcfsResponse instanceof FcfsSuccessResponseDto)
-            return ResponseDto.onSuccess(fcfsResponse);
-
-        return ResponseDto.onSuccess(fcfsResponse);
-    }
+//    @PostMapping("/fcfs")
+//    public ResponseDto<FcfsResponseDto> handleFCFS(@Parameter(hidden = true) @AuthInfo Integer userId) {
+//        FcfsResponseDto fcfsResponse = fcfsService.handleFcfsEvent(userId);
+//
+//        if (fcfsResponse instanceof FcfsSuccessResponseDto)
+//            return ResponseDto.onSuccess(fcfsResponse);
+//
+//        return ResponseDto.onSuccess(fcfsResponse);
+//    }
 
 }

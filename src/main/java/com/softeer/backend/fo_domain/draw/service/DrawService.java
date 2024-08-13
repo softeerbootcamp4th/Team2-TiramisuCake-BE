@@ -14,6 +14,7 @@ import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
 import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
+import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisLockPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
@@ -115,14 +116,27 @@ public class DrawService {
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
-            // 레디스에서 해당 랭킹에 자리가 있는지 확인
-            // 만약 있다면
-            saveWinnerInfo(drawUtil.getRanking(), userId); // redis 당첨자 목록에 저장
-            // 없다면
-            return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
+
+            ranking = drawUtil.getRanking();
+            int winnerNum;
+            if (ranking == 1) {
+                winnerNum = first;
+            } else if (ranking == 2) {
+                winnerNum = second;
+            } else {
+                winnerNum = third;
+            }
+
+            if (isWinner(userId, ranking, winnerNum)) {
+                // 추첨 티켓이 다 팔리지 않았다면
+                return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
+            } else {
+                // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
+                return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
+            }
         } else { // 낙첨자일 경우
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
-            return ResponseDto.onSuccess(responseLoseModal(userId));  // LoseModal 반환
+            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
     }
 
@@ -154,6 +168,22 @@ public class DrawService {
                 .images(drawUtil.generateWinImages())
                 .winModal(drawUtil.generateWinModal())
                 .build();
+    }
+
+    @EventLock(key = "DRAW_WINNER_#{#ranking}")
+    private boolean isWinner(Integer userId, int ranking, int winnerNum) {
+        String drawWinnerKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+        Set<Integer> drawWinnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
+
+        // 레디스에서 해당 랭킹에 자리가 있는지 확인
+        if (drawWinnerSet.size() < winnerNum) {
+            // 자리가 있다면 당첨 성공
+            eventLockRedisUtil.addValueToSet(drawWinnerKey, userId);
+            return true;
+        } else {
+            // 이미 자리가 가득 차서 당첨 실패
+            return false;
+        }
     }
 
     /**

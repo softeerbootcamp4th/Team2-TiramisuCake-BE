@@ -2,7 +2,6 @@ package com.softeer.backend.bo_domain.admin.controller;
 
 import com.softeer.backend.bo_domain.admin.dto.indicator.EventIndicatorResponseDto;
 import com.softeer.backend.bo_domain.admin.service.IndicatorPageService;
-import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

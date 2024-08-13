@@ -17,6 +17,7 @@ import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisLockPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
+import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class DrawService {
     private final EventLockRedisUtil eventLockRedisUtil;
     private final DrawSettingManager drawSettingManager;
     private final DrawUtil drawUtil;
+    private final StaticResourcesUtil staticResourcesUtil;
 
     /**
      * 1. 연속 참여일수 조회
@@ -113,7 +115,10 @@ public class DrawService {
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            // 레디스에서 해당 랭킹에 자리가 있는지 확인
+            // 만약 있다면
             saveWinnerInfo(drawUtil.getRanking(), userId); // redis 당첨자 목록에 저장
+            // 없다면
             return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
         } else { // 낙첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
@@ -134,7 +139,7 @@ public class DrawService {
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
                 .images(drawUtil.generateLoseImages())
-                .shareUrl(shareUrl)
+                .shareUrl(staticResourcesUtil.getData("BASE_URL") + shareUrl)
                 .build();
     }
 

@@ -5,6 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawLoseModalResponseDto {
+public class DrawLoseModalResponseDto extends DrawModalResponseDto {
     private String shareUrl;
 }

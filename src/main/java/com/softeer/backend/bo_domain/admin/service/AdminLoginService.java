@@ -59,7 +59,7 @@ public class AdminLoginService {
     @Transactional
     public void handleSignUp(AdminSignUpRequestDto adminSignUpRequestDto) {
 
-        if(adminRepository.existsByAccount(adminSignUpRequestDto.getAccount())){
+        if (adminRepository.existsByAccount(adminSignUpRequestDto.getAccount())) {
             log.error("Admin account already exist.");
             throw new AdminException(ErrorStatus._BAD_REQUEST);
         }

@@ -1,9 +1,7 @@
 package com.softeer.backend.bo_domain.admin.service;
 
-import com.softeer.backend.bo_domain.admin.dto.winner.DrawWinnerListResponseDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.DrawWinnerUpdateRequestDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.FcfsWinnerListResponseDto;
-import com.softeer.backend.bo_domain.admin.dto.winner.FcfsWinnerUpdateRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
+import com.softeer.backend.bo_domain.admin.dto.winner.*;
 import com.softeer.backend.bo_domain.admin.exception.AdminException;
 import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
@@ -17,6 +15,7 @@ import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +31,13 @@ public class WinnerPageService {
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
 
+    @Transactional(readOnly = true)
+    public WinnerPageResponseDto getWinnerPage() {
+        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
+        List<DrawSetting> drawSetting = drawSettingRepository.findAll();
+
+        return WinnerPageResponseDto.of(fcfsSettingList, drawSetting);
+    }
 
     @Transactional(readOnly = true)
     public FcfsWinnerListResponseDto getFcfsWinnerList(int round) {

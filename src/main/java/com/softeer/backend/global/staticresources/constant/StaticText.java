@@ -4,6 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum StaticText {
+    EVENT_TITLE("신차 출시 기념 EVENT"),
+    EVENT_DESCRIPTION("현대자동차의 The new IONIQ 5 출시 기념 이벤트로 여러분을 초대합니다.\n" +
+            "24시간 무료 렌트, 신차 할인 쿠폰 및 다양한 경품을 받아보세요."),
+
     FCFS_INFO("매주 %s, %s %s시 선착순 %s명"),
     FCFS_TITLE("'24시 내 차' 이벤트"),
     FCFS_CONTENT("하단의 The new IONIQ 5 정보를 바탕으로 빠르게 문장 퀴즈를 맞춰\n" +

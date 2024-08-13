@@ -14,6 +14,10 @@ public class MainPageEventResponseDto {
 
     private String endDate;
 
+    private String eventTitle;
+
+    private String eventDescription;
+
     private String fcfsInfo;
 
     private String totalDrawWinner;

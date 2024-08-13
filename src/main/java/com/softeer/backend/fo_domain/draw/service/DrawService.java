@@ -97,6 +97,7 @@ public class DrawService {
         int ranking = getRankingIfWinner(userId);
         if (ranking != 0) {
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            increaseDrawParticipationCount();
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
 
@@ -128,13 +129,16 @@ public class DrawService {
 
             if (isWinner(userId, ranking, winnerNum)) {
                 // 추첨 티켓이 다 팔리지 않았다면
+                increaseDrawParticipationCount();
                 return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
             } else {
                 // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
+                increaseDrawParticipationCount();
                 return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            increaseDrawParticipationCount();
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
     }
@@ -183,6 +187,11 @@ public class DrawService {
             // 이미 자리가 가득 차서 당첨 실패
             return false;
         }
+    }
+
+    @EventLock(key = "DRAW_PARTICIPATION_COUNT")
+    private void increaseDrawParticipationCount() {
+        eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
     /**

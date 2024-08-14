@@ -99,6 +99,12 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 추첨 이벤트 당첨 로직 작성
+     *
+     * @param userId 사용자 아이디
+     * @return 추첨 결과에 따른 응답 반환
+     */
     public ResponseDto<DrawModalResponseDto> participateDrawEvent(Integer userId) {
         // 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)

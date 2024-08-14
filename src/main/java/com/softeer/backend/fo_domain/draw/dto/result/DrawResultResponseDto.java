@@ -6,5 +6,5 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 public class DrawResultResponseDto {
-    private boolean isWinner;
+    private boolean isDrawWin;
 }

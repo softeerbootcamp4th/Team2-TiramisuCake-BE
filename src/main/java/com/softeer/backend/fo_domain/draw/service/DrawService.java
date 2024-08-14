@@ -16,7 +16,7 @@ import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.RedisLockPrefix;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
@@ -175,7 +175,7 @@ public class DrawService {
 
     @EventLock(key = "DRAW_WINNER_#{#ranking}")
     private boolean isWinner(Integer userId, int ranking, int winnerNum) {
-        String drawWinnerKey = RedisLockPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+        String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
         Set<Integer> drawWinnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
 
         // 레디스에서 해당 랭킹에 자리가 있는지 확인
@@ -191,7 +191,7 @@ public class DrawService {
 
     @EventLock(key = "DRAW_PARTICIPATION_COUNT")
     private void increaseDrawParticipationCount() {
-        eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+        eventLockRedisUtil.incrementData(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
     /**
@@ -221,7 +221,7 @@ public class DrawService {
     private int getRankingIfWinner(int userId) {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisLockPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
             if (drawTempSet.contains(userId)) {
                 return ranking;

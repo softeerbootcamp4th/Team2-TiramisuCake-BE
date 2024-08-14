@@ -6,6 +6,7 @@ import com.softeer.backend.fo_domain.comment.service.CommentService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -20,7 +21,7 @@ public class CommentController {
 
     @GetMapping("/comment")
     ResponseDto<CommentsResponseDto> getComment(@RequestParam(name = "cursor", required = false) Integer cursor,
-                                                @AuthInfo Integer userId) {
+                                                @Parameter(hidden = true) @AuthInfo Integer userId) {
         if (cursor == null) {
             cursor = Integer.MAX_VALUE;
         }
@@ -35,7 +36,7 @@ public class CommentController {
 
     @PostMapping("/comment")
     ResponseDto<Void> saveComment(@RequestParam(name = "commentType") Integer commentType,
-                                  @AuthInfo Integer userId) {
+                                  @Parameter(hidden = true) @AuthInfo Integer userId) {
 
         if(commentType == null || commentType<1 || commentType > 5){
 

@@ -88,6 +88,9 @@ public class DrawService {
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
+        DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
+                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
+
         // 만약 남은 참여 기회가 0이라면
         if (remainDrawCount == 0) {
             return ResponseDto.onSuccess(responseLoseModal(userId));
@@ -98,6 +101,7 @@ public class DrawService {
         if (ranking != 0) {
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
             increaseDrawParticipationCount();
+            addLoseCount(drawParticipationInfo);
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
 
@@ -130,15 +134,18 @@ public class DrawService {
             if (isWinner(userId, ranking, winnerNum)) {
                 // 추첨 티켓이 다 팔리지 않았다면
                 increaseDrawParticipationCount();
+                addWinCount(drawParticipationInfo); // 당첨 횟수 증가
                 return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
             } else {
                 // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
                 increaseDrawParticipationCount();
+                addLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
                 return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
             increaseDrawParticipationCount();
+            addLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
     }
@@ -171,6 +178,24 @@ public class DrawService {
                 .images(drawUtil.generateWinImages())
                 .winModal(drawUtil.generateWinModal())
                 .build();
+    }
+
+    private void addWinCount(DrawParticipationInfo drawParticipationInfo) {
+        drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
+                .userId(drawParticipationInfo.getUserId())
+                .drawWinningCount(drawParticipationInfo.getDrawWinningCount() + 1)
+                .drawLosingCount(drawParticipationInfo.getDrawLosingCount())
+                .drawParticipationCount(drawParticipationInfo.getDrawParticipationCount())
+                .build());
+    }
+
+    private void addLoseCount(DrawParticipationInfo drawParticipationInfo) {
+        drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
+                .userId(drawParticipationInfo.getUserId())
+                .drawWinningCount(drawParticipationInfo.getDrawWinningCount())
+                .drawLosingCount(drawParticipationInfo.getDrawLosingCount() + 1)
+                .drawParticipationCount(drawParticipationInfo.getDrawParticipationCount())
+                .build());
     }
 
     @EventLock(key = "DRAW_WINNER_#{#ranking}")

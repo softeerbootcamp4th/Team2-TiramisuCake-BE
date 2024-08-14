@@ -1,13 +1,16 @@
 package com.softeer.backend.fo_domain.mainpage.service;
 
-import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
-import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageCarResponseDto;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventResponseDto;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
+import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
@@ -16,10 +19,13 @@ import java.util.Arrays;
 public class MainPageService {
     private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+    private final EventLockRedisUtil eventLockRedisUtil;
     private final StaticResourcesUtil staticResourcesUtil;
-    private final DrawSettingRepository drawSettingRepository;
+    private final DrawSettingManager drawSettingManager;
 
     public MainPageEventResponseDto getEventPage(){
+
+        setTotalVisitorsCount();
 
         MainPageEventResponseDto.EventInfo fcfsInfo = MainPageEventResponseDto.EventInfo.builder()
                 .title(staticResourcesUtil.getData("FCFS_TITLE"))
@@ -35,11 +41,9 @@ public class MainPageService {
                 .rewardImage2(staticResourcesUtil.getData("draw_reward_image_2_3"))
                 .build();
 
-        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
-
         return MainPageEventResponseDto.builder()
-                .startDate(drawSetting.getStartDate().format(eventTimeFormatter))
-                .endDate(drawSetting.getEndDate().format(eventTimeFormatter))
+                .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))
+                .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))
                 .eventTitle(staticResourcesUtil.getData("EVENT_TITLE"))
                 .eventDescription(staticResourcesUtil.getData("EVENT_DESCRIPTION"))
                 .fcfsInfo(staticResourcesUtil.getData("FCFS_INFO"))
@@ -47,6 +51,17 @@ public class MainPageService {
                 .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))
                 .eventInfoList(Arrays.asList(fcfsInfo, drawInfo))
                 .build();
+
+    }
+
+    // 이벤트 기간이면 redis에 사이트 방문자 수 +1 하기
+    private void setTotalVisitorsCount(){
+
+        LocalDate now = LocalDate.now();
+
+        if (!now.isBefore(drawSettingManager.getStartDate()) && !now.isAfter(drawSettingManager.getEndDate())) {
+            eventLockRedisUtil.incrementData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());
+        }
 
     }
 

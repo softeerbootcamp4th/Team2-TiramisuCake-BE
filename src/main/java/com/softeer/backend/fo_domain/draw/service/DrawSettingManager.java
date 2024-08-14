@@ -4,19 +4,16 @@ import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.RedisLockPrefix;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -58,8 +55,19 @@ public class DrawSettingManager {
     private void deleteTempWinnerSetFromRedis() {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisLockPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisKeyPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
             eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
         }
+    }
+
+    public void setDrawTime(DrawSetting drawSetting) {
+        this.startTime = drawSetting.getStartTime();
+        this.endTime = drawSetting.getEndTime();
+    }
+
+    public void setDrawWinnerNum(int winnerNum1, int winnerNum2, int winnerNum3) {
+        this.winnerNum1 = winnerNum1;
+        this.winnerNum2 = winnerNum2;
+        this.winnerNum3 = winnerNum3;
     }
 }

@@ -7,10 +7,12 @@ import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +32,13 @@ public class WinnerPageService {
     private final DrawRepository drawRepository;
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
+    private final FcfsSettingManager fcfsSettingManager;
+    private final DrawSettingManager drawSettingManager;
 
     @Transactional(readOnly = true)
     public WinnerPageResponseDto getWinnerPage() {
-        List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll(Sort.by(Sort.Order.asc("round")));
-        List<DrawSetting> drawSetting = drawSettingRepository.findAll();
 
-        return WinnerPageResponseDto.of(fcfsSettingList, drawSetting);
+        return WinnerPageResponseDto.of(fcfsSettingManager, drawSettingManager);
     }
 
     @Transactional(readOnly = true)
@@ -58,6 +60,8 @@ public class WinnerPageService {
         List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll();
 
         fcfsSettingList.forEach((fcfsSetting) -> fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum()));
+
+        fcfsSettingManager.setFcfsWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum());
     }
 
     @Transactional
@@ -67,5 +71,9 @@ public class WinnerPageService {
         drawSetting.setWinnerNum1(drawWinnerUpdateRequestDto.getFirstWinnerNum());
         drawSetting.setWinnerNum2(drawWinnerUpdateRequestDto.getSecondWinnerNum());
         drawSetting.setWinnerNum3(drawWinnerUpdateRequestDto.getThirdWinnerNum());
+
+        drawSettingManager.setDrawWinnerNum(drawWinnerUpdateRequestDto.getFirstWinnerNum(),
+                drawWinnerUpdateRequestDto.getSecondWinnerNum(),
+                drawWinnerUpdateRequestDto.getThirdWinnerNum());
     }
 }

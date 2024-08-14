@@ -5,6 +5,7 @@ import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipatio
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import kotlinx.serialization.Required;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,13 @@ import java.util.List;
 public class IndicatorPageService {
 
     private final EventParticipationRepository eventParticipationRepository;
-    private final DrawSettingRepository drawSettingRepository;
+    private final DrawSettingManager drawSettingManager;
 
     public EventIndicatorResponseDto getEventIndicator() {
 
-        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 
         List<EventParticipation> eventParticipationList = eventParticipationRepository.findAllByEventDateBetween(
-                drawSetting.getStartDate(), drawSetting.getEndDate()
+                drawSettingManager.getStartDate(), drawSettingManager.getEndDate()
         );
 
         return EventIndicatorResponseDto.of(eventParticipationList);

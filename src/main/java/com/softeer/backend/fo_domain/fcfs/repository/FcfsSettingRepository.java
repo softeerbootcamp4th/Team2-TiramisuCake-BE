@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface FcfsSettingRepository extends JpaRepository<FcfsSetting, Integer> {
 
+    Optional<FcfsSetting> findByRound(int round);
 
 }

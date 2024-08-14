@@ -98,24 +98,7 @@ public enum StaticText {
 
     // 공유 url
     BASE_URL("https://softeer.shop/"),
-    NON_USER_SHARE_URL("https://softeer.site"),
-
-    // 선착순
-    FCFS_QUIZ_DESCRIPTION("선착순 %s명에게 The new IONIQ 5 24시간 무료 렌트권 증정"),
-
-    FCFS_WINNER_TITLE("선착순 %s명 안에 들었어요!"),
-    FCFS_WINNER_SUBTITLE("[ 더뉴 아이오닉 5 24시간 렌트 이용권 + 신차 구입 10% 할인권 ]"),
-    FCFS_WINNER_CODE_WORD("코드"),
-    FCFS_WINNER_EXPIRY_DATE("사용기한 : %s년 %s ~ %s"),
-    FCFS_WINNER_CAUTION("본 이벤트는 (주)쏘카와 함께하며, 쏘카 회원가입 및 로그인 후 이용 가능합니다.\n" +
-            "이벤트 참여를 위해 쏘카 어플리케이션에서 추가적인 절차가 요구될 수 있습니다.\n" +
-            "이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 안내가 진행될 예정입니다."),
-
-    FCFS_LOSER_TITLE("다음 주에 다시 도전해보세요"),
-    FCFS_LOSER_SUBTITLE("아쉽게도 선착순 순위에 들지 못했어요"),
-    FCFS_LOSER_CAUTION("본 이벤트는 (주)쏘카와 함께하며, 쏘카 회원가입 및 로그인 후 이용 가능합니다.\n" +
-            "이벤트 참여를 위해 쏘카 어플리케이션에서 추가적인 절차가 요구될 수 있습니다.");
-
+    NON_USER_SHARE_URL("https://softeer.site");
 
 
     private final String text;

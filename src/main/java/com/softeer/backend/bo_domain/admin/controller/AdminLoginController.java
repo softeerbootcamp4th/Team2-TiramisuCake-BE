@@ -6,7 +6,6 @@ import com.softeer.backend.bo_domain.admin.service.AdminLoginService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
 import com.softeer.backend.global.common.response.ResponseDto;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +28,7 @@ public class AdminLoginController {
     }
 
     @PostMapping("/logout")
-    ResponseDto<Void> handleLogout(@Parameter(hidden = true) @AuthInfo Integer adminId) {
+    ResponseDto<Void> handleLogout(@AuthInfo Integer adminId) {
         adminLoginService.handleLogout(adminId);
 
         return ResponseDto.onSuccess();

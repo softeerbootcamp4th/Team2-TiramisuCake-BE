@@ -6,8 +6,9 @@ import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawResultLoserResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawResultResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -239,17 +240,21 @@ public class DrawService {
         shareInfoRepository.save(shareInfo);
     }
 
-    public ResponseDto<DrawResultResponseDto> getDrawHistory(Integer userId) {
+    public ResponseDto<DrawHistoryResponseDto> getDrawHistory(Integer userId) {
         int ranking = getRankingIfWinner(userId);
 
         if (ranking != 0) {
             // 당첨자라면
-
+            drawUtil.setRanking(ranking);
+            return ResponseDto.onSuccess(DrawHistoryWinnerResponseDto.builder()
+                    .isDrawWin(true)
+                    .winModal(drawUtil.generateWinModalForHistory())
+                    .build());
         }
 
         // 당첨자가 아니라면
         String shareUrl = getShareUrl(userId);
-        return ResponseDto.onSuccess(DrawResultLoserResponseDto.builder()
+        return ResponseDto.onSuccess(DrawHistoryLoserResponseDto.builder()
                 .isDrawWin(false)
                 .shareUrl(shareUrl)
                 .build());

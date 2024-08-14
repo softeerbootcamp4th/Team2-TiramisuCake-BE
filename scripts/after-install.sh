@@ -18,7 +18,7 @@ fi
 JAR_FILE="$APP_DIR/backend-0.0.1-SNAPSHOT.jar"
 if [ -f "$JAR_FILE" ]; then
   echo "Starting the application..."
-  nohup java -jar $JAR_FILE --spring.config.additional-location=file:$YML_PATH > /home/ubuntu/backend/app.log 2>&1 &
+  nohup java -Duser.timezone=Asia/Seoul -jar $JAR_FILE --spring.config.additional-location=file:$YML_PATH > /home/ubuntu/backend/app.log 2>&1 &
 else
   echo "JAR file not found: $JAR_FILE"
   exit 1

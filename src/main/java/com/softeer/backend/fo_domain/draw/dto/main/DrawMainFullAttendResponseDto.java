@@ -1,12 +1,14 @@
-package com.softeer.backend.fo_domain.draw.dto;
+package com.softeer.backend.fo_domain.draw.dto.main;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawWinFullAttendResponseDto extends DrawWinResponseDto {
-    private FullAttendModal fullAttendModal;
+public class DrawMainFullAttendResponseDto extends DrawMainResponseDto {
+    private DrawMainFullAttendResponseDto.FullAttendModal fullAttendModal;
 
     @Data
     @SuperBuilder

@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.draw.dto.*;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -68,9 +69,18 @@ public class DrawUtil {
      */
     public List<String> generateLoseImages() {
         ArrayList<String> images = new ArrayList<>(3);
-        images.add("left");
-        images.add("right");
-        images.add("up");
+        Random random = new Random();
+        int firstDirection, secondDirection, thirdDirection;
+
+        do {
+            firstDirection = random.nextInt(4);
+            secondDirection = random.nextInt(4);
+            thirdDirection = random.nextInt(4);
+        } while (firstDirection == secondDirection && secondDirection == thirdDirection);
+
+        images.add(getImageUrl(firstDirection));
+        images.add(getImageUrl(secondDirection));
+        images.add(getImageUrl(thirdDirection));
         return images;
     }
 
@@ -81,13 +91,13 @@ public class DrawUtil {
     private String getImageUrl(int direction) {
         String directionImage;
         if (direction == 0) {
-            directionImage = "up";
+            directionImage = staticResourcesUtil.getData("draw_block_up_image");
         } else if (direction == 1) {
-            directionImage = "right";
+            directionImage = staticResourcesUtil.getData("draw_block_right_image");
         } else if (direction == 2) {
-            directionImage = "down";
+            directionImage = staticResourcesUtil.getData("draw_block_down_image");
         } else {
-            directionImage = "left";
+            directionImage = staticResourcesUtil.getData("draw_block_left_image");
         }
         return directionImage;
     }
@@ -95,7 +105,7 @@ public class DrawUtil {
     /**
      * @return 등수에 따른 WinModal을 반환
      */
-    public DrawWinResponseDto.WinModal generateWinModal() {
+    public DrawWinModalResponseDto.WinModal generateWinModal() {
         if (ranking == 1) {
             return generateFirstWinModal();
         } else if (ranking == 2) {
@@ -108,46 +118,36 @@ public class DrawUtil {
     /**
      * @return 1등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateFirstWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("아이패드 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
+    private DrawWinModalResponseDto.WinModal generateFirstWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_FIRST_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_1"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 
     /**
      * @return 2등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateSecondWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 10만원권 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
+    private DrawWinModalResponseDto.WinModal generateSecondWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_SECOND_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_2"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 
     /**
      * @return 3등 WinModal 반환
      */
-    private DrawWinResponseDto.WinModal generateThirdWinModal() {
-        return DrawWinFullAttendResponseDto.WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 1만원권 어쩌구")
-                .img("image url")
-                .description("전화번호 어쩌구")
-                .build();
-    }
-
-    /**
-     * @param shareUrl 공유 url
-     * @return LoseModal 반환
-     */
-    public DrawLoseResponseDto.LoseModal generateLoseModal(String shareUrl) {
-        return DrawLoseResponseDto.LoseModal.builder()
-                .shareUrl(shareUrl)
+    private DrawWinModalResponseDto.WinModal generateThirdWinModal() {
+        return DrawWinModalResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_THIRD_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_3"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
                 .build();
     }
 
@@ -156,22 +156,8 @@ public class DrawUtil {
      *
      * @return FullAttendModal 반환
      */
-    public DrawWinFullAttendResponseDto.FullAttendModal generateWinFullAttendModal() {
-        return DrawWinFullAttendResponseDto.FullAttendModal.builder()
-                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
-                .image(staticResourcesUtil.getData("attendance_reward_image"))
-                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
-                .build();
-    }
-
-    /**
-     * 7일 연속 출석자 상품 정보 반환 메서드
-     *
-     * @return FullAttendModal 반환
-     */
-    public DrawLoseFullAttendResponseDto.FullAttendModal generateLoseFullAttendModal() {
-        return DrawLoseFullAttendResponseDto.FullAttendModal.builder()
+    public DrawMainFullAttendResponseDto.FullAttendModal generateFullAttendModal() {
+        return DrawMainFullAttendResponseDto.FullAttendModal.builder()
                 .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
                 .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
                 .image(staticResourcesUtil.getData("attendance_reward_image"))

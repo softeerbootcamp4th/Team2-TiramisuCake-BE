@@ -69,8 +69,8 @@ public class DrawService {
     /**
      * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
      *
-     * @param invitedNum 초대한 사람 수
-     * @param remainDrawCount 남은 추첨 기회
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
      * @param drawParticipationCount 연속 출석 일수
      * @return 7일 연속 출석 상품 모달
      */
@@ -86,8 +86,8 @@ public class DrawService {
     /**
      * 7일 미만 출석 시 모달 만들어서 반환하는 메서드
      *
-     * @param invitedNum 초대한 사람 수
-     * @param remainDrawCount 남은 추첨 기회
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
      * @param drawParticipationCount 연속 출석 일수
      * @return 7일 미만 출석 상품 모달
      */
@@ -187,7 +187,7 @@ public class DrawService {
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
                 .images(drawUtil.generateLoseImages())
-                .shareUrl(staticResourcesUtil.getData("BASE_URL") + shareUrl)
+                .shareUrl(shareUrl)
                 .build();
     }
 
@@ -324,7 +324,7 @@ public class DrawService {
      * @return 공유 url
      */
     private String getShareUrl(Integer userId) {
-        return shareUrlInfoRepository.findShareUrlByUserId(userId)
+        return staticResourcesUtil.getData("BASE_URL") + shareUrlInfoRepository.findShareUrlByUserId(userId)
                 .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
     }
 }

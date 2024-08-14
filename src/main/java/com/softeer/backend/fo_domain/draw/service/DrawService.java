@@ -6,6 +6,9 @@ import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -63,6 +66,14 @@ public class DrawService {
         }
     }
 
+    /**
+     * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
+     * @param drawParticipationCount 연속 출석 일수
+     * @return 7일 연속 출석 상품 모달
+     */
     private DrawMainFullAttendResponseDto responseMainFullAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainFullAttendResponseDto.builder()
                 .invitedNum(invitedNum)
@@ -72,6 +83,14 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 7일 미만 출석 시 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
+     * @param drawParticipationCount 연속 출석 일수
+     * @return 7일 미만 출석 상품 모달
+     */
     private DrawMainResponseDto responseMainNotAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainResponseDto.builder()
                 .invitedNum(invitedNum)
@@ -80,6 +99,12 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 추첨 이벤트 당첨 로직 작성
+     *
+     * @param userId 사용자 아이디
+     * @return 추첨 결과에 따른 응답 반환
+     */
     public ResponseDto<DrawModalResponseDto> participateDrawEvent(Integer userId) {
         // 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
@@ -157,13 +182,12 @@ public class DrawService {
      * @return 낙첨자 응답
      */
     private DrawLoseModalResponseDto responseLoseModal(Integer userId) {
-        String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
-                .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+        String shareUrl = getShareUrl(userId);
 
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
                 .images(drawUtil.generateLoseImages())
-                .shareUrl(staticResourcesUtil.getData("BASE_URL") + shareUrl)
+                .shareUrl(shareUrl)
                 .build();
     }
 
@@ -180,6 +204,11 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 당첨된 경우 당첨 횟수 증가
+     *
+     * @param drawParticipationInfo 추첨 참여 정보
+     */
     private void increaseWinCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())
@@ -189,6 +218,11 @@ public class DrawService {
                 .build());
     }
 
+    /**
+     * 당첨되지 않은 경우 낙첨 횟수 증가
+     *
+     * @param drawParticipationInfo 추첨 참여 정보
+     */
     private void increaseLoseCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())
@@ -239,6 +273,34 @@ public class DrawService {
     }
 
     /**
+     * 당첨 내역 조회하는 메서드
+     * 1. 당첨자라면 WinModal과 같은 당첨 내역 모달 응답
+     * 2. 낙첨자라면 LoseModal과 같은 공유 url 모달 응답
+     *
+     * @param userId 사용자 아이디
+     * @return 당첨 내역에 따른 응답
+     */
+    public ResponseDto<DrawHistoryResponseDto> getDrawHistory(Integer userId) {
+        int ranking = getRankingIfWinner(userId);
+
+        if (ranking != 0) {
+            // 당첨자라면
+            drawUtil.setRanking(ranking);
+            return ResponseDto.onSuccess(DrawHistoryWinnerResponseDto.builder()
+                    .isDrawWin(true)
+                    .winModal(drawUtil.generateWinModalForHistory())
+                    .build());
+        }
+
+        // 당첨자가 아니라면
+        String shareUrl = getShareUrl(userId);
+        return ResponseDto.onSuccess(DrawHistoryLoserResponseDto.builder()
+                .isDrawWin(false)
+                .shareUrl(shareUrl)
+                .build());
+    }
+
+    /**
      * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
      *
      * @param userId 사용자 아이디
@@ -253,5 +315,16 @@ public class DrawService {
             }
         }
         return 0;
+    }
+
+    /**
+     * 공유 url 조회
+     *
+     * @param userId 사용자 아이디
+     * @return 공유 url
+     */
+    private String getShareUrl(Integer userId) {
+        return staticResourcesUtil.getData("BASE_URL") + shareUrlInfoRepository.findShareUrlByUserId(userId)
+                .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
     }
 }

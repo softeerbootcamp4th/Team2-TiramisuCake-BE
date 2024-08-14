@@ -1,8 +1,13 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.user.domain.User;
+import com.softeer.backend.fo_domain.user.exception.UserException;
+import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
@@ -14,15 +19,19 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Set;
 
 @Getter
 @Component
 @RequiredArgsConstructor
 public class DrawSettingManager {
+    private final DrawRepository drawRepository;
     private final DrawSettingRepository drawSettingRepository;
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
+    private final UserRepository userRepository;
 
     private LocalDate startDate;
     private LocalDate endDate;
@@ -48,6 +57,9 @@ public class DrawSettingManager {
         winnerNum2 = drawSetting.getWinnerNum2();
         winnerNum3 = drawSetting.getWinnerNum3();
 
+        // 매일 01:00:00에 redis 당첨자 목록 데이터베이스에 저장
+        taskScheduler.schedule(this::addWinnerToDatabase, new CronTrigger("0 0 1 * * *"));
+
         // 매일 01:00:00에 redis 임시 당첨자 목록 삭제하기
         taskScheduler.schedule(this::deleteTempWinnerSetFromRedis, new CronTrigger("0 0 1 * * *"));
     }
@@ -57,6 +69,27 @@ public class DrawSettingManager {
         for (int ranking = 1; ranking < 4; ranking++) {
             drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
+        }
+    }
+
+    private void addWinnerToDatabase() {
+        String drawWinnerKey;
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            Set<Integer> winnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
+
+            for (Integer userId : winnerSet) {
+                User user = userRepository.findById(userId).orElseThrow(
+                        () -> new UserException(ErrorStatus._NOT_FOUND));
+
+                Draw draw = Draw.builder()
+                        .user(user)
+                        .rank(ranking)
+                        .winningDate(LocalDateTime.now().minusHours(2)) // 하루 전 날 오후 11시로 설정
+                        .build();
+
+                drawRepository.save(draw);
+            }
         }
     }
 

@@ -32,9 +32,9 @@ public class DrawService {
     private final ShareInfoRepository shareInfoRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final EventLockRedisUtil eventLockRedisUtil;
-    private final DrawSettingManager drawSettingManager;
-    private final DrawUtil drawUtil;
     private final StaticResourcesUtil staticResourcesUtil;
+    private final DrawUtil drawUtil;
+    private final DrawSettingManager drawSettingManager;
 
     /**
      * 1. 연속 참여일수 조회
@@ -88,20 +88,20 @@ public class DrawService {
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
-        DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
-                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
-
         // 만약 남은 참여 기회가 0이라면
         if (remainDrawCount == 0) {
             return ResponseDto.onSuccess(responseLoseModal(userId));
         }
 
+        DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
+                .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
+
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
-        int ranking = getRankingIfWinner(userId);
+        int ranking = getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
         if (ranking != 0) {
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
-            increaseDrawParticipationCount();
-            addLoseCount(drawParticipationInfo);
+            increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+            increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
 
@@ -131,21 +131,21 @@ public class DrawService {
                 winnerNum = third;
             }
 
-            if (isWinner(userId, ranking, winnerNum)) {
+            if (isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
                 // 추첨 티켓이 다 팔리지 않았다면
-                increaseDrawParticipationCount();
-                addWinCount(drawParticipationInfo); // 당첨 횟수 증가
+                increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+                increaseWinCount(drawParticipationInfo); // 당첨 횟수 증가
                 return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
             } else {
                 // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
-                increaseDrawParticipationCount();
-                addLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+                increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+                increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
                 return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
             decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
-            increaseDrawParticipationCount();
-            addLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+            increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+            increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
     }
@@ -180,7 +180,7 @@ public class DrawService {
                 .build();
     }
 
-    private void addWinCount(DrawParticipationInfo drawParticipationInfo) {
+    private void increaseWinCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())
                 .drawWinningCount(drawParticipationInfo.getDrawWinningCount() + 1)
@@ -189,7 +189,7 @@ public class DrawService {
                 .build());
     }
 
-    private void addLoseCount(DrawParticipationInfo drawParticipationInfo) {
+    private void increaseLoseCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())
                 .drawWinningCount(drawParticipationInfo.getDrawWinningCount())
@@ -239,7 +239,7 @@ public class DrawService {
     }
 
     /**
-     * userId가 임시 당첨자 목록에 있으면 등수, 없으면 0 반환
+     * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
      *
      * @param userId 사용자 아이디
      */

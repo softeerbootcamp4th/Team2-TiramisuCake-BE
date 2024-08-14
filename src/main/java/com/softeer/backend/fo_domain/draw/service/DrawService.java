@@ -204,6 +204,11 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 당첨된 경우 당첨 횟수 증가
+     *
+     * @param drawParticipationInfo 추첨 참여 정보
+     */
     private void increaseWinCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())
@@ -213,6 +218,11 @@ public class DrawService {
                 .build());
     }
 
+    /**
+     * 당첨되지 않은 경우 낙첨 횟수 증가
+     *
+     * @param drawParticipationInfo 추첨 참여 정보
+     */
     private void increaseLoseCount(DrawParticipationInfo drawParticipationInfo) {
         drawParticipationInfoRepository.save(DrawParticipationInfo.builder()
                 .userId(drawParticipationInfo.getUserId())

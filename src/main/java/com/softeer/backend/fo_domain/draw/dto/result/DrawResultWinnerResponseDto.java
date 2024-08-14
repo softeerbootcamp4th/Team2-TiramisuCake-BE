@@ -1,6 +1,5 @@
 package com.softeer.backend.fo_domain.draw.dto.result;
 
-import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

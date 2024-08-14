@@ -78,6 +78,8 @@ public class DrawSettingManager {
             drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             Set<Integer> winnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
 
+            LocalDateTime winningDate = LocalDateTime.now().minusHours(2); // 하루 전 날 오후 11시로 설정
+
             for (Integer userId : winnerSet) {
                 User user = userRepository.findById(userId).orElseThrow(
                         () -> new UserException(ErrorStatus._NOT_FOUND));
@@ -85,7 +87,7 @@ public class DrawSettingManager {
                 Draw draw = Draw.builder()
                         .user(user)
                         .rank(ranking)
-                        .winningDate(LocalDateTime.now().minusHours(2)) // 하루 전 날 오후 11시로 설정
+                        .winningDate(winningDate)
                         .build();
 
                 drawRepository.save(draw);

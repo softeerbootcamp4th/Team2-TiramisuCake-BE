@@ -5,8 +5,10 @@ import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.service.DrawService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,12 +19,19 @@ public class DrawController {
     private final DrawService drawService;
 
     @GetMapping("/event/draw")
-    public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(@Parameter(hidden = true) @AuthInfo Integer userId) {
+    public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
         return drawService.getDrawMainPageInfo(userId);
     }
 
     @PostMapping("/event/draw")
-    public ResponseDto<DrawModalResponseDto> participateDrawEvent(@Parameter(hidden = true) @AuthInfo Integer userId) {
+    public ResponseEntity<Void> participateDrawEvent(@AuthInfo Integer userId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/event/draw-result");
+        return new ResponseEntity<>(headers, HttpStatus.FOUND); // HTTP 302 Found 응답
+    }
+
+    @GetMapping("/event/draw-result")
+    public ResponseDto<DrawModalResponseDto> getDrawResult(@AuthInfo Integer userId) {
         return drawService.participateDrawEvent(userId);
     }
 }

@@ -1,6 +1,5 @@
 package com.softeer.backend.global.common.exception;
 
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResponseDtoDto;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.ConstraintViolationException;

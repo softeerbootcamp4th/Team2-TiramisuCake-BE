@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.softeer.backend.bo_domain.admin.serializer.PercentageSerializer;
 import com.softeer.backend.bo_domain.admin.serializer.PhoneNumberSerializer;
 import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -48,9 +49,9 @@ public class EventIndicatorResponseDto {
         private int visitorNum;
     }
 
-    public static EventIndicatorResponseDto of(List<EventParticipation> eventParticipationList) {
-        LocalDate startDate = eventParticipationList.get(0).getEventDate();
-        LocalDate endDate = eventParticipationList.get(eventParticipationList.size() - 1).getEventDate();
+    public static EventIndicatorResponseDto of(List<EventParticipation> eventParticipationList, DrawSettingManager drawSettingManager) {
+        LocalDate startDate = drawSettingManager.getStartDate();
+        LocalDate endDate = drawSettingManager.getEndDate();
 
         int totalVisitorCount = eventParticipationList.stream()
                 .mapToInt(EventParticipation::getVisitorCount)
@@ -64,8 +65,8 @@ public class EventIndicatorResponseDto {
                 .mapToInt(EventParticipation::getDrawParticipantCount)
                 .sum();
 
-        double fcfsParticipantRate = (double) totalFcfsParticipantCount / (double) totalVisitorCount;
-        double drawParticipantRate = (double) totalDrawParticipantCount / (double) totalVisitorCount;
+        double fcfsParticipantRate = totalVisitorCount == 0 ? 0 : (double) totalFcfsParticipantCount / (double) totalVisitorCount;
+        double drawParticipantRate = totalVisitorCount == 0 ? 0 : (double) totalDrawParticipantCount / (double) totalVisitorCount;
 
         List<VisitorNum> visitorNumList = eventParticipationList.stream()
                 .map((eventParticipation) ->

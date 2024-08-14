@@ -24,6 +24,8 @@ public class MainPageEventResponseDto {
 
     private String remainDrawCount;
 
+    private String fcfsHint;
+
     private List<EventInfo> eventInfoList;
 
     @Getter

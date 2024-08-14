@@ -177,14 +177,29 @@ public class DrawUtil {
     }
 
     private DrawHistoryWinnerResponseDto.WinModal generateFirstWinModalForHistory() {
-        return DrawHistoryWinnerResponseDto.WinModal.builder().build();
+        return DrawHistoryWinnerResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_FIRST_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_1"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .build();
     }
 
     private DrawHistoryWinnerResponseDto.WinModal generateSecondWinModalForHistory() {
-        return DrawHistoryWinnerResponseDto.WinModal.builder().build();
+        return DrawHistoryWinnerResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_SECOND_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_2"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .build();
     }
 
     private DrawHistoryWinnerResponseDto.WinModal generateThirdWinModalForHistory() {
-        return DrawHistoryWinnerResponseDto.WinModal.builder().build();
+        return DrawHistoryWinnerResponseDto.WinModal.builder()
+                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
+                .subtitle(staticResourcesUtil.getData("DRAW_THIRD_WINNER_MODAL_SUBTITLE"))
+                .img(staticResourcesUtil.getData("draw_reward_image_3"))
+                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .build();
     }
 }

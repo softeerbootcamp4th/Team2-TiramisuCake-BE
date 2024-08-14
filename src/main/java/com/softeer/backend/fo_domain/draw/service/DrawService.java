@@ -6,6 +6,8 @@ import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawResultLoserResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawResultResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -157,8 +159,7 @@ public class DrawService {
      * @return 낙첨자 응답
      */
     private DrawLoseModalResponseDto responseLoseModal(Integer userId) {
-        String shareUrl = shareUrlInfoRepository.findShareUrlByUserId(userId)
-                .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+        String shareUrl = getShareUrl(userId);
 
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
@@ -238,6 +239,22 @@ public class DrawService {
         shareInfoRepository.save(shareInfo);
     }
 
+    public ResponseDto<DrawResultResponseDto> getDrawHistory(Integer userId) {
+        int ranking = getRankingIfWinner(userId);
+
+        if (ranking != 0) {
+            // 당첨자라면
+
+        }
+
+        // 당첨자가 아니라면
+        String shareUrl = getShareUrl(userId);
+        return ResponseDto.onSuccess(DrawResultLoserResponseDto.builder()
+                .isDrawWin(false)
+                .shareUrl(shareUrl)
+                .build());
+    }
+
     /**
      * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
      *
@@ -253,5 +270,10 @@ public class DrawService {
             }
         }
         return 0;
+    }
+
+    private String getShareUrl(Integer userId) {
+        return shareUrlInfoRepository.findShareUrlByUserId(userId)
+                .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
     }
 }

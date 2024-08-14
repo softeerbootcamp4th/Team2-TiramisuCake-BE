@@ -1,7 +1,6 @@
 package com.softeer.backend.fo_domain.mainpage.service;
 
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
-import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageCarResponseDto;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventResponseDto;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
@@ -22,7 +21,6 @@ public class MainPageService {
 
     private final EventLockRedisUtil eventLockRedisUtil;
     private final StaticResourcesUtil staticResourcesUtil;
-    private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
 
     public MainPageEventResponseDto getEventPage(){
@@ -51,7 +49,6 @@ public class MainPageService {
                 .fcfsInfo(staticResourcesUtil.getData("FCFS_INFO"))
                 .totalDrawWinner(staticResourcesUtil.getData("TOTAL_DRAW_WINNER"))
                 .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))
-                .fcfsHint(fcfsSettingManager.getHint())
                 .eventInfoList(Arrays.asList(fcfsInfo, drawInfo))
                 .build();
 

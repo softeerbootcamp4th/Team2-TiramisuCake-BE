@@ -317,6 +317,12 @@ public class DrawService {
         return 0;
     }
 
+    /**
+     * 공유 url 조회
+     *
+     * @param userId 사용자 아이디
+     * @return 공유 url
+     */
     private String getShareUrl(Integer userId) {
         return shareUrlInfoRepository.findShareUrlByUserId(userId)
                 .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));

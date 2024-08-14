@@ -55,7 +55,7 @@ public class DrawSettingManager {
     private void deleteTempWinnerSetFromRedis() {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisKeyPrefix.DRAW_TEMP_PREFIX.getPrefix() + ranking;
+            drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
         }
     }

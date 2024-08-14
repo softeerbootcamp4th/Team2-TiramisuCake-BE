@@ -1,9 +1,7 @@
 package com.softeer.backend.global.common.exception;
 
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsFailResponseDtoDto;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -139,8 +137,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         ResponseDto<Object> body = null;
 
-        if (redissonKeyName.contains("FCFS"))
-            body = ResponseDto.onSuccess(new FcfsFailResponseDtoDto(1));
+//        if (redissonKeyName.contains("FCFS"))
+//            body = ResponseDto.onSuccess(new FcfsFailResponseDtoDto(1));
 
         //TODO
         // DRAW 관련 예외일 경우, body 구성하는 코드 필요

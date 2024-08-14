@@ -66,6 +66,14 @@ public class DrawService {
         }
     }
 
+    /**
+     * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum 초대한 사람 수
+     * @param remainDrawCount 남은 추첨 기회
+     * @param drawParticipationCount 연속 출석 일수
+     * @return 7일 연속 출석 상품 모달
+     */
     private DrawMainFullAttendResponseDto responseMainFullAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainFullAttendResponseDto.builder()
                 .invitedNum(invitedNum)
@@ -75,6 +83,14 @@ public class DrawService {
                 .build();
     }
 
+    /**
+     * 7일 미만 출석 시 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum 초대한 사람 수
+     * @param remainDrawCount 남은 추첨 기회
+     * @param drawParticipationCount 연속 출석 일수
+     * @return 7일 미만 출석 상품 모달
+     */
     private DrawMainResponseDto responseMainNotAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainResponseDto.builder()
                 .invitedNum(invitedNum)

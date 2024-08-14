@@ -1,12 +1,14 @@
-package com.softeer.backend.fo_domain.draw.dto;
+package com.softeer.backend.fo_domain.draw.dto.participate;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawWinResponseDto extends DrawResponseDto {
-    private WinModal winModal;
+public class DrawWinModalResponseDto extends DrawModalResponseDto {
+    private DrawWinModalResponseDto.WinModal winModal;
 
     @Data
     @SuperBuilder

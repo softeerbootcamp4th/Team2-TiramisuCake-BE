@@ -33,15 +33,4 @@ public class EventParticipation {
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 
-    public void addTotalVisitorsCount(int totalVisitorsCount) {
-        this.visitorCount += totalVisitorsCount;
-    }
-
-    public void addFcfsParticipantCount(int fcfsParticipantCount) {
-        this.fcfsParticipantCount += fcfsParticipantCount;
-    }
-
-    public void addDrawParticipantCount(int drawParticipantCount) {
-        this.drawParticipantCount += drawParticipantCount;
-    }
 }

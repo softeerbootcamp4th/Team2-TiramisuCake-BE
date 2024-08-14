@@ -5,6 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawResultResponseDto {
-    private boolean isDrawWin;
+public class DrawHistoryLoserResponseDto extends DrawHistoryResponseDto {
+    private String shareUrl; // 공유 url
 }

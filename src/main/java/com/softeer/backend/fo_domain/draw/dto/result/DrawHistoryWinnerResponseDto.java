@@ -7,8 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-public class DrawResultWinnerResponseDto extends DrawResultResponseDto {
-    private DrawResultWinnerResponseDto.WinModal winModal;
+public class DrawHistoryWinnerResponseDto extends DrawHistoryResponseDto {
+    private DrawHistoryWinnerResponseDto.WinModal winModal;
 
     @Data
     @SuperBuilder

@@ -272,6 +272,14 @@ public class DrawService {
         shareInfoRepository.save(shareInfo);
     }
 
+    /**
+     * 당첨 내역 조회하는 메서드
+     * 1. 당첨자라면 WinModal과 같은 당첨 내역 모달 응답
+     * 2. 낙첨자라면 LoseModal과 같은 공유 url 모달 응답
+     *
+     * @param userId 사용자 아이디
+     * @return 당첨 내역에 따른 응답
+     */
     public ResponseDto<DrawHistoryResponseDto> getDrawHistory(Integer userId) {
         int ranking = getRankingIfWinner(userId);
 

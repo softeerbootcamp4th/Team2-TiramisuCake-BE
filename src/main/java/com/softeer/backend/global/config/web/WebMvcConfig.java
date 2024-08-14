@@ -1,7 +1,6 @@
 package com.softeer.backend.global.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softeer.backend.fo_domain.fcfs.interceptor.FcfsTimeCheckInterceptor;
 import com.softeer.backend.global.annotation.argumentresolver.AuthInfoArgumentResolver;
 import com.softeer.backend.global.config.properties.JwtProperties;
 import com.softeer.backend.global.filter.ExceptionHandlingFilter;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -32,8 +30,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final StringRedisUtil stringRedisUtil;
     private final JwtProperties jwtProperties;
 
-    private final FcfsTimeCheckInterceptor fcfsTimeCheckInterceptor;
-
     /**
      * AuthInfo 애노테이션에 대한 Argument Resolver 등록
      *
@@ -41,12 +37,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new AuthInfoArgumentResolver());
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(fcfsTimeCheckInterceptor)
-                .addPathPatterns("/fcfs");
     }
 
     /**

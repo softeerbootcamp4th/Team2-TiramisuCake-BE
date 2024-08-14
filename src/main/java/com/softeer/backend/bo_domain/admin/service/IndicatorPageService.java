@@ -26,7 +26,7 @@ public class IndicatorPageService {
                 drawSettingManager.getStartDate(), drawSettingManager.getEndDate()
         );
 
-        return EventIndicatorResponseDto.of(eventParticipationList, drawSettingManager);
+        return EventIndicatorResponseDto.of(eventParticipationList);
     }
 
 }

@@ -28,7 +28,6 @@ public class StaticResourcesUtil {
 
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("a h", Locale.KOREAN);
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###");
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
 
     private final StaticResourcesRepository staticResourcesRepository;
     private final DrawSettingManager drawSettingManager;
@@ -75,12 +74,6 @@ public class StaticResourcesUtil {
                                     return enumValue.format(decimalFormat.format(totalDrawWinner));
                                 case REMAIN_DRAW_COUNT:
                                     return enumValue.format(decimalFormat.format(remainDrawCount));
-                                case FCFS_QUIZ_DESCRIPTION, FCFS_WINNER_TITLE:
-                                    return enumValue.format(fcfsSettingManager.getFcfsWinnerNum());
-                                case FCFS_WINNER_EXPIRY_DATE:
-                                    return enumValue.format(firstFcfsSetting.getStartTime().getYear(),
-                                            firstFcfsSetting.getStartTime().format(dateFormatter),
-                                            drawSettingManager.getEndDate().plusDays(14).format(dateFormatter));
 
                                 default:
                                     return enumValue.getText();

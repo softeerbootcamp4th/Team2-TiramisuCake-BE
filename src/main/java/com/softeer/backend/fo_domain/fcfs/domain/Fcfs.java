@@ -32,6 +32,9 @@ public class Fcfs {
     @Column(name = "round")
     private int round;
 
+    @Column(name = "code")
+    private String code;
+
     @CreatedDate
     @Column(name = "winning_date", nullable = false)
     private LocalDateTime winningDate;

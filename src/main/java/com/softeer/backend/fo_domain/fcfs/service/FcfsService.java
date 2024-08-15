@@ -69,8 +69,11 @@ public class FcfsService {
      */
     public String handleFcfsEvent(int userId, int round, String answer) {
 
-        if(!answer.equals(fcfsSettingManager.getQuiz(round).getAnswerSentence()))
+        if(!answer.equals(fcfsSettingManager.getQuiz(round).getAnswerWord())) {
+            log.error("fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}",
+                    fcfsSettingManager.getQuiz(round).getAnswerWord(), answer);
             throw new FcfsException(ErrorStatus._BAD_REQUEST);
+        }
 
         if (fcfsSettingManager.isFcfsClosed()){
             countFcfsParticipant(round);

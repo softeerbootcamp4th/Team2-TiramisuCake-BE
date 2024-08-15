@@ -26,6 +26,9 @@ public class JwtUtil {
 
     // HttpServletRequest 부터 Access Token 추출
     public Optional<String> extractAccessToken(HttpServletRequest request) {
+
+        log.info("Authorization 헤더: {}", request.getHeader("Authorization"));
+
         return Optional.ofNullable(request.getHeader(jwtProperties.getAccessHeader()))
                 .filter(StringUtils::hasText)
                 .filter(accessToken -> accessToken.startsWith(jwtProperties.getBearer()))

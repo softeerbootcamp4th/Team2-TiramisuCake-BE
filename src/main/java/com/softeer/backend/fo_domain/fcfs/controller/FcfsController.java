@@ -1,7 +1,8 @@
 package com.softeer.backend.fo_domain.fcfs.controller;
 
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsPageResponseDto;
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResult;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
@@ -64,14 +65,15 @@ public class FcfsController {
 
     @GetMapping("/result")
     @ResponseBody
-    public ResponseDto<FcfsResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
-                                                      @RequestParam("fcfsWin") Boolean fcfsWin){
+    public ResponseDto<FcfsResultResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
+                                                            @RequestParam("fcfsWin") Boolean fcfsWin){
 
         String fcfsCode = (String) request.getSession().getAttribute("fcfsCode");
+        request.getSession().removeAttribute("fcfsCode");
 
-        FcfsResponseDto fcfsResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);
+        FcfsResultResponseDto fcfsResultResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);
 
-        return ResponseDto.onSuccess(fcfsResponseDto);
+        return ResponseDto.onSuccess(fcfsResultResponseDto);
     }
 
 }

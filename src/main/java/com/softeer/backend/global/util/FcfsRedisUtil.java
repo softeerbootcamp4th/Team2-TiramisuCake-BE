@@ -23,7 +23,7 @@ public class FcfsRedisUtil {
     }
 
     public void addToHash(String key, String field, Integer value) {
-        stringRedisTemplate.opsForHash().put(key, field, value);
+        integerRedisTemplate.opsForHash().put(key, field, value);
     }
 
     public void incrementValue(String key){
@@ -43,7 +43,7 @@ public class FcfsRedisUtil {
     }
 
     public Map<String, Integer> getHashEntries(String key) {
-        Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(key);
+        Map<Object, Object> entries = integerRedisTemplate.opsForHash().entries(key);
         Map<String, Integer> result = new HashMap<>();
 
         for (Map.Entry<Object, Object> entry : entries.entrySet()) {
@@ -68,7 +68,7 @@ public class FcfsRedisUtil {
     }
 
     public void clearHash(String key) {
-        stringRedisTemplate.delete(key);
+        integerRedisTemplate.delete(key);
     }
 
     public void clearValue(String key) {

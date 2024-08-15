@@ -95,6 +95,11 @@ public class DrawSettingManager {
         }
     }
 
+    public void setDrawDate(DrawSetting drawSetting) {
+        this.startDate = drawSetting.getStartDate();
+        this.endDate = drawSetting.getEndDate();
+    }
+
     public void setDrawTime(DrawSetting drawSetting) {
         this.startTime = drawSetting.getStartTime();
         this.endTime = drawSetting.getEndTime();

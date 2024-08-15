@@ -1,28 +1,20 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
-import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.*;
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResponseDto;
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResponseDto;
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResult;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
-import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
-import com.softeer.backend.fo_domain.user.domain.User;
-import com.softeer.backend.fo_domain.user.exception.UserException;
-import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
-import com.softeer.backend.global.util.EventLockRedisUtil;
 import com.softeer.backend.global.util.FcfsRedisUtil;
 import com.softeer.backend.global.util.RandomCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -127,9 +119,9 @@ public class FcfsService {
         fcfsRedisUtil.incrementValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
     }
 
-    public FcfsResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode){
+    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode){
         if(fcfsWin){
-            return FcfsSuccessResponseDto.builder()
+            FcfsSuccessResult fcfsSuccessResult = FcfsSuccessResult.builder()
                     .title(staticResourcesUtil.getData("FCFS_WINNER_TITLE"))
                     .subTitle(staticResourcesUtil.getData("FCFS_WINNER_SUBTITLE"))
                     .qrCode(staticResourcesUtil.getData("barcode_image"))
@@ -138,12 +130,22 @@ public class FcfsService {
                     .expirationDate(staticResourcesUtil.getData("FCFS_WINNER_EXPIRY_DATE"))
                     .caution(staticResourcesUtil.getData("FCFS_WINNER_CAUTION"))
                     .build();
+
+            return FcfsResultResponseDto.builder()
+                    .isFcfsWinner(fcfsWin)
+                    .fcfsResult(fcfsSuccessResult)
+                    .build();
         }
 
-        return FcfsFailResponseDto.builder()
+        FcfsFailResult fcfsFailResult = FcfsFailResult.builder()
                 .title(staticResourcesUtil.getData("FCFS_LOSER_TITLE"))
                 .subTitle(staticResourcesUtil.getData("FCFS_LOSER_SUBTITLE"))
                 .caution(staticResourcesUtil.getData("FCFS_LOSER_CAUTION"))
+                .build();
+
+        return FcfsResultResponseDto.builder()
+                .isFcfsWinner(fcfsWin)
+                .fcfsResult(fcfsFailResult)
                 .build();
     }
 

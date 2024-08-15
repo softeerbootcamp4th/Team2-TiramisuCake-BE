@@ -4,7 +4,7 @@ import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.domain.ShareUrlInfo;
-import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
+import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.fo_domain.user.domain.User;
@@ -48,7 +48,6 @@ public class LoginService {
      */
     @Transactional
     public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, HttpSession session) {
-
         // 인증번호가 인증 되지 않은 경우, 예외 발생
         if (!loginRequestDto.getHasCodeVerified()) {
             log.error("hasCodeVerified is false in loginRequest.");
@@ -82,11 +81,18 @@ public class LoginService {
             // 공유받은 url을 이용해 인증한다면
             // 공유한 사람 추첨 기회 추가
             if (shareUrl != null) {
-                int shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareUrl).orElseThrow(
-                        () -> new UserException(ErrorStatus._NOT_FOUND));
+                ShareUrlInfo shareUrlInfo = shareUrlInfoRepository.findShareUrlInfoByShareUrl(shareUrl)
+                        .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
-                // 공유한 사람 추첨 기회 추가
-                shareInfoRepository.increaseRemainDrawCount(shareUserId);
+                if (!shareUrlInfo.getIsShared()) { // 아직 추첨 기회를 얻지 못했다면
+                    int shareUserId = shareUrlInfo.getUserId();
+
+                    // 공유한 사람 추첨 기회 추가
+                    shareInfoRepository.increaseRemainDrawCount(shareUserId);
+
+                    // 추첨 기회 추가했음을 업데이트
+                    shareUrlInfoRepository.updateIsShared(shareUserId);
+                }
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우
@@ -141,5 +147,4 @@ public class LoginService {
 
         drawParticipationInfoRepository.save(drawParticipationInfo);
     }
-
 }

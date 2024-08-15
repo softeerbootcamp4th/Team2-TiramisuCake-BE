@@ -70,6 +70,8 @@ public class DbInsertScheduler {
         int drawParticipantCount = 0;
 
         if(fcfsSettingManager.getRoundForScheduler(now)!=-1){
+            fcfsSettingManager.setFcfsClosed(false);
+
             int round = fcfsSettingManager.getRoundForScheduler(now);
 
             Map<String, Integer> participantIds = fcfsRedisUtil.getHashEntries(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);

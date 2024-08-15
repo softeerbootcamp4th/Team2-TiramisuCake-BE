@@ -144,7 +144,6 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             modelAndView.addObject("fcfsWin", false);
         }
 
-
         //TODO
         // DRAW 관련 예외일 경우, body 구성하는 코드 필요
 

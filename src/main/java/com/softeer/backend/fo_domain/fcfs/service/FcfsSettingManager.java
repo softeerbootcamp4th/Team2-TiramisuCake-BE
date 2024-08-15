@@ -152,7 +152,6 @@ public class FcfsSettingManager {
     }
 
     public QuizDto getQuiz(int round){
-
         log.info("quiz: {}", quizList.get(round-1));
         return quizList.get(round - 1);
     }

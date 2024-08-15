@@ -16,7 +16,4 @@ public class ShareUrlInfo {
 
     @Column(name = "share_url")
     private String shareUrl;
-
-    @Column(name = "is_shared")
-    private Boolean isShared;
 }

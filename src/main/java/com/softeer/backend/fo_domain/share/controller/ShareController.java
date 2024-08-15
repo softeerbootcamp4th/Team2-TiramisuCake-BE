@@ -33,7 +33,7 @@ public class ShareController {
 
         // 헤더를 이용해 redirect
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/");
+        headers.add("Location", "https://softeer.site");
         return new ResponseEntity<>(headers, HttpStatus.FOUND); // HTTP 302 Found 응답
     }
 }

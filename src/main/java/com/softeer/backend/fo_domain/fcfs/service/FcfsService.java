@@ -1,15 +1,28 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
+import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.*;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResponseDto;
+import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
+import com.softeer.backend.fo_domain.user.domain.User;
+import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
+import com.softeer.backend.global.annotation.EventLock;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
+import com.softeer.backend.global.util.FcfsRedisUtil;
+import com.softeer.backend.global.util.RandomCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -20,10 +33,9 @@ import org.springframework.stereotype.Service;
 public class FcfsService {
 
     private final FcfsSettingManager fcfsSettingManager;
-    private final FcfsRepository fcfsRepository;
-    private final EventLockRedisUtil eventLockRedisUtil;
-    private final UserRepository userRepository;
+    private final FcfsRedisUtil fcfsRedisUtil;
     private final StaticResourcesUtil staticResourcesUtil;
+    private final RandomCodeUtil randomCodeUtil;
 
 
     public FcfsPageResponseDto getFcfsPage(int round) {
@@ -55,60 +67,78 @@ public class FcfsService {
      * 1. 선착순 당첨자가 아직 다 결정되지 않았으면, 선착순 당첨 응답 생성 및 반환
      * 2. 선착순 당첨자가 다 결정됐다면, Redisson lock을 사용하지 않고 Redis에 저장된 선착순 이벤트 참여자 수를 1명씩 더한다.
      */
-//    public FcfsResponseDto handleFcfsEvent(int userId, int round, String answer) {
-//        if (fcfsSettingManager.isFcfsClosed())
-//            return countFcfsParticipant(fcfsSettingManager.getRound());
-//
-//        return saveFcfsWinners(userId, fcfsSettingManager.getRound());
-//    }
+    public String handleFcfsEvent(int userId, int round, String answer) {
 
-    /**
-     * 1. Redisson lock을 걸고 선착순 이벤트 참여자 수가 지정된 수보다 적다면, 선착순 당첨 정보를 DB에 저장하고
-     * Redis에 저장된 선착순 이벤트 참여자 수를 1만큼 증가시키도 선착순 당첨 응답을 생성하여 반환한다.
-     * 만약, 참여자 수가 총 당첨자 수와 같아졌으면, fcfsSettingManager의 setFcfsClosed를 true로 변환한다.
-     * 2. setFcfsClosed가 true로 바뀌게 전에 요청이 들어왔다면, 선착순 실패 응답을 생성하여 반환한다.
-     */
-//    @EventLock(key = "FCFS_WINNER_#{#round}")
-//    private FcfsResponseDto saveFcfsWinners(int userId, int round) {
-//        Set<Integer> participantIds = eventLockRedisUtil.getAllDataAsSet(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
-//
-//        if (participantIds.size() < fcfsSettingManager.getWinnerNum() &&
-//                !eventLockRedisUtil.isParticipantExists(RedisLockPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId)) {
-//            User user = userRepository.findById(userId)
-//                    .orElseThrow(() -> {
-//                        log.error("user not found in saveFcfsWinners method.");
-//                        return new UserException(ErrorStatus._NOT_FOUND);
-//                    });
-//
-//            Fcfs fcfs = Fcfs.builder()
-//                    .user(user)
-//                    .round(round)
-//                    .build();
-//            fcfsRepository.save(fcfs);
-//
-//            eventLockRedisUtil.incrementParticipantCount(RedisLockPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
-//            if (participantIds.size() + 1 == fcfsSettingManager.getWinnerNum()) {
-//                fcfsSettingManager.setFcfsClosed(true);
-//            }
-//
-//            return new FcfsSuccessResponseDto(1);
-//        }
-//
-//        return new FcfsFailResponseDtoDto(1);
-//    }
+        if(!answer.equals(fcfsSettingManager.getQuiz(round).getAnswerWord())) {
+            log.error("fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}",
+                    fcfsSettingManager.getQuiz(round).getAnswerWord(), answer);
+            throw new FcfsException(ErrorStatus._BAD_REQUEST);
+        }
 
-    public FcfsResponseDto getFcfsResult(boolean fcfsWin){
-//        if(fcfsWin){
-//            return FcfsSuccessResponseDto.builder()
-//                    .title(staticResourcesUtil.getData("FCFS_WINNER_TITLE"))
-//                    .subTitle(staticResourcesUtil.getData("FCFS_WINNER_SUBTITLE"))
-//                    .qrCode(staticResourcesUtil.getData("barcode_image"))
-//                    .codeWord(staticResourcesUtil.getData("FCFS_WINNER_CODE_WORD"))
-//                    .fcfsCode()
-//                    .expirationDate(staticResourcesUtil.getData("FCFS_WINNER_EXPIRY_DATE"))
-//                    .caution(staticResourcesUtil.getData("FCFS_WINNER_CAUTION"))
-//                    .build();
-//        }
+        if (fcfsSettingManager.isFcfsClosed()){
+            countFcfsParticipant(round);
+
+            return null;
+        }
+
+        return saveFcfsWinners(userId, round);
+    }
+
+    @EventLock(key = "FCFS_WINNER_#{#round}")
+    private String saveFcfsWinners(int userId, int round) {
+
+        long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+
+        if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+                && !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId)) {
+
+            // redis에 userId 등록
+            fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId);
+
+            // redis에 code 등록
+            String code = makeFcfsCode(round);
+            while(fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)){
+                code = makeFcfsCode(round);
+            }
+            fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
+
+            // redis에 code-userId 형태로 등록(hash)
+            fcfsRedisUtil.addToHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round, code, userId);
+
+            // redis에 선착순 참가자 수 +1
+            countFcfsParticipant(round);
+
+            // 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClodes 변수값을 true로 설정
+            if (numOfWinners + 1 == fcfsSettingManager.getFcfsWinnerNum()) {
+                fcfsSettingManager.setFcfsClosed(true);
+            }
+
+            return code;
+        }
+
+        return null;
+    }
+
+    private String makeFcfsCode(int round){
+        return (char)('A'+round-1) + randomCodeUtil.generateRandomCode(5);
+    }
+
+    private void countFcfsParticipant(int round) {
+        fcfsRedisUtil.incrementValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+    }
+
+    public FcfsResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode){
+        if(fcfsWin){
+            return FcfsSuccessResponseDto.builder()
+                    .title(staticResourcesUtil.getData("FCFS_WINNER_TITLE"))
+                    .subTitle(staticResourcesUtil.getData("FCFS_WINNER_SUBTITLE"))
+                    .qrCode(staticResourcesUtil.getData("barcode_image"))
+                    .codeWord(staticResourcesUtil.getData("FCFS_WINNER_CODE_WORD"))
+                    .fcfsCode(fcfsCode)
+                    .expirationDate(staticResourcesUtil.getData("FCFS_WINNER_EXPIRY_DATE"))
+                    .caution(staticResourcesUtil.getData("FCFS_WINNER_CAUTION"))
+                    .build();
+        }
 
         return FcfsFailResponseDto.builder()
                 .title(staticResourcesUtil.getData("FCFS_LOSER_TITLE"))
@@ -116,5 +146,7 @@ public class FcfsService {
                 .caution(staticResourcesUtil.getData("FCFS_LOSER_CAUTION"))
                 .build();
     }
+
+
 
 }

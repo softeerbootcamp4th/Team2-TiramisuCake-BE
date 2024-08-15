@@ -48,19 +48,28 @@ public class FcfsController {
 
         int round = (Integer) request.getAttribute("round");
 
-//        boolean isFcfsWinner = fcfsService.handleFcfsEvent(userId, round, answer);
-//
-//        // 리다이렉트 시 쿼리 파라미터를 추가하여 정보 전달
-//        redirectAttributes.addAttribute("fcfsWin", isFcfsWinner);
+        String fcfsCode = fcfsService.handleFcfsEvent(userId, round, answer);
 
-        // GET 요청으로 리다이렉트
+        if(fcfsCode != null){
+            request.getSession().setAttribute("fcfsCode", fcfsCode);
+
+            redirectAttributes.addAttribute("fcfsWin", true);
+        }
+        else{
+            redirectAttributes.addAttribute("fcfsWin", false);
+        }
+
         return "redirect:/fcfs/result";
     }
 
     @GetMapping("/result")
     @ResponseBody
-    public ResponseDto<FcfsResponseDto> getFcfsResult(@RequestParam("fcfsWin") Boolean fcfsWin){
-        FcfsResponseDto fcfsResponseDto = fcfsService.getFcfsResult(fcfsWin);
+    public ResponseDto<FcfsResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
+                                                      @RequestParam("fcfsWin") Boolean fcfsWin){
+
+        String fcfsCode = (String) request.getSession().getAttribute("fcfsCode");
+
+        FcfsResponseDto fcfsResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);
 
         return ResponseDto.onSuccess(fcfsResponseDto);
     }

@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * 선착순 이벤트 정보를 관리하는 클래스
@@ -60,7 +59,7 @@ public class FcfsSettingManager {
     public void loadInitialData() {
 
         List<FcfsSetting> fcfsSettings = fcfsSettingRepository.findAll();
-        fcfsSettingList = new ArrayList<>(4);
+        fcfsSettingList = new ArrayList<>();
 
         for (int i = 0; i < 4; i++) {
             fcfsSettingList.add(null);  // 인덱스 0부터 3까지 빈 슬롯을 추가
@@ -76,11 +75,7 @@ public class FcfsSettingManager {
         });
 
         List<Quiz> quizs = quizRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-        quizList = new ArrayList<>(4);
-
-        for (int i = 0; i < 4; i++) {
-            quizList.add(null);  // 인덱스 0부터 3까지 빈 슬롯을 추가
-        }
+        quizList = new ArrayList<>();
 
         quizs.forEach((quiz) -> {
 
@@ -157,7 +152,7 @@ public class FcfsSettingManager {
     }
 
     public QuizDto getQuiz(int round){
-
+        log.info("quiz: {}", quizList.get(round-1));
         return quizList.get(round - 1);
     }
 

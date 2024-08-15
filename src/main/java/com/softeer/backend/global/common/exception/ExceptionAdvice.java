@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.*;
@@ -39,7 +40,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Object> handleEventLockException(EventLockException eventLockException, WebRequest webRequest) {
+    public ModelAndView handleEventLockException(EventLockException eventLockException, WebRequest webRequest) {
         return handleEventLockExceptionInternal(eventLockException, HttpHeaders.EMPTY, webRequest);
     }
 
@@ -129,27 +130,24 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     // EventLockException에 대한 client 응답 객체를 생성하는 메서드
-    private ResponseEntity<Object> handleEventLockExceptionInternal(EventLockException e, HttpHeaders headers, WebRequest webRequest) {
+    private ModelAndView handleEventLockExceptionInternal(EventLockException e, HttpHeaders headers, WebRequest webRequest) {
 
         log.error("EventLockException captured in ExceptionAdvice", e);
 
         String redissonKeyName = e.getRedissonKeyName();
 
-        ResponseDto<Object> body = null;
+        ModelAndView modelAndView = new ModelAndView();
 
-//        if (redissonKeyName.contains("FCFS"))
-//            body = ResponseDto.onSuccess(new FcfsFailResponseDtoDto(1));
+        if (redissonKeyName.contains("FCFS")){
+
+            modelAndView.setViewName("redirect:/fcfs/result");
+            modelAndView.addObject("fcfsWin", false);
+        }
 
         //TODO
         // DRAW 관련 예외일 경우, body 구성하는 코드 필요
 
-        return super.handleExceptionInternal(
-                e,
-                body,
-                headers,
-                HttpStatus.OK,
-                webRequest
-        );
+        return modelAndView;
     }
 
     // ConstraintViolationException에 대한 client 응답 객체를 생성하는 메서드

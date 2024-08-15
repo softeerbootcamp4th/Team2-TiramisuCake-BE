@@ -38,6 +38,10 @@ public class RedisConfig {
 
         template.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
 
+        template.setHashKeySerializer(new StringRedisSerializer());
+
+        template.setHashValueSerializer(new GenericToStringSerializer<>(Integer.class));
+
         return template;
     }
 

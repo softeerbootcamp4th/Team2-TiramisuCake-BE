@@ -12,6 +12,7 @@ import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.util.EventLockRedisUtil;
+import com.softeer.backend.global.util.FcfsRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
@@ -31,6 +34,7 @@ public class DbInsertScheduler {
 
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
+    private final FcfsRedisUtil fcfsRedisUtil;
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
     private final EventParticipationRepository eventParticipationRepository;
@@ -66,26 +70,32 @@ public class DbInsertScheduler {
         int drawParticipantCount = 0;
 
         if(fcfsSettingManager.getRoundForScheduler(now)!=-1){
+            fcfsSettingManager.setFcfsClosed(false);
+
             int round = fcfsSettingManager.getRoundForScheduler(now);
 
-            Set<Integer> participantIds = eventLockRedisUtil.getAllDataAsSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
-            participantIds.forEach((userId) -> {
+            Map<String, Integer> participantIds = fcfsRedisUtil.getHashEntries(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
+            participantIds.forEach((code, userId) -> {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> {
                             log.error("user not found in saveFcfsWinners method.");
                             return new UserException(ErrorStatus._NOT_FOUND);
                         });
+
                 Fcfs fcfs = Fcfs.builder()
                         .user(user)
                         .round(round)
+                        .code(code)
                         .build();
                 fcfsRepository.save(fcfs);
             });
 
-            fcfsParticipantCount += eventLockRedisUtil.getData(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+            fcfsParticipantCount += fcfsRedisUtil.getValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
 
-            eventLockRedisUtil.deleteData(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
-            eventLockRedisUtil.deleteData(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+            fcfsRedisUtil.clearValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
+            fcfsRedisUtil.clearIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+            fcfsRedisUtil.clearStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round);
+            fcfsRedisUtil.clearHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
         }
 
         // TODO: drawParticipantCount에 추첨 이벤트 참가자 수 할당하기

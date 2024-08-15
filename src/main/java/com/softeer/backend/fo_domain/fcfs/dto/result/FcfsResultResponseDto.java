@@ -6,11 +6,9 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class FcfsFailResponseDto implements FcfsResponseDto {
+public class FcfsResultResponseDto {
 
-    private String title;
+    private boolean isFcfsWinner;
 
-    private String subTitle;
-
-    private String caution;
+    private FcfsResult fcfsResult;
 }

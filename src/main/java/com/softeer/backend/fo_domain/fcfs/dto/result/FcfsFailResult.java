@@ -6,20 +6,11 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class FcfsSuccessResponseDto implements FcfsResponseDto {
+public class FcfsFailResult implements FcfsResult {
 
     private String title;
 
     private String subTitle;
 
-    private String qrCode;
-
-    private String codeWord;
-
-    private String fcfsCode;
-
-    private String expirationDate;
-
     private String caution;
-
 }

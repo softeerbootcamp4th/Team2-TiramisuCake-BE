@@ -4,6 +4,7 @@ import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.domain.ShareUrlInfo;
+import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.fo_domain.user.domain.User;
@@ -16,6 +17,7 @@ import com.softeer.backend.global.common.constant.RoleType;
 import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.util.JwtUtil;
 import com.softeer.backend.global.util.RandomCodeUtil;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,12 +41,13 @@ public class LoginService {
     /**
      * 1. Login 정보애서 인증 번호가 인증되지 않은 경우, 예외가 발생한다.
      * 2. 전화번호가 User DB에 등록되어 있지 않은 경우, DB에 User를 등록한다.
+     * 2-1. 이 때 공유 정보, 공유 url 생성, 추첨 이벤트 참여 정보를 생성한다.
+     * 2-2. 만약 공유 url을 통해 인증한 사용자라면 공유한 사용자의 추첨 기회를 추가해준다.
      * 3. 전화번호가 이미 User DB에 등록되어 있는 경우, 전화번호로 User 객체를 조회한다.
      * 4. User 객체의 id를 얻은 후에, access & refresh token을 client에게 전달한다.
      */
     @Transactional
-    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto) {
-
+    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, HttpSession session) {
         // 인증번호가 인증 되지 않은 경우, 예외 발생
         if (!loginRequestDto.getHasCodeVerified()) {
             log.error("hasCodeVerified is false in loginRequest.");
@@ -58,6 +61,7 @@ public class LoginService {
         // 추첨 이벤트 참여 정보 생성
         // 공유 정보 생성(초대한 친구 수, 남은 추첨 횟수)
         // 공유 url 생성
+        // 만약 공유 url을 통해 새로 인증한 사용자라면 공유자에게 추첨 기회 1회 추가
         if (!userRepository.existsByPhoneNumber(loginRequestDto.getPhoneNumber())) {
             User user = User.builder()
                     .name(loginRequestDto.getName())
@@ -72,6 +76,19 @@ public class LoginService {
             createDrawParticipationInfo(userId); // 추첨 이벤트 참여 정보 생성
             createShareInfo(userId); // 공유 정보 생성(초대한 친구 수, 남은 추첨 횟수)
             createShareUrlInfo(userId); // 공유 url 생성
+
+            String shareUrl = (String) session.getAttribute("shareUrl");
+            // 공유받은 url을 이용해 인증한다면
+            // 공유한 사람 추첨 기회 추가
+            // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
+            if (shareUrl != null) {
+                // 공유한 사람의 아이디
+                Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareUrl)
+                        .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+
+                // 공유한 사람 추첨 기회 추가
+                shareInfoRepository.increaseRemainDrawCount(shareUserId);
+            }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우
         // 전화번호로 User 객체 조회
@@ -84,7 +101,6 @@ public class LoginService {
                 .id(userId)
                 .roleType(RoleType.ROLE_USER)
                 .build());
-
     }
 
     private void createShareInfo(Integer userId) {
@@ -126,5 +142,4 @@ public class LoginService {
 
         drawParticipationInfoRepository.save(drawParticipationInfo);
     }
-
 }

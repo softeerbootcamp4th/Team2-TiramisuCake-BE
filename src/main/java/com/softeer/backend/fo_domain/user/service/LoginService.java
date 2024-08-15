@@ -83,15 +83,8 @@ public class LoginService {
                 int shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareUrl).orElseThrow(
                         () -> new UserException(ErrorStatus._NOT_FOUND));
 
-                ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(shareUserId)
-                        .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
-
                 // 공유한 사람 추첨 기회 추가
-                shareInfoRepository.save(ShareInfo.builder()
-                        .userId(shareUserId)
-                        .invitedNum(shareInfo.getInvitedNum())
-                        .remainDrawCount(shareInfo.getInvitedNum() + 1)
-                        .build());
+                shareInfoRepository.increaseRemainDrawCount(shareUserId);
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우

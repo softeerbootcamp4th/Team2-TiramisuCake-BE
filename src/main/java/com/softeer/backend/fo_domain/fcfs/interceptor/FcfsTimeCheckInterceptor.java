@@ -29,10 +29,10 @@ public class FcfsTimeCheckInterceptor implements HandlerInterceptor {
             throw new FcfsException(ErrorStatus._BAD_REQUEST);
         }
 
-        if(request.getMethod().equals("GET")){
-            int round = fcfsSettingManager.getFcfsRound(now);
-            request.setAttribute("round", round);
-        }
+
+        int round = fcfsSettingManager.getFcfsRound(now);
+        request.setAttribute("round", round);
+
 
         return true;
     }

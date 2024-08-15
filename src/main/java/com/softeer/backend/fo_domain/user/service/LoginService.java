@@ -80,19 +80,14 @@ public class LoginService {
             String shareUrl = (String) session.getAttribute("shareUrl");
             // 공유받은 url을 이용해 인증한다면
             // 공유한 사람 추첨 기회 추가
+            // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
             if (shareUrl != null) {
-                ShareUrlInfo shareUrlInfo = shareUrlInfoRepository.findShareUrlInfoByShareUrl(shareUrl)
+                // 공유한 사람의 아이디
+                Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareUrl)
                         .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
-                if (!shareUrlInfo.getIsShared()) { // 아직 추첨 기회를 얻지 못했다면
-                    int shareUserId = shareUrlInfo.getUserId();
-
-                    // 공유한 사람 추첨 기회 추가
-                    shareInfoRepository.increaseRemainDrawCount(shareUserId);
-
-                    // 추첨 기회 추가했음을 업데이트
-                    shareUrlInfoRepository.updateIsShared(shareUserId);
-                }
+                // 공유한 사람 추첨 기회 추가
+                shareInfoRepository.increaseRemainDrawCount(shareUserId);
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우

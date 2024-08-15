@@ -58,7 +58,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/**")
-                .allowedOrigins("https://softeer.site", "http://localhost:5173", "https://softeer.shop") // 허용할 도메인 설정
+                .allowedOrigins("https://softeer.site", "http://localhost:5173", "https://softeer.shop",
+                        "https://d3qmq1ffhp5il9.cloudfront.net") // 허용할 도메인 설정
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정
                 .allowedHeaders("Content-Type", "Authorization", "Authorization-Refresh") // 허용할 헤더 설정
                 .exposedHeaders("Authorization", "Authorization-Refresh") // 클라이언트에 노출할 헤더 설정

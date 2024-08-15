@@ -2,6 +2,7 @@ package com.softeer.backend.fo_domain.draw.controller;
 
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.service.DrawService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
@@ -33,5 +34,10 @@ public class DrawController {
     @GetMapping("/event/draw-result")
     public ResponseDto<DrawModalResponseDto> getDrawResult(@AuthInfo Integer userId) {
         return drawService.participateDrawEvent(userId);
+    }
+
+    @GetMapping("/event/draw/history")
+    public ResponseDto<DrawHistoryResponseDto> getDrawHistory(@AuthInfo Integer userId) {
+        return drawService.getDrawHistory(userId);
     }
 }

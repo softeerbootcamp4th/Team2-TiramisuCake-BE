@@ -20,7 +20,4 @@ public interface ShareUrlInfoRepository extends JpaRepository<ShareUrlInfo, Inte
     List<String> findAllShareUrl();
 
     Optional<ShareUrlInfo> findShareUrlInfoByShareUrl(String shareUrl);
-
-    @Query("UPDATE ShareUrlInfo s SET s.isShared = true WHERE s.userId = :userId")
-    void updateIsShared(Integer userId);
 }

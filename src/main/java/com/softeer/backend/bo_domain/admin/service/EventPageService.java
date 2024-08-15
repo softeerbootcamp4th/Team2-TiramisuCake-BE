@@ -82,6 +82,8 @@ public class EventPageService {
 
         drawSetting.setStartDate(startDateOfDraw);
         drawSetting.setEndDate(endDateOfDraw);
+
+        drawSettingManager.setDrawDate(drawSetting);
     }
 
     public void updateDrawEventTime(DrawEventTimeRequestDto drawEventTimeRequestDto) {

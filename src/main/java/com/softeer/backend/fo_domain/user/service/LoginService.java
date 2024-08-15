@@ -41,6 +41,8 @@ public class LoginService {
     /**
      * 1. Login 정보애서 인증 번호가 인증되지 않은 경우, 예외가 발생한다.
      * 2. 전화번호가 User DB에 등록되어 있지 않은 경우, DB에 User를 등록한다.
+     * 2-1. 이 때 공유 정보, 공유 url 생성, 추첨 이벤트 참여 정보를 생성한다.
+     * 2-2. 만약 공유 url을 통해 인증한 사용자라면 공유한 사용자의 추첨 기회를 추가해준다.
      * 3. 전화번호가 이미 User DB에 등록되어 있는 경우, 전화번호로 User 객체를 조회한다.
      * 4. User 객체의 id를 얻은 후에, access & refresh token을 client에게 전달한다.
      */
@@ -98,7 +100,6 @@ public class LoginService {
                 .id(userId)
                 .roleType(RoleType.ROLE_USER)
                 .build());
-
     }
 
     private void createShareInfo(Integer userId) {

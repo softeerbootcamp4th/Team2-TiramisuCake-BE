@@ -29,7 +29,7 @@ public class DrawResponseGenerateUtil {
      * @param drawParticipationCount 연속 출석 일수
      * @return 7일 연속 출석 상품 모달
      */
-    public DrawMainFullAttendResponseDto responseMainFullAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+    public DrawMainFullAttendResponseDto generateMainFullAttendResponse(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainFullAttendResponseDto.builder()
                 .invitedNum(invitedNum)
                 .remainDrawCount(remainDrawCount)
@@ -46,7 +46,7 @@ public class DrawResponseGenerateUtil {
      * @param drawParticipationCount 연속 출석 일수
      * @return 7일 미만 출석 상품 모달
      */
-    public DrawMainResponseDto responseMainNotAttend(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+    public DrawMainResponseDto generateMainNotAttendResponse(int invitedNum, int remainDrawCount, int drawParticipationCount) {
         return DrawMainResponseDto.builder()
                 .invitedNum(invitedNum)
                 .remainDrawCount(remainDrawCount)
@@ -60,7 +60,7 @@ public class DrawResponseGenerateUtil {
      * @param userId 를 이용하여 공유 url 조회
      * @return 낙첨자 응답
      */
-    public DrawLoseModalResponseDto responseLoseModal(Integer userId) {
+    public DrawLoseModalResponseDto generateDrawLoserResponse(Integer userId) {
         return DrawLoseModalResponseDto.builder()
                 .isDrawWin(false)
                 .images(drawUtil.generateLoseImages())
@@ -73,7 +73,7 @@ public class DrawResponseGenerateUtil {
      *
      * @return 당첨자 응답
      */
-    public DrawWinModalResponseDto responseWinModal(int ranking) {
+    public DrawWinModalResponseDto generateDrawWinnerResponse(int ranking) {
         return DrawWinModalResponseDto.builder()
                 .isDrawWin(true)
                 .images(drawUtil.generateWinImages())

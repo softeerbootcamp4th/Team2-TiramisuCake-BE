@@ -50,10 +50,10 @@ public class DrawService {
 
         if (drawParticipationCount == 7) {
             // 7일 연속 출석자라면
-            return drawResponseGenerateUtil.responseMainFullAttend(invitedNum, remainDrawCount, drawParticipationCount);
+            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);
         } else {
             // 연속 출석자가 아니라면
-            return drawResponseGenerateUtil.responseMainNotAttend(invitedNum, remainDrawCount, drawParticipationCount);
+            return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);
         }
     }
 
@@ -70,7 +70,7 @@ public class DrawService {
 
         // 만약 남은 참여 기회가 0이라면
         if (shareInfo.getRemainDrawCount() == 0) {
-            return drawResponseGenerateUtil.responseLoseModal(userId);
+            return drawResponseGenerateUtil.generateDrawLoserResponse(userId);
         }
 
         increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
@@ -80,7 +80,7 @@ public class DrawService {
         int ranking = getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
         if (ranking != 0) {
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
-            return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
+            return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환
         }
 
         // 당첨자 수 조회
@@ -110,15 +110,15 @@ public class DrawService {
             if (isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
                 // 추첨 티켓이 다 팔리지 않았다면
                 drawParticipationInfoRepository.increaseWinCount(userId); // 당첨 횟수 증가
-                return drawResponseGenerateUtil.responseWinModal(ranking); // WinModal 반환
+                return drawResponseGenerateUtil.generateDrawWinnerResponse(ranking); // WinModal 반환
             } else {
                 // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
                 drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
-                return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
+                return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
-            return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
+            return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환
         }
     }
 

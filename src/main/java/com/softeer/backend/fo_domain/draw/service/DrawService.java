@@ -74,11 +74,11 @@ public class DrawService {
         }
 
         increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+        shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
 
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
         int ranking = getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
         if (ranking != 0) {
-            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
         }
@@ -97,8 +97,6 @@ public class DrawService {
         drawUtil.performDraw();
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
-            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
-
             ranking = drawUtil.getRanking();
             int winnerNum;
             if (ranking == 1) {
@@ -119,7 +117,6 @@ public class DrawService {
                 return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
-            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
         }

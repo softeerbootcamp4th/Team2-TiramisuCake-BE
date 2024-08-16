@@ -120,8 +120,8 @@ public class DrawService {
                 return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
-            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return drawResponseGenerateUtil.responseLoseModal(userId); // LoseModal 반환
         }

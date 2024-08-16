@@ -21,7 +21,7 @@ public class DrawController {
 
     @GetMapping("/event/draw")
     public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
-        return drawService.getDrawMainPageInfo(userId);
+        return ResponseDto.onSuccess(drawService.getDrawMainPageInfo(userId));
     }
 
     @PostMapping("/event/draw")

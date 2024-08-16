@@ -45,7 +45,7 @@ public class DrawService {
      * 1-1. 만약 7일 연속 참여했다면 상품 정보 응답
      * 1-2. 만약 7일 미만 참여라면 일반 정보 응답
      */
-    public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(Integer userId) {
+    public DrawMainResponseDto getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
                 .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
@@ -60,10 +60,10 @@ public class DrawService {
 
         if (drawParticipationCount == 7) {
             // 7일 연속 출석자라면
-            return ResponseDto.onSuccess(responseMainFullAttend(invitedNum, remainDrawCount, drawParticipationCount));
+            return responseMainFullAttend(invitedNum, remainDrawCount, drawParticipationCount);
         } else {
             // 연속 출석자가 아니라면
-            return ResponseDto.onSuccess(responseMainNotAttend(invitedNum, remainDrawCount, drawParticipationCount));
+            return responseMainNotAttend(invitedNum, remainDrawCount, drawParticipationCount);
         }
     }
 

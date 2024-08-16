@@ -21,15 +21,143 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Swagger 설정
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	// Redis 설정
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// JWT 설정
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// Google Simple JSON
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+
+	//DatatypeConverter
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+
+	// JPA 설정
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+
+	// MySql 설정
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// spring aop 설정
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// redisson 설정
+	implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
+
+	// cool sms 설정
+	implementation 'net.nurigo:sdk:4.3.0'
+
+	// Bcrypt 설정
+	implementation 'org.mindrot:jbcrypt:0.4'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
+
+	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

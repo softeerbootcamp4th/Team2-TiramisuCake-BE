@@ -256,10 +256,10 @@ public class DrawService {
      * @param userId 사용자 아이디
      */
     private int getRankingIfWinner(int userId) {
-        String drawTempKey;
+        String drawWinnerKey;
         for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            Set<Integer> drawTempSet = drawRedisUtil.getAllDataAsSet(drawTempKey);
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            Set<Integer> drawTempSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
             if (drawTempSet.contains(userId)) {
                 return ranking;
             }

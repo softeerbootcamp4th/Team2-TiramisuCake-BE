@@ -22,7 +22,7 @@ public class ShareController {
 
     @GetMapping("/share-shorten-url")
     public ResponseDto<ShareUrlInfoResponseDto> getShortenShareUrl(@Parameter(hidden = true) @AuthInfo Integer userId) {
-        return shareUrlInfoService.getShortenShareUrl(userId);
+        return ResponseDto.onSuccess(shareUrlInfoService.getShortenShareUrl(userId));
     }
 
     @GetMapping("/share/{shareUrl}")

@@ -230,24 +230,24 @@ public class DrawService {
      * @param userId 사용자 아이디
      * @return 당첨 내역에 따른 응답
      */
-    public ResponseDto<DrawHistoryResponseDto> getDrawHistory(Integer userId) {
+    public DrawHistoryResponseDto getDrawHistory(Integer userId) {
         int ranking = getRankingIfWinner(userId);
 
         if (ranking != 0) {
             // 당첨자라면
             drawUtil.setRanking(ranking);
-            return ResponseDto.onSuccess(DrawHistoryWinnerResponseDto.builder()
+            return DrawHistoryWinnerResponseDto.builder()
                     .isDrawWin(true)
                     .winModal(drawUtil.generateWinModalForHistory())
-                    .build());
+                    .build();
         }
 
         // 당첨자가 아니라면
         String shareUrl = getShareUrl(userId);
-        return ResponseDto.onSuccess(DrawHistoryLoserResponseDto.builder()
+        return DrawHistoryLoserResponseDto.builder()
                 .isDrawWin(false)
                 .shareUrl(shareUrl)
-                .build());
+                .build();
     }
 
     /**

@@ -38,6 +38,6 @@ public class DrawController {
 
     @GetMapping("/event/draw/history")
     public ResponseDto<DrawHistoryResponseDto> getDrawHistory(@AuthInfo Integer userId) {
-        return drawService.getDrawHistory(userId);
+        return ResponseDto.onSuccess(drawService.getDrawHistory(userId));
     }
 }

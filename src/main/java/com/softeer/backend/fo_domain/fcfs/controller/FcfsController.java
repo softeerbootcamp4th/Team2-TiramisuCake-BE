@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.fcfs.controller;
 
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsPageResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResult;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
@@ -44,12 +45,12 @@ public class FcfsController {
     @PostMapping
     public String handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
                              @Parameter(hidden = true) @AuthInfo Integer userId,
-                             @RequestParam(value = "answer") String answer,
+                             @RequestBody FcfsRequestDto fcfsRequestDto,
                              @Parameter(hidden = true) RedirectAttributes redirectAttributes) {
 
         int round = (Integer) request.getAttribute("round");
 
-        String fcfsCode = fcfsService.handleFcfsEvent(userId, round, answer);
+        String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
 
         if(fcfsCode != null){
             request.getSession().setAttribute("fcfsCode", fcfsCode);

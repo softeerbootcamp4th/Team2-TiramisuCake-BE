@@ -1,31 +1,20 @@
 package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
-import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
-import com.softeer.backend.fo_domain.draw.util.DrawModalGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
-import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
-import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
-import com.softeer.backend.global.common.response.ResponseDto;
-import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import com.softeer.backend.global.util.DrawRedisUtil;
-import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +25,7 @@ import java.util.Set;
 public class DrawService {
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
-    private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final DrawRedisUtil drawRedisUtil;
-    private final StaticResourcesUtil staticResourcesUtil;
     private final DrawUtil drawUtil;
     private final DrawResponseGenerateUtil drawResponseGenerateUtil;
     private final DrawSettingManager drawSettingManager;

@@ -81,8 +81,7 @@ public class FcfsService {
 
         long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
 
-        if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
-                && !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId)) {
+
 
             // redis에 userId 등록
             fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round, userId);
@@ -106,9 +105,8 @@ public class FcfsService {
             }
 
             return code;
-        }
 
-        return null;
+
     }
 
     private String makeFcfsCode(int round){

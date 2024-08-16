@@ -21,11 +21,11 @@ public class DrawController {
 
     @GetMapping("/event/draw")
     public ResponseDto<DrawMainResponseDto> getDrawMainPageInfo(@AuthInfo Integer userId) {
-        return drawService.getDrawMainPageInfo(userId);
+        return ResponseDto.onSuccess(drawService.getDrawMainPageInfo(userId));
     }
 
     @PostMapping("/event/draw")
-    public ResponseEntity<Void> participateDrawEvent(@AuthInfo Integer userId) {
+    public ResponseEntity<Void> participateDrawEvent() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/event/draw-result");
         return new ResponseEntity<>(headers, HttpStatus.FOUND); // HTTP 302 Found 응답
@@ -33,11 +33,11 @@ public class DrawController {
 
     @GetMapping("/event/draw-result")
     public ResponseDto<DrawModalResponseDto> getDrawResult(@AuthInfo Integer userId) {
-        return drawService.participateDrawEvent(userId);
+        return ResponseDto.onSuccess(drawService.participateDrawEvent(userId));
     }
 
     @GetMapping("/event/draw/history")
     public ResponseDto<DrawHistoryResponseDto> getDrawHistory(@AuthInfo Integer userId) {
-        return drawService.getDrawHistory(userId);
+        return ResponseDto.onSuccess(drawService.getDrawHistory(userId));
     }
 }

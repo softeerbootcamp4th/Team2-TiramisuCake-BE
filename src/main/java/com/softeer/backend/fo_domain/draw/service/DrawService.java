@@ -35,7 +35,6 @@ public class DrawService {
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
-    // private final EventLockRedisUtil eventLockRedisUtil;
     private final DrawRedisUtil drawRedisUtil;
     private final StaticResourcesUtil staticResourcesUtil;
     private final DrawUtil drawUtil;

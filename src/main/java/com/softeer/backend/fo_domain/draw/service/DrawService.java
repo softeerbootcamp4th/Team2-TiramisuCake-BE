@@ -124,9 +124,11 @@ public class DrawService {
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
         int ranking = getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
         if (ranking != 0) {
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            // decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
-            increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+            // increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+            drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
 
@@ -144,7 +146,8 @@ public class DrawService {
         drawUtil.performDraw();
 
         if (drawUtil.isDrawWin()) { // 당첨자일 경우
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            // decreaseRemainDrawCount(userId, invitedNum, remainDrawCount);  // 횟수 1회 차감
+            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
 
             ranking = drawUtil.getRanking();
             int winnerNum;
@@ -159,18 +162,22 @@ public class DrawService {
             if (isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
                 // 추첨 티켓이 다 팔리지 않았다면
                 increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
-                increaseWinCount(drawParticipationInfo); // 당첨 횟수 증가
+                //increaseWinCount(drawParticipationInfo); // 당첨 횟수 증가
+                drawParticipationInfoRepository.increaseWinCount(userId); // 당첨 횟수 증가
                 return ResponseDto.onSuccess(responseWinModal()); // WinModal 반환
             } else {
                 // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
                 increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
-                increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+                //increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+                drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
                 return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
             }
         } else { // 낙첨자일 경우
-            decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            // decreaseRemainDrawCount(userId, invitedNum, remainDrawCount); // 횟수 1회 차감
+            shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
             increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
-            increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+            // increaseLoseCount(drawParticipationInfo); // 낙첨 횟수 증가
+            drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return ResponseDto.onSuccess(responseLoseModal(userId)); // LoseModal 반환
         }
     }

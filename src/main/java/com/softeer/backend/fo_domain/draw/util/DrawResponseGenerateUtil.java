@@ -81,6 +81,11 @@ public class DrawResponseGenerateUtil {
                 .build();
     }
 
+    /**
+     * 당첨내역이 있는 경우 당첨 내역 응답 만들어서 반환
+     * @param ranking 등수
+     * @return 당첨 내역 응답
+     */
     public DrawHistoryWinnerResponseDto generateDrawHistoryWinnerResponse(int ranking) {
         return DrawHistoryWinnerResponseDto.builder()
                 .isDrawWin(true)
@@ -88,6 +93,11 @@ public class DrawResponseGenerateUtil {
                 .build();
     }
 
+    /**
+     * 당첨내역이 없는 경우 낙첨 응답 만들어서 반환
+     * @param userId 사용자 아이디
+     * @return 낙첨 내역 응답
+     */
     public DrawHistoryLoserResponseDto generateDrawHistoryLoserResponse(Integer userId) {
         return DrawHistoryLoserResponseDto.builder()
                 .isDrawWin(false)

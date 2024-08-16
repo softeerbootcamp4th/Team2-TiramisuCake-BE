@@ -22,6 +22,7 @@ import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.common.response.ResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
+import com.softeer.backend.global.util.DrawRedisUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,8 @@ public class DrawService {
     private final DrawParticipationInfoRepository drawParticipationInfoRepository;
     private final ShareInfoRepository shareInfoRepository;
     private final ShareUrlInfoRepository shareUrlInfoRepository;
-    private final EventLockRedisUtil eventLockRedisUtil;
+    // private final EventLockRedisUtil eventLockRedisUtil;
+    private final DrawRedisUtil drawRedisUtil;
     private final StaticResourcesUtil staticResourcesUtil;
     private final DrawUtil drawUtil;
     private final DrawSettingManager drawSettingManager;
@@ -203,12 +205,12 @@ public class DrawService {
     @EventLock(key = "DRAW_WINNER_#{#ranking}")
     private boolean isWinner(Integer userId, int ranking, int winnerNum) {
         String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-        Set<Integer> drawWinnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
+        Set<Integer> drawWinnerSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
 
         // 레디스에서 해당 랭킹에 자리가 있는지 확인
         if (drawWinnerSet.size() < winnerNum) {
             // 자리가 있다면 당첨 성공. 당첨자 리스트에 추가
-            eventLockRedisUtil.addValueToSet(drawWinnerKey, userId);
+            drawRedisUtil.setIntegerValueToSet(drawWinnerKey, userId);
             return true;
         } else {
             // 이미 자리가 가득 차서 당첨 실패
@@ -218,7 +220,7 @@ public class DrawService {
 
     @EventLock(key = "DRAW_PARTICIPATION_COUNT")
     private void increaseDrawParticipationCount() {
-        eventLockRedisUtil.incrementData(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+        drawRedisUtil.incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
     /**
@@ -258,7 +260,7 @@ public class DrawService {
         String drawTempKey;
         for (int ranking = 1; ranking < 4; ranking++) {
             drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            Set<Integer> drawTempSet = eventLockRedisUtil.getAllDataAsSet(drawTempKey);
+            Set<Integer> drawTempSet = drawRedisUtil.getAllDataAsSet(drawTempKey);
             if (drawTempSet.contains(userId)) {
                 return ranking;
             }

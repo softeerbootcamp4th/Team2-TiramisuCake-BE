@@ -19,7 +19,7 @@ public class DrawRedisUtil {
     // 추첨 참여자 수:  DRAW_PARTICIPANT_COUNT, Integer
 
     // 추첨 참여자 수 증가
-    public void increaseIntegerValue(String key) {
+    public void incrementIntegerValue(String key) {
         integerRedisTemplate.opsForValue().increment(key);
     }
 

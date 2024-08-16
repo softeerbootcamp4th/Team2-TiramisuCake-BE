@@ -11,11 +11,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
+import java.net.URI;
+
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/fcfs")
 @Tag(name = "Fcfs Controller", description = "선착순 API")
@@ -23,7 +28,6 @@ public class FcfsController {
     private final FcfsService fcfsService;
 
     @GetMapping
-    @ResponseBody
     public ResponseDto<FcfsPageResponseDto> getFcfsPage(@Parameter(hidden = true) HttpServletRequest request) {
 
         int round = (Integer) request.getAttribute("round");
@@ -34,7 +38,6 @@ public class FcfsController {
     }
 
     @GetMapping("/tutorial")
-    @ResponseBody
     public ResponseDto<FcfsPageResponseDto> getFcfsTutorialPage() {
 
         FcfsPageResponseDto fcfsPageResponseDto = fcfsService.getFcfsTutorialPage();
@@ -43,29 +46,30 @@ public class FcfsController {
     }
 
     @PostMapping
-    public String handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
-                             @Parameter(hidden = true) @AuthInfo Integer userId,
-                             @RequestBody FcfsRequestDto fcfsRequestDto,
-                             @Parameter(hidden = true) RedirectAttributes redirectAttributes) {
+    public ResponseEntity<Void> handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
+                                     @Parameter(hidden = true) @AuthInfo Integer userId,
+                                     @RequestBody FcfsRequestDto fcfsRequestDto) {
 
         int round = (Integer) request.getAttribute("round");
 
         String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
 
+        HttpHeaders headers = new HttpHeaders();
+        String redirectUrl = "/fcfs/result";
+
         if(fcfsCode != null){
             request.getSession().setAttribute("fcfsCode", fcfsCode);
-
-            redirectAttributes.addAttribute("fcfsWin", true);
+            redirectUrl += "?fcfsWin=true";
         }
         else{
-            redirectAttributes.addAttribute("fcfsWin", false);
+            redirectUrl += "?fcfsWin=false";
         }
 
-        return "redirect:/fcfs/result";
+        headers.setLocation(URI.create(redirectUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @GetMapping("/result")
-    @ResponseBody
     public ResponseDto<FcfsResultResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
                                                             @RequestParam("fcfsWin") Boolean fcfsWin){
 

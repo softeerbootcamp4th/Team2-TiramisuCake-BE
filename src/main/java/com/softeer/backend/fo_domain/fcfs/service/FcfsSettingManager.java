@@ -82,7 +82,7 @@ public class FcfsSettingManager {
             QuizDto quizDto = QuizDto.builder()
                     .hint(quiz.getHint())
                     .answerWord(quiz.getAnswerWord())
-                    .answerSentence(quiz.getAnswerSentence())
+                    .answerSentence(quiz.getAnswerSentence().replace("\\n", "\n"))
                     .startIndex(quiz.getStartIndex())
                     .endIndex(quiz.getEndIndex())
                     .build();

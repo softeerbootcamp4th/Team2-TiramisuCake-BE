@@ -59,11 +59,11 @@ public class FcfsService {
      * 1. 선착순 당첨자가 아직 다 결정되지 않았으면, 선착순 당첨 응답 생성 및 반환
      * 2. 선착순 당첨자가 다 결정됐다면, Redisson lock을 사용하지 않고 Redis에 저장된 선착순 이벤트 참여자 수를 1명씩 더한다.
      */
-    public String handleFcfsEvent(int userId, int round, String answer) {
+    public String handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
 
-        if(!answer.equals(fcfsSettingManager.getQuiz(round).getAnswerWord())) {
+        if(!fcfsRequestDto.getAnswer().equals(fcfsSettingManager.getQuiz(round).getAnswerWord())) {
             log.error("fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}",
-                    fcfsSettingManager.getQuiz(round).getAnswerWord(), answer);
+                    fcfsSettingManager.getQuiz(round).getAnswerWord(), fcfsRequestDto.getAnswer());
             throw new FcfsException(ErrorStatus._BAD_REQUEST);
         }
 

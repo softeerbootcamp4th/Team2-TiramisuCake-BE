@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/fcfs")
@@ -54,6 +56,8 @@ public class FcfsController {
 
         String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
 
+        log.info("fcfsCode in handleFcfs : {}", fcfsCode);
+
         HttpHeaders headers = new HttpHeaders();
         String redirectUrl = "/fcfs/result";
 
@@ -74,6 +78,7 @@ public class FcfsController {
                                                             @RequestParam("fcfsWin") Boolean fcfsWin){
 
         String fcfsCode = (String) request.getSession().getAttribute("fcfsCode");
+        log.info("fcfsCode in getFcfsResult : {}", fcfsCode);
         request.getSession().removeAttribute("fcfsCode");
 
         FcfsResultResponseDto fcfsResultResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);

@@ -30,12 +30,21 @@ public class DrawTimeCheckInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * 참가 가능한 시간인지 확인
+     * @return 참가 가능하면 true, 불가능하면 false 반환
+     */
     private boolean isAvailableTime() {
         LocalDateTime now = LocalDateTime.now();
 
         return compareDate(now) && compareTime(now);
     }
 
+    /**
+     * 날짜 비교
+     * @param now 현재시각
+     * @return 참가 가능한 날짜이면 true, 불가능하면 false 반환
+     */
     private boolean compareDate(LocalDateTime now) {
         LocalDateTime startDateTime = drawSettingManager.getStartDate().atStartOfDay();
         LocalDateTime endDateTime = drawSettingManager.getEndDate().atStartOfDay();
@@ -43,6 +52,11 @@ public class DrawTimeCheckInterceptor implements HandlerInterceptor {
         return now.isAfter(startDateTime) && now.isBefore(endDateTime);
     }
 
+    /**
+     * 시간 비교
+     * @param now 현재 시각
+     * @return 참가 가능한 시간이면 true, 불가능하면 false 반환
+     */
     private boolean compareTime(LocalDateTime now) {
         LocalDate nowDate = now.toLocalDate();
         LocalDateTime startTimeAsDateTime = LocalDateTime.of(nowDate, drawSettingManager.getStartTime());

@@ -79,6 +79,7 @@ public class DrawService {
             return true;
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
+            drawParticipationInfoRepository.setParticipationCountToOne(userId);
             return false;
         }
     }

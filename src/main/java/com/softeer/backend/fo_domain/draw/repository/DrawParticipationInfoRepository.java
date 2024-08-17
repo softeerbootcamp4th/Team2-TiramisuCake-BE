@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -32,4 +33,9 @@ public interface DrawParticipationInfoRepository extends JpaRepository<DrawParti
     @Transactional
     @Query("UPDATE DrawParticipationInfo d SET d.drawAttendanceCount = 1 WHERE d.userId = :userId")
     void setAttendanceCountToOne(Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE DrawParticipationInfo d SET d.lastParticipated = :lastParticipated WHERE d.userId = :userId")
+    void setLastParticipated(Integer userId, LocalDateTime lastParticipated);
 }

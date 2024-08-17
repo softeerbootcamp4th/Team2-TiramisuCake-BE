@@ -57,7 +57,7 @@ public class SwaggerConfig {
 
     private SecurityScheme getJwtSecurityScheme() {
         return new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
+                .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)

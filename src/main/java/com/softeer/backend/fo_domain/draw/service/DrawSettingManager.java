@@ -103,7 +103,7 @@ public class DrawSettingManager {
         }
     }
 
-    public boolean isAvailableTime(LocalDateTime entryTime) {
+    public boolean isAvailableTime() {
         LocalDateTime now = LocalDateTime.now();
 
         return compareDate(now) && compareTime(now);

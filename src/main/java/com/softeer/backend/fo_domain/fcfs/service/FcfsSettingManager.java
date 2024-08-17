@@ -183,5 +183,16 @@ public class FcfsSettingManager {
         return null;
     }
 
+    public LocalDateTime getNextFcfsTime(LocalDateTime now){
+
+        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+            LocalDateTime startTime = fcfsSettingDto.getStartTime();
+
+            if(now.isBefore(startTime)) {
+                return startTime;
+            }
+        }
+        return null;
+    }
 
 }

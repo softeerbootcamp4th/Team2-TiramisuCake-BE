@@ -43,7 +43,7 @@ public class DrawService {
                 .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
         // 출석일수 증가 및 유지 로직
-        handleAttendanceCount(userId, drawParticipationInfo);
+        boolean isNewToday = handleAttendanceCount(userId, drawParticipationInfo);
 
         // 초대한 친구 수, 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
@@ -52,6 +52,11 @@ public class DrawService {
         int drawParticipationCount = drawParticipationInfo.getDrawParticipationCount();
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
+
+        if (isNewToday) {
+            drawParticipationCount += 1;
+        }
+
 
         if (drawParticipationCount == 7) {
             // 7일 연속 출석자라면
@@ -62,11 +67,14 @@ public class DrawService {
         }
     }
 
-    private void handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
+    private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
 
         if (lastParticipated == null || isNewParticipateToday(lastParticipated)) {
             drawParticipationInfoRepository.increaseParticipationCount(userId);
+            return true;
+        } else {
+            return false;
         }
     }
 

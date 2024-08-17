@@ -4,16 +4,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@RequiredArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "draw_participation_info")
 public class DrawParticipationInfo {
     @Id

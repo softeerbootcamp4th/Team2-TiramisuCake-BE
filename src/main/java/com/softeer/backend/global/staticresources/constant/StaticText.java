@@ -97,7 +97,7 @@ public enum StaticText {
             "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다."),
 
     // 공유 url
-    BASE_URL("https://softeer.site/"),
+    BASE_URL("https://softeer.site/share"),
     NON_USER_SHARE_URL("https://softeer.site"),
 
     // 선착순

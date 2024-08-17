@@ -103,27 +103,6 @@ public class DrawSettingManager {
         }
     }
 
-    public boolean isAvailableTime() {
-        LocalDateTime now = LocalDateTime.now();
-
-        return compareDate(now) && compareTime(now);
-    }
-
-    private boolean compareDate(LocalDateTime now) {
-        LocalDateTime startDateTime = this.startDate.atStartOfDay();
-        LocalDateTime endDateTime = this.endDate.atStartOfDay();
-
-        return now.isAfter(startDateTime) && now.isBefore(endDateTime);
-    }
-
-    private boolean compareTime(LocalDateTime now) {
-        LocalDate nowDate = now.toLocalDate();
-        LocalDateTime startTimeAsDateTime = LocalDateTime.of(nowDate, this.startTime);
-        LocalDateTime endTimeAsDateTime = LocalDateTime.of(nowDate, this.endTime);
-
-        return (now.isAfter(startTimeAsDateTime) && now.isBefore(endTimeAsDateTime));
-    }
-
     public void setDrawDate(DrawSetting drawSetting) {
         this.startDate = drawSetting.getStartDate();
         this.endDate = drawSetting.getEndDate();

@@ -76,7 +76,7 @@ public class DrawService {
      * 2. 연속 참여가 아니면 DB에 연속 출석일수 1로 초기화
      * 3. 현재 참여시각을 마지막 참여시각으로 DB에 업데이트
      *
-     * @param userId 사용자 아이디
+     * @param userId                사용자 아이디
      * @param drawParticipationInfo 참여 정보
      * @return 연속 참여이면 true, 연속 참여가 아니면 false 반환
      */
@@ -93,12 +93,16 @@ public class DrawService {
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
             drawParticipationInfoRepository.setAttendanceCountToOne(userId);
+
+            // lastParticipated를 현재 시각으로 설정
+            drawParticipationInfoRepository.setLastParticipated(userId, lastParticipated);
             return false;
         }
     }
 
     /**
      * 연속 참여인지 판단
+     *
      * @param lastParticipated 마지막으로 참가한 날짜
      * @return 연속 참여이면 true, 연속참여가 아니면 false 반환
      */

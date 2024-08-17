@@ -54,7 +54,11 @@ public class DrawService {
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
         if (isNewToday) {
+            // 연속 출석이라면
             drawParticipationCount += 1;
+        } else {
+            // 연속 출석이 아니라면 초기화
+            drawParticipationCount = 1;
         }
 
         if (drawParticipationCount >= 7) {

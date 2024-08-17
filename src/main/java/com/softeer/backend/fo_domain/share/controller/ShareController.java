@@ -25,7 +25,7 @@ public class ShareController {
         return ResponseDto.onSuccess(shareUrlInfoService.getShortenShareUrl(userId));
     }
 
-    @GetMapping("/{shareUrl}")
+    @GetMapping("/share/{shareUrl}")
     public ResponseEntity<Void> redirectWithShareUrl(@PathVariable String shareUrl, HttpServletRequest request) {
         // session을 이용해 공유 url 저장
         HttpSession session = request.getSession();

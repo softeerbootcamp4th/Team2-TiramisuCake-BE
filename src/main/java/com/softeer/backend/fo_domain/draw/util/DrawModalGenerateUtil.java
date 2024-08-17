@@ -1,9 +1,6 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
-import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

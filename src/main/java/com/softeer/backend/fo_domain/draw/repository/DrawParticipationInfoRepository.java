@@ -27,4 +27,9 @@ public interface DrawParticipationInfoRepository extends JpaRepository<DrawParti
     @Transactional
     @Query("UPDATE DrawParticipationInfo d SET d.drawParticipationCount = d.drawParticipationCount + 1 WHERE d.userId = :userId")
     void increaseParticipationCount(Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE DrawParticipationInfo d SET d.drawParticipationCount = 1 WHERE d.userId = :userId")
+    void setParticipationCountToOne(Integer userId);
 }

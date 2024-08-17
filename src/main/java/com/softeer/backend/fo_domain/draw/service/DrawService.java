@@ -70,6 +70,16 @@ public class DrawService {
         }
     }
 
+    /**
+     * 연속 참여인지 판단
+     * 1. 연속 참여이면 연속 출석일수 1 증가하여 DB에 업데이트
+     * 2. 연속 참여가 아니면 DB에 연속 출석일수 1로 초기화
+     * 3. 현재 참여시각을 마지막 참여시각으로 DB에 업데이트
+     *
+     * @param userId 사용자 아이디
+     * @param drawParticipationInfo 참여 정보
+     * @return 연속 참여이면 true, 연속 참여가 아니면 false 반환
+     */
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
 

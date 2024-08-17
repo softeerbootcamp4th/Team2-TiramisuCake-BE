@@ -78,7 +78,7 @@ public class DrawService {
      * @return 연속 출석이면 true, 연속 출석이 아니면 false 반환
      */
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
-        LocalDateTime lastAttendance = drawParticipationInfo.getLastParticipated();
+        LocalDateTime lastAttendance = drawParticipationInfo.getLastAttendance();
 
         if (lastAttendance == null || isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가

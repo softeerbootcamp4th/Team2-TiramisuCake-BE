@@ -87,10 +87,12 @@ public class DrawService {
 
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
+
+            return true;
         }
 
         // 근데 오늘 접속했던 사람이면 1로 초기화하면 안됨
-        if (lastAttendance == null || isContinuousAttendance(lastAttendance)) {
+        if (isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
 

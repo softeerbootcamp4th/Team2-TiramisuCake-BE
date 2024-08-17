@@ -46,24 +46,24 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawParticipationCount = drawParticipationInfo.getDrawAttendanceCount();
+        int drawAttendanceCount = drawParticipationInfo.getDrawAttendanceCount();
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
         if (handleAttendanceCount(userId, drawParticipationInfo)) {
             // 연속 출석이라면
-            drawParticipationCount += 1;
+            drawAttendanceCount += 1;
         } else {
             // 연속 출석이 아니라면 초기화
-            drawParticipationCount = 1;
+            drawAttendanceCount = 1;
         }
 
-        if (drawParticipationCount >= 7) {
+        if (drawAttendanceCount >= 7) {
             // 7일 연속 출석자라면
-            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawParticipationCount % 8);
+            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount % 8);
         } else {
             // 연속 출석자가 아니라면
-            return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);
+            return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount);
         }
     }
 

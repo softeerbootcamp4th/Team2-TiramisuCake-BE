@@ -85,14 +85,14 @@ public class DrawService {
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
 
             // lastParticipated를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastParticipated(userId, lastAttendance);
+            drawParticipationInfoRepository.setLastAttendance(userId, lastAttendance);
             return true;
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
             drawParticipationInfoRepository.setAttendanceCountToOne(userId);
 
             // lastParticipated를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastParticipated(userId, lastAttendance);
+            drawParticipationInfoRepository.setLastAttendance(userId, lastAttendance);
             return false;
         }
     }

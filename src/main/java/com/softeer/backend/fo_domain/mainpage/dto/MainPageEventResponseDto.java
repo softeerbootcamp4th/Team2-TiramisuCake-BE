@@ -1,7 +1,9 @@
 package com.softeer.backend.fo_domain.mainpage.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,6 +27,9 @@ public class MainPageEventResponseDto {
     private String remainDrawCount;
 
     private String fcfsHint;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime fcfsStartTime;
 
     private List<EventInfo> eventInfoList;
 

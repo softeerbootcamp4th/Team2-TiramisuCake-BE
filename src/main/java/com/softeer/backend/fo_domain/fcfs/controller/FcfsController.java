@@ -58,7 +58,6 @@ public class FcfsController {
         int round = (Integer) request.getAttribute("round");
 
         String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
-        log.info("fcfsCode in handleFcfs : {}", fcfsCode);
 
         log.info("fcfsCode in handleFcfs : {}", fcfsCode);
 

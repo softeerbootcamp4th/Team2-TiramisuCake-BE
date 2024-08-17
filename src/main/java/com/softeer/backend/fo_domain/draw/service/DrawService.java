@@ -80,6 +80,16 @@ public class DrawService {
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastAttendance = drawParticipationInfo.getLastAttendance();
 
+        // 한 번도 접속한 적이 없는 사람이라면
+        if (lastAttendance == null) {
+            // 연속출석일수 1로 초기화
+            drawParticipationInfoRepository.setAttendanceCountToOne(userId);
+
+            // lastAttendance를 현재 시각으로 설정
+            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
+        }
+
+        // 근데 오늘 접속했던 사람이면 1로 초기화하면 안됨
         if (lastAttendance == null || isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);

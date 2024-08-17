@@ -18,6 +18,8 @@ import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 
 @Service
@@ -40,6 +42,9 @@ public class DrawService {
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
                 .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
+        // 출석일수 증가 및 유지 로직
+        handleAttendanceCount(userId, drawParticipationInfo);
+
         // 초대한 친구 수, 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
@@ -55,6 +60,22 @@ public class DrawService {
             // 연속 출석자가 아니라면
             return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);
         }
+    }
+
+    private void handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
+        LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
+
+        if (lastParticipated == null || isNewParticipateToday(lastParticipated)) {
+            drawParticipationInfoRepository.increaseParticipationCount(userId);
+        }
+    }
+
+    private boolean isNewParticipateToday(LocalDateTime lastParticipated) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDateTime = lastParticipated.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
+        LocalDateTime endDateTime = lastParticipated.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정
+
+        return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
     }
 
     /**

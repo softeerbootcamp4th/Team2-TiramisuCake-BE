@@ -91,7 +91,15 @@ public class DrawService {
             return true;
         }
 
-        // 근데 오늘 접속했던 사람이면 1로 초기화하면 안됨
+        // 마지막 접속 시간이 오늘이라면 false 반환
+        if (isLastAttendanceToday(lastAttendance)) {
+            // lastAttendance를 현재 시각으로 설정
+            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
+
+            return false;
+        }
+
+
         if (isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
@@ -112,13 +120,27 @@ public class DrawService {
     /**
      * 연속 출석인지 판단
      *
-     * @param lastAttendance 마지막으로 참가한 날짜
+     * @param lastAttendance 마지막 출석 날짜
      * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
      */
     private boolean isContinuousAttendance(LocalDateTime lastAttendance) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDateTime = lastAttendance.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
         LocalDateTime endDateTime = lastAttendance.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정
+
+        return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
+    }
+
+    /**
+     * 마지막 출석 시간이 오늘인지 판단
+     *
+     * @param lastAttendance 마지막 출석 날짜
+     * @return 마지막 출석 시간이 오늘이면 true, 아니면 false 반환
+     */
+    private boolean isLastAttendanceToday(LocalDateTime lastAttendance) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDateTime = lastAttendance.with(LocalTime.MIDNIGHT);
+        LocalDateTime endDateTime = lastAttendance.plusDays(1).with(LocalTime.MIDNIGHT);
 
         return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
     }

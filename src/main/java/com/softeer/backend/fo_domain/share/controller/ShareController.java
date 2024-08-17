@@ -5,7 +5,9 @@ import com.softeer.backend.fo_domain.share.service.ShareUrlInfoService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,10 +28,13 @@ public class ShareController {
     }
 
     @GetMapping("/share/{shareUrl}")
-    public ResponseEntity<Void> redirectWithShareUrl(@PathVariable String shareUrl, HttpServletRequest request) {
+    public ResponseEntity<Void> redirectWithShareUrl(@PathVariable String shareUrl, HttpServletRequest request, HttpServletResponse response) {
         // session을 이용해 공유 url 저장
-        HttpSession session = request.getSession();
-        session.setAttribute("shareUrl", shareUrl);
+        Cookie shareCodeCookie = new Cookie("shareCode", shareUrl);
+        shareCodeCookie.setPath("/");
+        shareCodeCookie.setHttpOnly(false); // HttpOnly 속성을 비활성화
+        shareCodeCookie.setDomain("softeer.site"); // 도메인 설정. 이렇게 해서 softeer.site 포함 하위 모든 도메인에서 해당 쿠키 사용 가능
+        response.addCookie(shareCodeCookie);
 
         // 헤더를 이용해 redirect
         HttpHeaders headers = new HttpHeaders();

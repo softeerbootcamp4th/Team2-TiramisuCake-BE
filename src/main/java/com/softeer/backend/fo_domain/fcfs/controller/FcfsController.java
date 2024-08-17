@@ -61,7 +61,7 @@ public class FcfsController {
         log.info("fcfsCode in handleFcfs : {}", fcfsCode);
 
         HttpHeaders headers = new HttpHeaders();
-        String redirectUrl = "https://softeer.site/fcfs/result";
+        String redirectUrl = "https://softeer.shop/fcfs/result";
 
         if(fcfsCode != null){
             request.getSession().setAttribute("fcfsCode", fcfsCode);
@@ -73,7 +73,6 @@ public class FcfsController {
             headers.add("Location", redirectUrl);
         }
 
-        headers.setLocation(URI.create(redirectUrl));
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 

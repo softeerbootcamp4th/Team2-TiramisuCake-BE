@@ -52,6 +52,7 @@ public class MainPageService {
                 .totalDrawWinner(staticResourcesUtil.getData("TOTAL_DRAW_WINNER"))
                 .remainDrawCount(staticResourcesUtil.getData("REMAIN_DRAW_COUNT"))
                 .fcfsHint(fcfsSettingManager.getHint())
+                .fcfsStartTime(fcfsSettingManager.getNextFcfsTime(LocalDateTime.now()))
                 .eventInfoList(Arrays.asList(fcfsInfo, drawInfo))
                 .build();
 

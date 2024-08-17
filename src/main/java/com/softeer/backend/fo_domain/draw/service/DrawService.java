@@ -42,9 +42,6 @@ public class DrawService {
         DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)
                 .orElseThrow(() -> new DrawException(ErrorStatus._NOT_FOUND));
 
-        // 출석일수 증가 및 유지 로직
-        boolean isNewToday = handleAttendanceCount(userId, drawParticipationInfo);
-
         // 초대한 친구 수, 복권 기회 조회
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
@@ -53,7 +50,7 @@ public class DrawService {
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
-        if (isNewToday) {
+        if (handleAttendanceCount(userId, drawParticipationInfo)) {
             // 연속 출석이라면
             drawParticipationCount += 1;
         } else {
@@ -71,19 +68,19 @@ public class DrawService {
     }
 
     /**
-     * 연속 참여인지 판단
-     * 1. 연속 참여이면 연속 출석일수 1 증가하여 DB에 업데이트
-     * 2. 연속 참여가 아니면 DB에 연속 출석일수 1로 초기화
-     * 3. 현재 참여시각을 마지막 참여시각으로 DB에 업데이트
+     * 연속 출석인지 판단
+     * 1. 연속 출석이면 연속 출석일수 1 증가하여 DB에 업데이트
+     * 2. 연속 출석이 아니면 DB에 연속 출석일수 1로 초기화
+     * 3. 현재 출석시각을 마지막 출석시각으로 DB에 업데이트
      *
      * @param userId                사용자 아이디
      * @param drawParticipationInfo 참여 정보
-     * @return 연속 참여이면 true, 연속 참여가 아니면 false 반환
+     * @return 연속 출석이면 true, 연속 출석이 아니면 false 반환
      */
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
 
-        if (lastParticipated == null || isNewParticipateToday(lastParticipated)) {
+        if (lastParticipated == null || isContinuousParticipate(lastParticipated)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
 
@@ -101,12 +98,12 @@ public class DrawService {
     }
 
     /**
-     * 연속 참여인지 판단
+     * 연속 출석인지 판단
      *
      * @param lastParticipated 마지막으로 참가한 날짜
-     * @return 연속 참여이면 true, 연속참여가 아니면 false 반환
+     * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
      */
-    private boolean isNewParticipateToday(LocalDateTime lastParticipated) {
+    private boolean isContinuousParticipate(LocalDateTime lastParticipated) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDateTime = lastParticipated.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
         LocalDateTime endDateTime = lastParticipated.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정

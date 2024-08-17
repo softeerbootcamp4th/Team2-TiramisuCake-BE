@@ -1,6 +1,8 @@
 package com.softeer.backend.fo_domain.draw.interceptor;
 
+import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,11 @@ public class DrawTimeCheckInterceptor implements HandlerInterceptor {
         if (CorsUtils.isPreFlightRequest(request))
             return true;
 
-        return isAvailableTime();
+        if (!isAvailableTime()) {
+            throw new DrawException(ErrorStatus._BAD_REQUEST);
+        }
+
+        return true;
     }
 
     private boolean isAvailableTime() {

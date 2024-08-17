@@ -10,6 +10,7 @@ import com.softeer.backend.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
@@ -55,18 +58,19 @@ public class FcfsController {
         int round = (Integer) request.getAttribute("round");
 
         String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
-
         log.info("fcfsCode in handleFcfs : {}", fcfsCode);
 
         HttpHeaders headers = new HttpHeaders();
-        String redirectUrl = "/fcfs/result";
+        String redirectUrl = "https://softeer.site/fcfs/result";
 
         if(fcfsCode != null){
             request.getSession().setAttribute("fcfsCode", fcfsCode);
-            redirectUrl += "?fcfsWin=true";
+            redirectUrl += "?fcfsWin=" + URLEncoder.encode("true", StandardCharsets.UTF_8);
+            headers.add("Location", redirectUrl);
         }
         else{
-            redirectUrl += "?fcfsWin=false";
+            redirectUrl += "?fcfsWin=" + URLEncoder.encode("true", StandardCharsets.UTF_8);
+            headers.add("Location", redirectUrl);
         }
 
         headers.setLocation(URI.create(redirectUrl));
@@ -77,9 +81,10 @@ public class FcfsController {
     public ResponseDto<FcfsResultResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
                                                             @RequestParam("fcfsWin") Boolean fcfsWin){
 
+
         String fcfsCode = (String) request.getSession().getAttribute("fcfsCode");
         log.info("fcfsCode in getFcfsResult : {}", fcfsCode);
-        request.getSession().removeAttribute("fcfsCode");
+        request.getSession().invalidate();
 
         FcfsResultResponseDto fcfsResultResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);
 

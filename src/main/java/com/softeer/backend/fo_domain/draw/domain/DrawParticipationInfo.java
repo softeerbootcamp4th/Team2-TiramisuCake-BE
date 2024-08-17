@@ -26,8 +26,8 @@ public class DrawParticipationInfo {
     @Column(name = "draw_losing_count")
     private Integer drawLosingCount;
 
-    @Column(name = "draw_participation_count")
-    private Integer drawParticipationCount;
+    @Column(name = "draw_attendance_count")
+    private Integer drawAttendanceCount;
 
     @Column(name = "last_participated")
     private LocalDateTime lastParticipated;

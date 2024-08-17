@@ -49,7 +49,7 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawParticipationCount = drawParticipationInfo.getDrawParticipationCount();
+        int drawParticipationCount = drawParticipationInfo.getDrawAttendanceCount();
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
@@ -75,11 +75,11 @@ public class DrawService {
 
         if (lastParticipated == null || isNewParticipateToday(lastParticipated)) {
             // 연속 출석이라면 연속출석일수 1 증가
-            drawParticipationInfoRepository.increaseParticipationCount(userId);
+            drawParticipationInfoRepository.increaseAttendanceCount(userId);
             return true;
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
-            drawParticipationInfoRepository.setParticipationCountToOne(userId);
+            drawParticipationInfoRepository.setAttendanceCountToOne(userId);
             return false;
         }
     }

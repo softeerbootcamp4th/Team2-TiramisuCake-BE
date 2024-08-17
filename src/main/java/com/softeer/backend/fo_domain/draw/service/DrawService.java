@@ -78,21 +78,21 @@ public class DrawService {
      * @return 연속 출석이면 true, 연속 출석이 아니면 false 반환
      */
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
-        LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
+        LocalDateTime lastAttendance = drawParticipationInfo.getLastParticipated();
 
-        if (lastParticipated == null || isContinuousAttendance(lastParticipated)) {
+        if (lastAttendance == null || isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
 
             // lastParticipated를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastParticipated(userId, lastParticipated);
+            drawParticipationInfoRepository.setLastParticipated(userId, lastAttendance);
             return true;
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
             drawParticipationInfoRepository.setAttendanceCountToOne(userId);
 
             // lastParticipated를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastParticipated(userId, lastParticipated);
+            drawParticipationInfoRepository.setLastParticipated(userId, lastAttendance);
             return false;
         }
     }
@@ -100,13 +100,13 @@ public class DrawService {
     /**
      * 연속 출석인지 판단
      *
-     * @param lastParticipated 마지막으로 참가한 날짜
+     * @param lastAttendance 마지막으로 참가한 날짜
      * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
      */
-    private boolean isContinuousAttendance(LocalDateTime lastParticipated) {
+    private boolean isContinuousAttendance(LocalDateTime lastAttendance) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDateTime = lastParticipated.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
-        LocalDateTime endDateTime = lastParticipated.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정
+        LocalDateTime startDateTime = lastAttendance.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
+        LocalDateTime endDateTime = lastAttendance.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정
 
         return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
     }

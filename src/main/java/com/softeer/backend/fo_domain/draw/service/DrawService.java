@@ -87,6 +87,11 @@ public class DrawService {
         }
     }
 
+    /**
+     * 연속 참여인지 판단
+     * @param lastParticipated 마지막으로 참가한 날짜
+     * @return 연속 참여이면 true, 연속참여가 아니면 false 반환
+     */
     private boolean isNewParticipateToday(LocalDateTime lastParticipated) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDateTime = lastParticipated.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정

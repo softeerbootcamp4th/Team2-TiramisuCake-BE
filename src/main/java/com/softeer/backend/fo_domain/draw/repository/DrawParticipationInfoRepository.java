@@ -36,6 +36,6 @@ public interface DrawParticipationInfoRepository extends JpaRepository<DrawParti
 
     @Modifying
     @Transactional
-    @Query("UPDATE DrawParticipationInfo d SET d.lastParticipated = :lastAttendance WHERE d.userId = :userId")
+    @Query("UPDATE DrawParticipationInfo d SET d.lastAttendance = :lastAttendance WHERE d.userId = :userId")
     void setLastAttendance(Integer userId, LocalDateTime lastAttendance);
 }

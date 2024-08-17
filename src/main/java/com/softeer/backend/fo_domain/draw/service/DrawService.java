@@ -74,9 +74,11 @@ public class DrawService {
         LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
 
         if (lastParticipated == null || isNewParticipateToday(lastParticipated)) {
+            // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseParticipationCount(userId);
             return true;
         } else {
+            // 연속출석이 아니라면 연속출석일수 1로 초기화
             return false;
         }
     }

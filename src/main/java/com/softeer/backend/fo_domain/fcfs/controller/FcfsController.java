@@ -60,8 +60,6 @@ public class FcfsController {
         String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
         log.info("fcfsCode in handleFcfs : {}", fcfsCode);
 
-        log.info("fcfsCode in handleFcfs : {}", fcfsCode);
-
         HttpHeaders headers = new HttpHeaders();
         String redirectUrl = "https://softeer.site/fcfs/result";
 

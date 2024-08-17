@@ -80,7 +80,7 @@ public class DrawService {
     private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastParticipated = drawParticipationInfo.getLastParticipated();
 
-        if (lastParticipated == null || isContinuousParticipate(lastParticipated)) {
+        if (lastParticipated == null || isContinuousAttendance(lastParticipated)) {
             // 연속 출석이라면 연속출석일수 1 증가
             drawParticipationInfoRepository.increaseAttendanceCount(userId);
 
@@ -103,7 +103,7 @@ public class DrawService {
      * @param lastParticipated 마지막으로 참가한 날짜
      * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
      */
-    private boolean isContinuousParticipate(LocalDateTime lastParticipated) {
+    private boolean isContinuousAttendance(LocalDateTime lastParticipated) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDateTime = lastParticipated.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
         LocalDateTime endDateTime = lastParticipated.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정

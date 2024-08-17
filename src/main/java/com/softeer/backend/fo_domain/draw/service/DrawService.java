@@ -46,17 +46,11 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawAttendanceCount = drawParticipationInfo.getDrawAttendanceCount();
+        int drawAttendanceCount = handleAttendanceCount(userId, drawParticipationInfo);
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
-        if (handleAttendanceCount(userId, drawParticipationInfo)) {
-            // 연속 출석이라면
-            drawAttendanceCount += 1;
-        } else {
-            // 연속 출석이 아니라면 초기화
-            drawAttendanceCount = 1;
-        }
+        System.out.println("Draw Attendance = " + drawAttendanceCount);
 
         if (drawAttendanceCount >= 7) {
             // 7일 연속 출석자라면
@@ -75,9 +69,9 @@ public class DrawService {
      *
      * @param userId                사용자 아이디
      * @param drawParticipationInfo 참여 정보
-     * @return 연속 출석이면 true, 연속 출석이 아니면 false 반환
+     * @return 연속출석 일수 반환
      */
-    private boolean handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
+    private int handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastAttendance = drawParticipationInfo.getLastAttendance();
 
         // 한 번도 접속한 적이 없는 사람이라면
@@ -88,7 +82,7 @@ public class DrawService {
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
 
-            return true;
+            return 1;
         }
 
         // 마지막 접속 시간이 오늘이라면 false 반환
@@ -96,9 +90,8 @@ public class DrawService {
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
 
-            return false;
+            return drawParticipationInfo.getDrawAttendanceCount();
         }
-
 
         if (isContinuousAttendance(lastAttendance)) {
             // 연속 출석이라면 연속출석일수 1 증가
@@ -106,14 +99,14 @@ public class DrawService {
 
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-            return true;
+            return drawParticipationInfo.getDrawAttendanceCount() + 1;
         } else {
             // 연속출석이 아니라면 연속출석일수 1로 초기화
             drawParticipationInfoRepository.setAttendanceCountToOne(userId);
 
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-            return false;
+            return 1;
         }
     }
 

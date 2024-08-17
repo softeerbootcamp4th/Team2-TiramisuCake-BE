@@ -57,10 +57,9 @@ public class DrawService {
             drawParticipationCount += 1;
         }
 
-
-        if (drawParticipationCount == 7) {
+        if (drawParticipationCount >= 7) {
             // 7일 연속 출석자라면
-            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);
+            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawParticipationCount % 8);
         } else {
             // 연속 출석자가 아니라면
             return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawParticipationCount);

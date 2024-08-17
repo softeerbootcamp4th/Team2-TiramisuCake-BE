@@ -1,23 +1,11 @@
 package com.softeer.backend.fo_domain.draw.dto.main;
 
-import lombok.AllArgsConstructor;
+import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
 public class DrawMainFullAttendResponseDto extends DrawMainResponseDto {
-    private DrawMainFullAttendResponseDto.FullAttendModal fullAttendModal;
-
-    @Data
-    @SuperBuilder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class FullAttendModal {
-        private String title; // 제목
-        private String subtitle; // 부제목
-        private String image; // 이미지 URL (S3 URL)
-        private String description; // 설명
-    }
+    private WinModal fullAttendModal;
 }

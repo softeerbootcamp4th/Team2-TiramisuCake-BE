@@ -34,7 +34,7 @@ public class DrawResponseGenerateUtil {
                 .invitedNum(invitedNum)
                 .remainDrawCount(remainDrawCount)
                 .drawParticipationCount(drawParticipationCount)
-                .fullAttendModal(drawModalGenerateUtil.generateFullAttendModal())
+                .fullAttendModal(drawModalGenerateUtil.generateWinModal(7))
                 .build();
     }
 
@@ -89,7 +89,7 @@ public class DrawResponseGenerateUtil {
     public DrawHistoryWinnerResponseDto generateDrawHistoryWinnerResponse(int ranking) {
         return DrawHistoryWinnerResponseDto.builder()
                 .isDrawWin(true)
-                .winModal(drawModalGenerateUtil.generateWinModalForHistory(ranking))
+                .winModal(drawModalGenerateUtil.generateWinModal(ranking))
                 .build();
     }
 

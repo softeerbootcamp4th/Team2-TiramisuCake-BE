@@ -243,21 +243,4 @@ public class DrawService {
         // 당첨자가 아니라면
         return drawResponseGenerateUtil.generateDrawHistoryLoserResponse(userId);
     }
-
-    /**
-     * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
-     *
-     * @param userId 사용자 아이디
-     */
-    private int getRankingIfWinner(int userId) {
-        String drawWinnerKey;
-        for (int ranking = 1; ranking < 4; ranking++) {
-            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            Set<Integer> drawTempSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
-            if (drawTempSet.contains(userId)) {
-                return ranking;
-            }
-        }
-        return 0;
-    }
 }

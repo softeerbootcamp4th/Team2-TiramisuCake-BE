@@ -1,5 +1,6 @@
 package com.softeer.backend.global.util;
 
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -40,5 +41,22 @@ public class DrawRedisUtil {
     // 참여자 수 삭제
     public void deleteIntegerValue(String key) {
         integerRedisTemplate.delete(key);
+    }
+
+    /**
+     * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
+     *
+     * @param userId 사용자 아이디
+     */
+    public int getRankingIfWinner(Integer userId) {
+        String drawWinnerKey;
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            Set<Integer> drawTempSet = getAllDataAsSet(drawWinnerKey);
+            if (drawTempSet.contains(userId)) {
+                return ranking;
+            }
+        }
+        return 0;
     }
 }

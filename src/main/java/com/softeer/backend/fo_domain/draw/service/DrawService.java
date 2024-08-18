@@ -6,6 +6,7 @@ import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
@@ -30,6 +31,7 @@ public class DrawService {
     private final DrawRedisUtil drawRedisUtil;
     private final DrawUtil drawUtil;
     private final DrawResponseGenerateUtil drawResponseGenerateUtil;
+    private final DrawAttendanceCountUtil drawAttendanceCountUtil;
     private final DrawSettingManager drawSettingManager;
 
     /**
@@ -46,7 +48,7 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawAttendanceCount = handleAttendanceCount(userId, drawParticipationInfo);
+        int drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
@@ -59,83 +61,6 @@ public class DrawService {
             // 연속 출석자가 아니라면
             return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount);
         }
-    }
-
-    /**
-     * 연속 출석인지 판단
-     * 1. 연속 출석이면 연속 출석일수 1 증가하여 DB에 업데이트
-     * 2. 연속 출석이 아니면 DB에 연속 출석일수 1로 초기화
-     * 3. 현재 출석시각을 마지막 출석시각으로 DB에 업데이트
-     *
-     * @param userId                사용자 아이디
-     * @param drawParticipationInfo 참여 정보
-     * @return 연속출석 일수 반환
-     */
-    private int handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
-        LocalDateTime lastAttendance = drawParticipationInfo.getLastAttendance();
-
-        // 한 번도 접속한 적이 없는 사람이라면
-        if (lastAttendance == null) {
-            // 연속출석일수 1로 초기화
-            drawParticipationInfoRepository.setAttendanceCountToOne(userId);
-
-            // lastAttendance를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-
-            return 1;
-        }
-
-        // 마지막 접속 시간이 오늘이라면 false 반환
-        if (isLastAttendanceToday(lastAttendance)) {
-            // lastAttendance를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-
-            return drawParticipationInfo.getDrawAttendanceCount();
-        }
-
-        if (isContinuousAttendance(lastAttendance)) {
-            // 연속 출석이라면 연속출석일수 1 증가
-            drawParticipationInfoRepository.increaseAttendanceCount(userId);
-
-            // lastAttendance를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-            return drawParticipationInfo.getDrawAttendanceCount() + 1;
-        } else {
-            // 연속출석이 아니라면 연속출석일수 1로 초기화
-            drawParticipationInfoRepository.setAttendanceCountToOne(userId);
-
-            // lastAttendance를 현재 시각으로 설정
-            drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
-            return 1;
-        }
-    }
-
-    /**
-     * 연속 출석인지 판단
-     *
-     * @param lastAttendance 마지막 출석 날짜
-     * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
-     */
-    private boolean isContinuousAttendance(LocalDateTime lastAttendance) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDateTime = lastAttendance.plusDays(1).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 다음날 자정
-        LocalDateTime endDateTime = lastAttendance.plusDays(2).with(LocalTime.MIDNIGHT); // 마지막 접속일자의 2일 후 자정
-
-        return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
-    }
-
-    /**
-     * 마지막 출석 시간이 오늘인지 판단
-     *
-     * @param lastAttendance 마지막 출석 날짜
-     * @return 마지막 출석 시간이 오늘이면 true, 아니면 false 반환
-     */
-    private boolean isLastAttendanceToday(LocalDateTime lastAttendance) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDateTime = lastAttendance.with(LocalTime.MIDNIGHT);
-        LocalDateTime endDateTime = lastAttendance.plusDays(1).with(LocalTime.MIDNIGHT);
-
-        return (now.isAfter(startDateTime) && now.isBefore(endDateTime));
     }
 
     /**

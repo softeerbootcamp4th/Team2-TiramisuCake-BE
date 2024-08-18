@@ -113,7 +113,7 @@ public class DrawService {
                 winnerNum = third;
             }
 
-            if (isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
+            if (drawRedisUtil.isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
                 // 추첨 티켓이 다 팔리지 않았다면
                 drawParticipationInfoRepository.increaseWinCount(userId); // 당첨 횟수 증가
                 return drawResponseGenerateUtil.generateDrawWinnerResponse(ranking); // WinModal 반환

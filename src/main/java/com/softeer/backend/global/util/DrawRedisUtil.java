@@ -1,5 +1,6 @@
 package com.softeer.backend.global.util;
 
+import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -58,5 +59,21 @@ public class DrawRedisUtil {
             }
         }
         return 0;
+    }
+
+    @EventLock(key = "DRAW_WINNER_#{#ranking}")
+    public boolean isWinner(Integer userId, int ranking, int winnerNum) {
+        String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+        Set<Integer> drawWinnerSet = getAllDataAsSet(drawWinnerKey);
+
+        // 레디스에서 해당 랭킹에 자리가 있는지 확인
+        if (drawWinnerSet.size() < winnerNum) {
+            // 자리가 있다면 당첨 성공. 당첨자 리스트에 추가
+            setIntegerValueToSet(drawWinnerKey, userId);
+            return true;
+        } else {
+            // 이미 자리가 가득 차서 당첨 실패
+            return false;
+        }
     }
 }

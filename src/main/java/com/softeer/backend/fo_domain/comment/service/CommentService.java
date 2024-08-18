@@ -31,13 +31,9 @@ public class CommentService {
     public CommentsResponseDto getComments(Integer userId, Integer cursor) {
 
         PageRequest pageRequest = PageRequest.of(0, SCROLL_SIZE + 1);
-        Page<Comment> page = commentRepository.findAllByIdLessThanOrderByIdDesc(cursor, pageRequest);
+        Page<Comment> page = commentRepository.findAllByIdLessThanEqualOrderByIdDesc(cursor, pageRequest);
 
-        // 변경 가능한 리스트로 변환
-        List<Comment> comments = new ArrayList<>(page.getContent());
-
-        // 리스트를 뒤집음
-        Collections.reverse(comments);
+        List<Comment> comments = page.getContent();
 
         ScrollPaginationUtil<Comment> commentCursor = ScrollPaginationUtil.of(comments, SCROLL_SIZE);
         return CommentsResponseDto.of(commentCursor, userId);

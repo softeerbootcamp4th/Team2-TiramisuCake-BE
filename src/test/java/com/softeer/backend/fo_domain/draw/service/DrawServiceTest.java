@@ -44,8 +44,17 @@ class DrawServiceTest {
     @InjectMocks
     private DrawService drawService;
 
+    @Test
+    void getDrawMainPageInfo() {
+    }
+
+    @Test
+    void participateDrawEvent() {
+    }
+
     @BeforeEach
-    void setUp() {
+    @DisplayName("getDrawHistory를 위한 초기화")
+    void setUpGetDrawHistory() {
         WinModal firstWinModal = WinModal.builder()
                 .title("축하합니다!")
                 .subtitle("아이패드에 당첨됐어요!")
@@ -88,14 +97,13 @@ class DrawServiceTest {
         Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(1)).thenReturn(firstWinnerResponse);
         Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(2)).thenReturn(secondWinnerResponse);
         Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(3)).thenReturn(thirdWinnerResponse);
-    }
 
-    @Test
-    void getDrawMainPageInfo() {
-    }
+        DrawHistoryLoserResponseDto loserResponseDto = DrawHistoryLoserResponseDto.builder()
+                .isDrawWin(false)
+                .shareUrl("https://softeer.shop/share/of8w")
+                .build();
 
-    @Test
-    void participateDrawEvent() {
+        Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryLoserResponse(6)).thenReturn(loserResponseDto);
     }
 
     @Test
@@ -195,5 +203,27 @@ class DrawServiceTest {
         assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo(expectedResponse.getWinModal().getSubtitle());
         assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getImg()).isEqualTo(expectedResponse.getWinModal().getImg());
         assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo(expectedResponse.getWinModal().getDescription());
+    }
+
+    @Test
+    @DisplayName("당첨자가 아닐 경우 당첨 내역 조회 시 낙첨 결과")
+    void getDrawHistoryLoser() {
+        // given
+        Integer userId = 6;
+
+        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+
+        DrawHistoryLoserResponseDto expectedResponse = DrawHistoryLoserResponseDto.builder()
+                .isDrawWin(false)
+                .shareUrl("https://softeer.shop/share/of8w")
+                .build();
+
+        // when
+        DrawHistoryResponseDto actualResponse = drawService.getDrawHistory(userId);
+
+        // then
+        assertThat(actualResponse).isNotEqualTo(null);
+        assertThat(actualResponse.isDrawWin()).isEqualTo(false);
+        assertThat(((DrawHistoryLoserResponseDto) actualResponse).getShareUrl()).isEqualTo(expectedResponse.getShareUrl());
     }
 }

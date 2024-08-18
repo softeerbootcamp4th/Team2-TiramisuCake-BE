@@ -6,6 +6,7 @@ import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
@@ -141,10 +142,10 @@ class DrawServiceTest {
         assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
         assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
         assertThat(actualResponse.getDrawParticipationCount()).isEqualTo(expectedResponse.getDrawParticipationCount());
-        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
-        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
-        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
-        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getDescription()).isEqualTo(expectedResponse.getFullAttendModal().getDescription());
+        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
+        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
+        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
+        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getDescription()).isEqualTo(expectedResponse.getFullAttendModal().getDescription());
     }
 
     @Test
@@ -222,10 +223,153 @@ class DrawServiceTest {
         // then
         assertThat(actualResponse).isNotNull();
         assertThat(actualResponse.isDrawWin()).isEqualTo(false);
-        assertThat(((DrawLoseModalResponseDto)actualResponse).getShareUrl()).isEqualTo("https://softeer.site/share/of8w");
+        assertThat(((DrawLoseModalResponseDto) actualResponse).getShareUrl()).isEqualTo("https://softeer.site/share/of8w");
         assertThat(actualResponse.getImages().get(0)).isEqualTo("left");
         assertThat(actualResponse.getImages().get(1)).isEqualTo("left");
         assertThat(actualResponse.getImages().get(2)).isEqualTo("right");
+    }
+
+    @Test
+    @DisplayName("이미 하루 중 당첨된 적이 있는 사용자의 추첨 참여")
+    void participateDrawEventTwice() {
+        // given
+        Integer userId = 6;
+
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(2)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        ArrayList<String> images = new ArrayList<>();
+        images.add("left");
+        images.add("left");
+        images.add("right");
+
+        DrawLoseModalResponseDto drawLoseModalResponseDto = DrawLoseModalResponseDto.builder()
+                .isDrawWin(false)
+                .images(images)
+                .shareUrl("https://softeer.site/share/of8w")
+                .build();
+
+        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+
+        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(3);
+
+        // when
+        DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.isDrawWin()).isEqualTo(false);
+        assertThat(((DrawLoseModalResponseDto) actualResponse).getShareUrl()).isEqualTo("https://softeer.site/share/of8w");
+        assertThat(actualResponse.getImages().get(0)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(1)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(2)).isEqualTo("right");
+    }
+
+    @Test
+    @DisplayName("낙첨자의 응답 반환")
+    void participateDrawEventLoser() {
+        // given
+        Integer userId = 6;
+
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(2)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+
+        Mockito.when(drawUtil.isDrawWin()).thenReturn(false);
+
+        ArrayList<String> images = new ArrayList<>();
+        images.add("left");
+        images.add("left");
+        images.add("right");
+
+        DrawLoseModalResponseDto drawLoseModalResponseDto = DrawLoseModalResponseDto.builder()
+                .isDrawWin(false)
+                .images(images)
+                .shareUrl("https://softeer.site/share/of8w")
+                .build();
+
+        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+
+        // when
+        DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.isDrawWin()).isEqualTo(false);
+        assertThat(((DrawLoseModalResponseDto) actualResponse).getShareUrl()).isEqualTo("https://softeer.site/share/of8w");
+        assertThat(actualResponse.getImages().get(0)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(1)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(2)).isEqualTo("right");
+    }
+
+    @Test
+    @DisplayName("추첨 1등 응답 반환")
+    void participateDrawEventFirst() {
+        // given
+        Integer userId = 6;
+
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(2)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+
+        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
+        Mockito.when(drawUtil.getRanking()).thenReturn(1);
+
+        ArrayList<String> images = new ArrayList<>();
+        images.add("up");
+        images.add("up");
+        images.add("up");
+
+        WinModal winModal = WinModal.builder()
+                .title("축하합니다!")
+                .subtitle("아이패드에 당첨됐어요!")
+                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_1.svg")
+                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
+                .build();
+
+        DrawWinModalResponseDto drawWinModalResponseDto = DrawWinModalResponseDto.builder()
+                .isDrawWin(true)
+                .images(images)
+                .winModal(winModal)
+                .build();
+
+        Mockito.when(drawResponseGenerateUtil.generateDrawWinnerResponse(1)).thenReturn(drawWinModalResponseDto);
+
+        // when
+        DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+    }
+
+    @Test
+    @DisplayName("추첨 2등 응답 반환")
+    void participateDrawEventSecond() {
+
+    }
+
+    @Test
+    @DisplayName("추첨 3등 응답 반환")
+    void participateDrawEventThird() {
+
     }
 
     @BeforeEach

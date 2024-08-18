@@ -1,6 +1,7 @@
 package com.softeer.backend.global.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softeer.backend.fo_domain.draw.interceptor.DrawTimeCheckInterceptor;
 import com.softeer.backend.fo_domain.fcfs.interceptor.FcfsTimeCheckInterceptor;
 import com.softeer.backend.global.annotation.argumentresolver.AuthInfoArgumentResolver;
 import com.softeer.backend.global.config.properties.JwtProperties;
@@ -33,6 +34,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtProperties jwtProperties;
 
     private final FcfsTimeCheckInterceptor fcfsTimeCheckInterceptor;
+    private final DrawTimeCheckInterceptor drawTimeCheckInterceptor;
 
     /**
      * AuthInfo 애노테이션에 대한 Argument Resolver 등록
@@ -47,6 +49,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(fcfsTimeCheckInterceptor)
                 .addPathPatterns("/fcfs");
+
+        registry.addInterceptor(drawTimeCheckInterceptor)
+                .addPathPatterns("/event/draw");
     }
 
     /**

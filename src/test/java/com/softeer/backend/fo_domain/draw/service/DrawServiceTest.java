@@ -4,6 +4,8 @@ import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
@@ -22,9 +24,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.hamcrest.MockitoHamcrest;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -186,11 +190,42 @@ class DrawServiceTest {
     }
 
     @Test
-    void getDrawMainPageInfo() {
-    }
+    @DisplayName("남은 기회 0회인 사용자의 추첨 참여")
+    void participateDrawEventZero() {
+        // given
+        Integer userId = 6;
 
-    @Test
-    void participateDrawEvent() {
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(0)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        ArrayList<String> images = new ArrayList<>();
+        images.add("left");
+        images.add("left");
+        images.add("right");
+
+        DrawLoseModalResponseDto drawLoseModalResponseDto = DrawLoseModalResponseDto.builder()
+                .isDrawWin(false)
+                .images(images)
+                .shareUrl("https://softeer.site/share/of8w")
+                .build();
+
+        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+
+        // when
+        DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.isDrawWin()).isEqualTo(false);
+        assertThat(((DrawLoseModalResponseDto)actualResponse).getShareUrl()).isEqualTo("https://softeer.site/share/of8w");
+        assertThat(actualResponse.getImages().get(0)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(1)).isEqualTo("left");
+        assertThat(actualResponse.getImages().get(2)).isEqualTo("right");
     }
 
     @BeforeEach

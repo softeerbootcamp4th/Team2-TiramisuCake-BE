@@ -1,13 +1,18 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawModalGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
+import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.global.util.DrawRedisUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -39,10 +46,144 @@ class DrawServiceTest {
     @Mock
     private DrawModalGenerateUtil drawModalGenerateUtil;
     @Mock
+    private DrawAttendanceCountUtil drawAttendanceCountUtil;
+    @Mock
     private DrawSettingManager drawSettingManager;
 
     @InjectMocks
     private DrawService drawService;
+
+    @BeforeEach
+    @DisplayName("getDrawMainPageInfo를 위한 초기화")
+    void setUpGetDrawMainPageInfo() {
+        WinModal fullAttendModal = WinModal.builder()
+                .title("7일 연속 출석하셨네요!")
+                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
+                .img("https://d1wv99asbppzjv.cloudfront.net/draw-page/7th_complete_image.svg")
+                .description("본 이벤트는 The new IONIQ 5 출시 이벤트 기간 내 한 회선당 1회만 참여 가능합니다.\n" +
+                        "이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.\n")
+                .build();
+
+        Mockito.lenient().when(drawModalGenerateUtil.generateWinModal(7)).thenReturn(fullAttendModal);
+
+        DrawMainFullAttendResponseDto drawMainFullAttendResponseDto = DrawMainFullAttendResponseDto
+                .builder()
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .drawParticipationCount(7)
+                .fullAttendModal(fullAttendModal)
+                .build();
+
+        Mockito.lenient().when(drawResponseGenerateUtil.generateMainFullAttendResponse(3, 1, 7)).thenReturn(drawMainFullAttendResponseDto);
+
+        DrawMainResponseDto drawMainNotAttendResponseDto = DrawMainResponseDto
+                .builder()
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .drawParticipationCount(1)
+                .build();
+
+        Mockito.lenient().when(drawResponseGenerateUtil.generateMainNotAttendResponse(3, 1, 1)).thenReturn(drawMainNotAttendResponseDto);
+    }
+
+    @Test
+    @DisplayName("7일 연속출석자의 추첨 이벤트 페이지 접속")
+    void getDrawMainPageFullAttend() {
+        // given
+        Integer userId = 6;
+
+        WinModal fullAttendModal = WinModal.builder()
+                .title("7일 연속 출석하셨네요!")
+                .subtitle("등록된 번호로 스타벅스 기프티콘을 보내드려요.")
+                .img("https://d1wv99asbppzjv.cloudfront.net/draw-page/7th_complete_image.svg")
+                .description("본 이벤트는 The new IONIQ 5 출시 이벤트 기간 내 한 회선당 1회만 참여 가능합니다.\n" +
+                        "이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.\n")
+                .build();
+
+        DrawParticipationInfo drawParticipationInfo = DrawParticipationInfo.builder()
+                .userId(6)
+                .drawWinningCount(10)
+                .drawLosingCount(10)
+                .drawAttendanceCount(7)
+                .build();
+
+        Mockito.when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        Mockito.when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(7);
+
+        DrawMainFullAttendResponseDto expectedResponse = DrawMainFullAttendResponseDto
+                .builder()
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .drawParticipationCount(7)
+                .fullAttendModal(fullAttendModal)
+                .build();
+
+        // when
+        DrawMainResponseDto actualResponse = drawService.getDrawMainPageInfo(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
+        assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
+        assertThat(actualResponse.getDrawParticipationCount()).isEqualTo(expectedResponse.getDrawParticipationCount());
+        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
+        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
+        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
+        assertThat(((DrawMainFullAttendResponseDto)actualResponse).getFullAttendModal().getDescription()).isEqualTo(expectedResponse.getFullAttendModal().getDescription());
+    }
+
+    @Test
+    @DisplayName("1일 출석자의 추첨 페이지 접속")
+    void getDrawMainPageNotAttend() {
+        // given
+        Integer userId = 6;
+
+        DrawParticipationInfo drawParticipationInfo = DrawParticipationInfo.builder()
+                .userId(6)
+                .drawWinningCount(10)
+                .drawLosingCount(10)
+                .drawAttendanceCount(1)
+                .build();
+
+        Mockito.when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        Mockito.when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(1);
+
+        DrawMainResponseDto expectedResponse = DrawMainResponseDto
+                .builder()
+                .invitedNum(3)
+                .remainDrawCount(1)
+                .drawParticipationCount(1)
+                .build();
+
+        // when
+        DrawMainResponseDto actualResponse = drawService.getDrawMainPageInfo(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
+        assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
+        assertThat(actualResponse.getDrawParticipationCount()).isEqualTo(expectedResponse.getDrawParticipationCount());
+    }
 
     @Test
     void getDrawMainPageInfo() {

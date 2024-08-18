@@ -501,7 +501,51 @@ class DrawServiceTest {
     @Test
     @DisplayName("로직상 당첨이어도 레디스에 자리가 없는 경우 실패 응답 반환")
     void participateDrawEventWithoutSeat() {
+        // given
+        Integer userId = 6;
 
+        ShareInfo shareInfo = ShareInfo.builder()
+                .userId(userId)
+                .invitedNum(3)
+                .remainDrawCount(2)
+                .build();
+
+        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+
+        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+
+        Mockito.when(drawSettingManager.getWinnerNum1()).thenReturn(1);
+        Mockito.when(drawSettingManager.getWinnerNum2()).thenReturn(10);
+        Mockito.when(drawSettingManager.getWinnerNum3()).thenReturn(100);
+
+        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
+        Mockito.when(drawUtil.getRanking()).thenReturn(1);
+
+        Mockito.when(drawRedisUtil.isWinner(userId, 1, 1)).thenReturn(false);
+
+        ArrayList<String> images = new ArrayList<>();
+        images.add("up");
+        images.add("up");
+        images.add("down");
+
+        DrawLoseModalResponseDto expectedResponse = DrawLoseModalResponseDto.builder()
+                .isDrawWin(false)
+                .images(images)
+                .shareUrl("https://softeer.shop/share/of8w")
+                .build();
+
+        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(expectedResponse);
+
+        // when
+        DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.isDrawWin()).isEqualTo(false);
+        assertThat(actualResponse.getImages().get(0)).isEqualTo("up");
+        assertThat(actualResponse.getImages().get(1)).isEqualTo("up");
+        assertThat(actualResponse.getImages().get(2)).isEqualTo("down");
+        assertThat(((DrawLoseModalResponseDto)actualResponse).getShareUrl()).isEqualTo("https://softeer.shop/share/of8w");
     }
 
     @BeforeEach

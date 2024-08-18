@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,9 +31,9 @@ public class CommentService {
     public CommentsResponseDto getComments(Integer userId, Integer cursor) {
 
         PageRequest pageRequest = PageRequest.of(0, SCROLL_SIZE + 1);
-        Page<Comment> page = commentRepository.findAllByIdLessThanOrderByIdDesc(cursor, pageRequest);
+        Page<Comment> page = commentRepository.findAllByIdLessThanEqualOrderByIdDesc(cursor, pageRequest);
+
         List<Comment> comments = page.getContent();
-        Collections.reverse(comments);
 
         ScrollPaginationUtil<Comment> commentCursor = ScrollPaginationUtil.of(comments, SCROLL_SIZE);
         return CommentsResponseDto.of(commentCursor, userId);

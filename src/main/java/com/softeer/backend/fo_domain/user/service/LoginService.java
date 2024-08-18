@@ -137,7 +137,7 @@ public class LoginService {
                 .userId(userId)
                 .drawWinningCount(0)
                 .drawLosingCount(0)
-                .drawParticipationCount(1)
+                .drawAttendanceCount(1)
                 .build();
 
         drawParticipationInfoRepository.save(drawParticipationInfo);

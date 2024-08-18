@@ -158,7 +158,7 @@ public class DrawService {
         shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
 
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
-        int ranking = getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
+        int ranking = drawRedisUtil.getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환
         if (ranking != 0) {
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환
@@ -233,7 +233,7 @@ public class DrawService {
      * @return 당첨 내역에 따른 응답
      */
     public DrawHistoryResponseDto getDrawHistory(Integer userId) {
-        int ranking = getRankingIfWinner(userId);
+        int ranking = drawRedisUtil.getRankingIfWinner(userId);
 
         if (ranking != 0) {
             // 당첨자라면

@@ -6,6 +6,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
+@Setter
 public class FcfsSuccessResult implements FcfsResult {
 
     private String title;

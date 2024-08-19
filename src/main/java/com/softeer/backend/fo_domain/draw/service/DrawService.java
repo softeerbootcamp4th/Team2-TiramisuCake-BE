@@ -19,10 +19,6 @@ import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Set;
-
 @Service
 @RequiredArgsConstructor
 public class DrawService {

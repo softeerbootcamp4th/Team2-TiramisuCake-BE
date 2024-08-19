@@ -83,7 +83,12 @@ public class DrawRedisUtil {
     }
 
     // 추첨 참여인원수 조회
-    public Integer getDrawParticipationCount() {
+    public Integer getDrawParticipantCount() {
         return integerRedisTemplate.opsForValue().get(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+    }
+
+    // 추첨 참여인원수 삭제
+    public void deleteDrawParticipantCount() {
+        integerRedisTemplate.delete(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 }

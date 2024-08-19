@@ -58,49 +58,6 @@ public class DrawSettingManager {
         winnerNum1 = drawSetting.getWinnerNum1();
         winnerNum2 = drawSetting.getWinnerNum2();
         winnerNum3 = drawSetting.getWinnerNum3();
-
-        // 매일 01:00:00에 redis 당첨자 목록 데이터베이스에 저장
-        taskScheduler.schedule(this::addWinnerToDatabase, new CronTrigger("0 0 1 * * *"));
-
-        // 매일 01:00:00에 redis 당첨자 목록 삭제하기
-        taskScheduler.schedule(this::deleteWinnerSetFromRedis, new CronTrigger("0 0 1 * * *"));
-    }
-
-    /**
-     * 당첨자 목록 모두 삭제
-     */
-    private void deleteWinnerSetFromRedis() {
-        String drawWinnerKey;
-        for (int ranking = 1; ranking < 4; ranking++) {
-            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            drawRedisUtil.deleteAllSetData(drawWinnerKey);
-        }
-    }
-
-    /**
-     * 당첨자 목록 모두 데이터베이스에 저장
-     */
-    private void addWinnerToDatabase() {
-        String drawWinnerKey;
-        for (int ranking = 1; ranking < 4; ranking++) {
-            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            Set<Integer> winnerSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
-
-            LocalDateTime winningDate = LocalDateTime.now().minusHours(2); // 하루 전 날 오후 11시로 설정
-
-            for (Integer userId : winnerSet) {
-                User user = userRepository.findById(userId).orElseThrow(
-                        () -> new UserException(ErrorStatus._NOT_FOUND));
-
-                Draw draw = Draw.builder()
-                        .user(user)
-                        .rank(ranking)
-                        .winningDate(winningDate)
-                        .build();
-
-                drawRepository.save(draw);
-            }
-        }
     }
 
     public void setDrawDate(DrawSetting drawSetting) {

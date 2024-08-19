@@ -39,11 +39,6 @@ public class DrawRedisUtil {
         integerRedisTemplate.delete(key);
     }
 
-    // 참여자 수 삭제
-    public void deleteIntegerValue(String key) {
-        integerRedisTemplate.delete(key);
-    }
-
     /**
      * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
      *

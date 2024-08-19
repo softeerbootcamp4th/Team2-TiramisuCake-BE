@@ -2,6 +2,8 @@ package com.softeer.backend.global.scheduler;
 
 import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
+import com.softeer.backend.fo_domain.draw.domain.Draw;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
@@ -11,6 +13,7 @@ import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
+import com.softeer.backend.global.util.DrawRedisUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import com.softeer.backend.global.util.FcfsRedisUtil;
 import jakarta.annotation.PostConstruct;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,11 +39,13 @@ public class DbInsertScheduler {
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
     private final FcfsRedisUtil fcfsRedisUtil;
+    private final DrawRedisUtil drawRedisUtil;
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
     private final EventParticipationRepository eventParticipationRepository;
     private final UserRepository userRepository;
     private final FcfsRepository fcfsRepository;
+    private final DrawRepository drawRepository;
 
 
     private ScheduledFuture<?> scheduledFuture;
@@ -60,7 +66,7 @@ public class DbInsertScheduler {
         if (now.isBefore(drawSettingManager.getStartDate().plusDays(1)))
             return;
 
-        if(now.isAfter(drawSettingManager.getEndDate().plusDays(1)))
+        if (now.isAfter(drawSettingManager.getEndDate().plusDays(1)))
             stopScheduler();
 
         int totalVisitorsCount = eventLockRedisUtil.getData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());
@@ -69,7 +75,7 @@ public class DbInsertScheduler {
         int fcfsParticipantCount = 0;
         int drawParticipantCount = 0;
 
-        if(fcfsSettingManager.getRoundForScheduler(now)!=-1){
+        if (fcfsSettingManager.getRoundForScheduler(now) != -1) {
             fcfsSettingManager.setFcfsClosed(false);
 
             int round = fcfsSettingManager.getRoundForScheduler(now);
@@ -98,7 +104,38 @@ public class DbInsertScheduler {
             fcfsRedisUtil.clearHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
         }
 
-        // TODO: drawParticipantCount에 추첨 이벤트 참가자 수 할당하기
+        // drawParticipantCount에 추첨 이벤트 참가자 수 할당하기
+        drawParticipantCount = drawRedisUtil.getDrawParticipantCount();
+        // redis에서 추첨 참가자 수 삭제
+        drawRedisUtil.deleteDrawParticipantCount();
+
+        // 추첨 당첨자 DB에 insert
+        String drawWinnerKey;
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            Set<Integer> winnerSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
+
+            LocalDateTime winningDate = LocalDateTime.now().minusHours(2); // 하루 전 날 오후 11시로 설정
+
+            for (Integer userId : winnerSet) {
+                User user = userRepository.findById(userId).orElseThrow(
+                        () -> new UserException(ErrorStatus._NOT_FOUND));
+
+                Draw draw = Draw.builder()
+                        .user(user)
+                        .rank(ranking)
+                        .winningDate(winningDate)
+                        .build();
+
+                drawRepository.save(draw);
+            }
+        }
+
+        // redis에서 추첨 당첨자 목록 삭제
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            drawRedisUtil.deleteAllSetData(drawWinnerKey);
+        }
 
         eventParticipationRepository.save(EventParticipation.builder()
                 .visitorCount(totalVisitorsCount)

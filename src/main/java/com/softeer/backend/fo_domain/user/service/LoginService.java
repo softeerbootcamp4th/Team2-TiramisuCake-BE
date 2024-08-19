@@ -80,6 +80,7 @@ public class LoginService {
             String shareUrl = (String) session.getAttribute("shareUrl");
             // 공유받은 url을 이용해 인증한다면
             // 공유한 사람 추첨 기회 추가
+            // 공유한 사람의 "내가 초대한 친구 수" 추가
             // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
             if (shareUrl != null) {
                 // 공유한 사람의 아이디
@@ -87,7 +88,7 @@ public class LoginService {
                         .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
                 // 공유한 사람 추첨 기회 추가
-                shareInfoRepository.increaseRemainDrawCount(shareUserId);
+                shareInfoRepository.increaseInvitedNumAndRemainDrawCount(shareUserId);
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우

@@ -9,17 +9,18 @@ import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDt
 import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class DrawResponseGenerateUtil {
+    public static final String BASE_URL = "https://softeer.shop/share/";
+
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final DrawUtil drawUtil;
     private final DrawModalGenerateUtil drawModalGenerateUtil;
-    private final StaticResourcesUtil staticResourcesUtil;
+
 
     /**
      * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
@@ -112,7 +113,7 @@ public class DrawResponseGenerateUtil {
      * @return 공유 url
      */
     private String getShareUrl(Integer userId) {
-        return staticResourcesUtil.getData("BASE_URL") + shareUrlInfoRepository.findShareUrlByUserId(userId)
+        return BASE_URL + shareUrlInfoRepository.findShareUrlByUserId(userId)
                 .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
     }
 }

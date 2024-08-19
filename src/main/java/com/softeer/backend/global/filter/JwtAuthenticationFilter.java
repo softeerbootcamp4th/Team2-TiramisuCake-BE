@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/swagger-ui/**", "/swagger", "/v3/**", "/error/**",
             "/verification/send", "/verification/confirm",
             "/login",
-            "/main/event", "/main/car",
+            "/main/event/static", "/main/event/info", "/main/car",
             "/admin/login", "/admin/signup",
             "/share/**"
     };

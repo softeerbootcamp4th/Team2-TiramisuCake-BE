@@ -42,7 +42,7 @@ public class LoginService {
      * 4. User 객체의 id를 얻은 후에, access & refresh token을 client에게 전달한다.
      */
     @Transactional
-    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, HttpSession session, String shareCode) {
+    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, String shareCode) {
         // 인증번호가 인증 되지 않은 경우, 예외 발생
         if (!loginRequestDto.getHasCodeVerified()) {
             log.error("hasCodeVerified is false in loginRequest.");

@@ -10,26 +10,11 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 @Getter
-public class MainPageEventResponseDto {
-
-    private String startDate;
-
-    private String endDate;
+public class MainPageEventStaticResponseDto {
 
     private String eventTitle;
 
     private String eventDescription;
-
-    private String fcfsInfo;
-
-    private String totalDrawWinner;
-
-    private String remainDrawCount;
-
-    private String fcfsHint;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime fcfsStartTime;
 
     private List<EventInfo> eventInfoList;
 

@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "static_resources")
-public class StaticResources {
+@Table(name = "s3_content")
+public class S3Content {
 
     @Id
-    @Column(name = "static_resources_id")
+    @Column(name = "s3_content_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

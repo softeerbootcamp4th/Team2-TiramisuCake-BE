@@ -81,4 +81,9 @@ public class DrawRedisUtil {
     public void increaseDrawParticipationCount() {
         incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
+
+    // 추첨 참여인원수 조회
+    public Integer getDrawParticipationCount() {
+        return integerRedisTemplate.opsForValue().get(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+    }
 }

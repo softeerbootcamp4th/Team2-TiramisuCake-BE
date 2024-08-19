@@ -8,9 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +18,9 @@ public class LoginController {
 
     @PostMapping("/login")
     ResponseDto<JwtTokenResponseDto> handleLogin(@Valid @RequestBody LoginRequestDto loginRequestDto,
-                                                 @Parameter(hidden = true) HttpSession session) {
-        JwtTokenResponseDto jwtTokenResponseDto = loginService.handleLogin(loginRequestDto, session);
+                                                 @Parameter(hidden = true) HttpSession session,
+                                                 @RequestHeader(value = "shareCode", required = false) String shareCode) {
+        JwtTokenResponseDto jwtTokenResponseDto = loginService.handleLogin(loginRequestDto, session, shareCode);
 
         return ResponseDto.onSuccess(jwtTokenResponseDto);
     }

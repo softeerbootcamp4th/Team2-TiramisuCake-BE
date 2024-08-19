@@ -75,7 +75,7 @@ class DrawServiceTest {
                 .builder()
                 .invitedNum(3)
                 .remainDrawCount(1)
-                .drawParticipationCount(7)
+                .drawAttendanceCount(7)
                 .fullAttendModal(fullAttendModal)
                 .build();
 
@@ -85,7 +85,7 @@ class DrawServiceTest {
                 .builder()
                 .invitedNum(3)
                 .remainDrawCount(1)
-                .drawParticipationCount(1)
+                .drawAttendanceCount(1)
                 .build();
 
         Mockito.lenient().when(drawResponseGenerateUtil.generateMainNotAttendResponse(3, 1, 1)).thenReturn(drawMainNotAttendResponseDto);
@@ -129,7 +129,7 @@ class DrawServiceTest {
                 .builder()
                 .invitedNum(3)
                 .remainDrawCount(1)
-                .drawParticipationCount(7)
+                .drawAttendanceCount(7)
                 .fullAttendModal(fullAttendModal)
                 .build();
 
@@ -140,7 +140,7 @@ class DrawServiceTest {
         assertThat(actualResponse).isNotNull();
         assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
         assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
-        assertThat(actualResponse.getDrawParticipationCount()).isEqualTo(expectedResponse.getDrawParticipationCount());
+        assertThat(actualResponse.getDrawAttendanceCount()).isEqualTo(expectedResponse.getDrawAttendanceCount());
         assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
         assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
         assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
@@ -176,7 +176,7 @@ class DrawServiceTest {
                 .builder()
                 .invitedNum(3)
                 .remainDrawCount(1)
-                .drawParticipationCount(1)
+                .drawAttendanceCount(1)
                 .build();
 
         // when
@@ -186,7 +186,7 @@ class DrawServiceTest {
         assertThat(actualResponse).isNotNull();
         assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
         assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
-        assertThat(actualResponse.getDrawParticipationCount()).isEqualTo(expectedResponse.getDrawParticipationCount());
+        assertThat(actualResponse.getDrawAttendanceCount()).isEqualTo(expectedResponse.getDrawAttendanceCount());
     }
 
     @Test

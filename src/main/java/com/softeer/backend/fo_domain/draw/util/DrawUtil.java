@@ -1,19 +1,28 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.repository.S3ContentRepository;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
 public class DrawUtil {
-    private final StaticResourcesUtil staticResourcesUtil;
+
+    private final ObjectProvider<DrawUtil> drawUtilProvider;
+    private final StaticResourceUtil staticResourceUtil;
+
     @Getter
     private boolean isDrawWin = false;
     @Getter
@@ -53,7 +62,8 @@ public class DrawUtil {
         Random random = new Random();
         int direction = random.nextInt(4); // 랜덤 수
 
-        String directionImage = getImageUrl(direction);
+        DrawUtil drawUtil = drawUtilProvider.getObject();
+        String directionImage = drawUtil.getImageUrl(direction);
 
         ArrayList<String> images = new ArrayList<>(3);
         images.add(directionImage);
@@ -66,6 +76,8 @@ public class DrawUtil {
      * @return 낙첨자를 위한 랜덤 방향 이미지 List 반환
      */
     public List<String> generateLoseImages() {
+        DrawUtil drawUtil = drawUtilProvider.getObject();
+
         ArrayList<String> images = new ArrayList<>(3);
         Random random = new Random();
         int firstDirection, secondDirection, thirdDirection;
@@ -76,9 +88,9 @@ public class DrawUtil {
             thirdDirection = random.nextInt(4);
         } while (firstDirection == secondDirection && secondDirection == thirdDirection);
 
-        images.add(getImageUrl(firstDirection));
-        images.add(getImageUrl(secondDirection));
-        images.add(getImageUrl(thirdDirection));
+        images.add(drawUtil.getImageUrl(firstDirection));
+        images.add(drawUtil.getImageUrl(secondDirection));
+        images.add(drawUtil.getImageUrl(thirdDirection));
         return images;
     }
 
@@ -86,16 +98,20 @@ public class DrawUtil {
      * @param direction 방향을 나타냄. 0, 1, 2, 3이 각각 위, 오른쪽, 밑, 왼쪽
      * @return 방향에 따른 이미지 url을 반환
      */
-    private String getImageUrl(int direction) {
+    @Cacheable(value = "staticResources", key = "'drawImage_' + #direction")
+    public String getImageUrl(int direction) {
+
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
+
         String directionImage;
         if (direction == 0) {
-            directionImage = staticResourcesUtil.getData("draw_block_up_image");
+            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_UP_IMAGE.name());
         } else if (direction == 1) {
-            directionImage = staticResourcesUtil.getData("draw_block_right_image");
+            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_RIGHT_IMAGE.name());
         } else if (direction == 2) {
-            directionImage = staticResourcesUtil.getData("draw_block_down_image");
+            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_DOWN_IMAGE.name());
         } else {
-            directionImage = staticResourcesUtil.getData("draw_block_left_image");
+            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_LEFT_IMAGE.name());
         }
         return directionImage;
     }

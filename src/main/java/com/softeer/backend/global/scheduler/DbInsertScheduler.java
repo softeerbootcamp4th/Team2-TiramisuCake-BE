@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -73,7 +72,6 @@ public class DbInsertScheduler {
         eventLockRedisUtil.deleteData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());
 
         int fcfsParticipantCount = 0;
-        int drawParticipantCount = 0;
 
         if (fcfsSettingManager.getRoundForScheduler(now) != -1) {
             fcfsSettingManager.setFcfsClosed(false);
@@ -105,7 +103,7 @@ public class DbInsertScheduler {
         }
 
         // drawParticipantCount에 추첨 이벤트 참가자 수 할당하기
-        drawParticipantCount = drawRedisUtil.getDrawParticipantCount();
+        int drawParticipantCount = drawRedisUtil.getDrawParticipantCount();
         // redis에서 추첨 참가자 수 삭제
         drawRedisUtil.deleteDrawParticipantCount();
 
@@ -143,11 +141,10 @@ public class DbInsertScheduler {
                 .drawParticipantCount(drawParticipantCount)
                 .eventDate(now.minusDays(1))
                 .build());
-
     }
 
     /**
-     * Schedular의 작업을 비활성화 시키는 메서드
+     * Scheduler의 작업을 비활성화 시키는 메서드
      */
     public void stopScheduler() {
         if (scheduledFuture != null) {

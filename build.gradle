@@ -97,6 +97,12 @@ dependencies {
 	// Bcrypt 설정
 	implementation 'org.mindrot:jbcrypt:0.4'
 
+	// Spring Cache 설정
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	// Caffeine Cache 설정
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

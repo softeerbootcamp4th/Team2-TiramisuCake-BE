@@ -26,14 +26,14 @@ public class DrawResponseGenerateUtil {
      *
      * @param invitedNum             초대한 사람 수
      * @param remainDrawCount        남은 추첨 기회
-     * @param drawParticipationCount 연속 출석 일수
+     * @param drawAttendanceCount 연속 출석 일수
      * @return 7일 연속 출석 상품 모달
      */
-    public DrawMainFullAttendResponseDto generateMainFullAttendResponse(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+    public DrawMainFullAttendResponseDto generateMainFullAttendResponse(int invitedNum, int remainDrawCount, int drawAttendanceCount) {
         return DrawMainFullAttendResponseDto.builder()
                 .invitedNum(invitedNum)
                 .remainDrawCount(remainDrawCount)
-                .drawParticipationCount(drawParticipationCount)
+                .drawAttendanceCount(drawAttendanceCount)
                 .fullAttendModal(drawModalGenerateUtil.generateWinModal(7))
                 .build();
     }
@@ -43,14 +43,14 @@ public class DrawResponseGenerateUtil {
      *
      * @param invitedNum             초대한 사람 수
      * @param remainDrawCount        남은 추첨 기회
-     * @param drawParticipationCount 연속 출석 일수
+     * @param drawAttendanceCount 연속 출석 일수
      * @return 7일 미만 출석 상품 모달
      */
-    public DrawMainResponseDto generateMainNotAttendResponse(int invitedNum, int remainDrawCount, int drawParticipationCount) {
+    public DrawMainResponseDto generateMainNotAttendResponse(int invitedNum, int remainDrawCount, int drawAttendanceCount) {
         return DrawMainResponseDto.builder()
                 .invitedNum(invitedNum)
                 .remainDrawCount(remainDrawCount)
-                .drawParticipationCount(drawParticipationCount)
+                .drawAttendanceCount(drawAttendanceCount)
                 .build();
     }
 

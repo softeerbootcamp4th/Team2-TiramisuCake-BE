@@ -114,19 +114,16 @@ public class LoginService {
     }
 
     private void createShareUrlInfo(Integer userId) {
-        List<String> shareUrlList = shareUrlInfoRepository.findAllShareUrl();
-        Set<String> shareUrlSet = new HashSet<>(shareUrlList);
-
         RandomCodeUtil randomCodeUtil = new RandomCodeUtil();
-        String shareUrl;
+        String shareCode;
 
         do {
-            shareUrl = randomCodeUtil.generateRandomCode(4);
-        } while (shareUrlSet.contains(shareUrl));
+            shareCode = randomCodeUtil.generateRandomCode(4);
+        } while (shareUrlInfoRepository.findUserIdByShareUrl(shareCode).isPresent());
 
         ShareUrlInfo shareUrlInfo = ShareUrlInfo.builder()
                 .userId(userId)
-                .shareUrl(shareUrl)
+                .shareUrl(shareCode)
                 .build();
 
         shareUrlInfoRepository.save(shareUrlInfo);

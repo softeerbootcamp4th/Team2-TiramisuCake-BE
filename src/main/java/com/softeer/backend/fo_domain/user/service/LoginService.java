@@ -47,7 +47,7 @@ public class LoginService {
      * 4. User 객체의 id를 얻은 후에, access & refresh token을 client에게 전달한다.
      */
     @Transactional
-    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, HttpSession session) {
+    public JwtTokenResponseDto handleLogin(LoginRequestDto loginRequestDto, HttpSession session, String shareCode) {
         // 인증번호가 인증 되지 않은 경우, 예외 발생
         if (!loginRequestDto.getHasCodeVerified()) {
             log.error("hasCodeVerified is false in loginRequest.");
@@ -77,14 +77,13 @@ public class LoginService {
             createShareInfo(userId); // 공유 정보 생성(초대한 친구 수, 남은 추첨 횟수)
             createShareUrlInfo(userId); // 공유 url 생성
 
-            String shareUrl = (String) session.getAttribute("shareUrl");
             // 공유받은 url을 이용해 인증한다면
             // 공유한 사람 추첨 기회 추가
             // 공유한 사람의 "내가 초대한 친구 수" 추가
             // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
-            if (shareUrl != null) {
+            if (shareCode != null) {
                 // 공유한 사람의 아이디
-                Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareUrl)
+                Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareCode)
                         .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
                 // 공유한 사람 추첨 기회 추가

@@ -51,44 +51,16 @@ public class FcfsController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
+    public ResponseDto<FcfsResultResponseDto> handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
                                      @Parameter(hidden = true) @AuthInfo Integer userId,
                                      @RequestBody FcfsRequestDto fcfsRequestDto) {
 
         int round = (Integer) request.getAttribute("round");
 
-        String fcfsCode = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
-
-        log.info("fcfsCode in handleFcfs : {}", fcfsCode);
-
-        HttpHeaders headers = new HttpHeaders();
-        String redirectUrl = "https://softeer.shop/fcfs/result";
-
-        if(fcfsCode != null){
-            request.getSession().setAttribute("fcfsCode", fcfsCode);
-            redirectUrl += "?fcfsWin=" + URLEncoder.encode("true", StandardCharsets.UTF_8);
-            headers.add("Location", redirectUrl);
-        }
-        else{
-            redirectUrl += "?fcfsWin=" + URLEncoder.encode("true", StandardCharsets.UTF_8);
-            headers.add("Location", redirectUrl);
-        }
-
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }
-
-    @GetMapping("/result")
-    public ResponseDto<FcfsResultResponseDto> getFcfsResult(@Parameter(hidden = true) HttpServletRequest request,
-                                                            @RequestParam("fcfsWin") Boolean fcfsWin){
-
-
-        String fcfsCode = (String) request.getSession().getAttribute("fcfsCode");
-        log.info("fcfsCode in getFcfsResult : {}", fcfsCode);
-        request.getSession().invalidate();
-
-        FcfsResultResponseDto fcfsResultResponseDto = fcfsService.getFcfsResult(fcfsWin, fcfsCode);
+        FcfsResultResponseDto fcfsResultResponseDto = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
 
         return ResponseDto.onSuccess(fcfsResultResponseDto);
     }
+
 
 }

@@ -1,63 +1,75 @@
 package com.softeer.backend.fo_domain.draw.util;
 
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
-import com.softeer.backend.global.staticresources.util.StaticResourcesUtil;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.constant.StaticTextName;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class DrawModalGenerateUtil {
-    private final StaticResourcesUtil staticResourcesUtil;
+
+    private final StaticResourceUtil staticResourceUtil;
 
     /**
      * @return 등수에 따른 WinModal을 반환
      */
+    @Cacheable(value = "staticResources", key = "'draw_modal_' + #ranking")
     public WinModal generateWinModal(int ranking) {
+
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
+        Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
+
         if (ranking == 1) {
-            return generateFirstWinModal();
+            return generateFirstWinModal(textContentMap, s3ContentMap);
         } else if (ranking == 2) {
-            return generateSecondWinModal();
+            return generateSecondWinModal(textContentMap, s3ContentMap);
         } else if (ranking == 3) {
-            return generateThirdWinModal();
+            return generateThirdWinModal(textContentMap, s3ContentMap);
         } else {
-            return generateFullAttendModal();
+            return generateFullAttendModal(textContentMap, s3ContentMap);
         }
     }
 
     /**
      * @return 1등 WinModal 반환
      */
-    private WinModal generateFirstWinModal() {
+
+    private WinModal generateFirstWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
-                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("DRAW_FIRST_WINNER_MODAL_SUBTITLE"))
-                .img(staticResourcesUtil.getData("draw_reward_image_1"))
-                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))
+                .subtitle(textContentMap.get(StaticTextName.DRAW_FIRST_WINNER_SUBTITLE.name()))
+                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_1.name()))
+                .description(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name())
                 .build();
     }
 
     /**
      * @return 2등 WinModal 반환
      */
-    private WinModal generateSecondWinModal() {
+    private WinModal generateSecondWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
-                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("DRAW_SECOND_WINNER_MODAL_SUBTITLE"))
-                .img(staticResourcesUtil.getData("draw_reward_image_2"))
-                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))
+                .subtitle(textContentMap.get(StaticTextName.DRAW_SECOND_WINNER_SUBTITLE.name()))
+                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_2.name()))
+                .description(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name()))
                 .build();
     }
 
     /**
      * @return 3등 WinModal 반환
      */
-    private WinModal generateThirdWinModal() {
+    private WinModal generateThirdWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
-                .title(staticResourcesUtil.getData("DRAW_WINNER_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("DRAW_THIRD_WINNER_MODAL_SUBTITLE"))
-                .img(staticResourcesUtil.getData("draw_reward_image_3"))
-                .description(staticResourcesUtil.getData("DRAW_WINNER_MODAL_DESCRIPTION"))
+                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))
+                .subtitle(textContentMap.get(StaticTextName.DRAW_THIRD_WINNER_SUBTITLE.name()))
+                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_3.name()))
+                .description(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name()))
                 .build();
     }
 
@@ -66,12 +78,12 @@ public class DrawModalGenerateUtil {
      *
      * @return FullAttendModal 반환
      */
-    public WinModal generateFullAttendModal() {
+    public WinModal generateFullAttendModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
-                .title(staticResourcesUtil.getData("FULL_ATTEND_MODAL_TITLE"))
-                .subtitle(staticResourcesUtil.getData("FULL_ATTEND_MODAL_SUBTITLE"))
-                .img(staticResourcesUtil.getData("attendance_reward_image"))
-                .description(staticResourcesUtil.getData("FULL_ATTEND_MODAL_DESCRIPTION"))
+                .title(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_TITLE.name()))
+                .subtitle(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_SUBTITLE.name()))
+                .img(s3ContentMap.get(S3FileName.ATTENDANCE_REWARD_IMAGE.name()))
+                .description(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_DESCRIPTION.name()))
                 .build();
     }
 }

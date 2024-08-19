@@ -29,7 +29,7 @@ public class ShareUrlInfoService {
 
             // DB에 이미 생성된 단축 url 코드 반환
             return ShareUrlInfoResponseDto.builder()
-                    .shareUrl(BASE_URL + shareUrl)
+                    .shareUrl(BASE_URL + shareCode)
                     .build();
         }
     }

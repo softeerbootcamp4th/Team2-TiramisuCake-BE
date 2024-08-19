@@ -10,13 +10,16 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ShareUrlInfoService {
+    public static final String NON_USER_SHARE_URL = "https://softeer.site";
+    public static final String BASE_URL = "https://softeer.site/share/";
+
     private final ShareUrlInfoRepository shareUrlInfoRepository;
 
     public ShareUrlInfoResponseDto getShortenShareUrl(Integer userId) {
         if (userId == null) {
             // 로그인하지 않은 사용자
             return ShareUrlInfoResponseDto.builder()
-                    .shareUrl("https://softeer.site")
+                    .shareUrl(NON_USER_SHARE_URL)
                     .build();
         } else {
             // 로그인한 사용자
@@ -26,7 +29,7 @@ public class ShareUrlInfoService {
 
             // DB에 이미 생성된 단축 url 코드 반환
             return ShareUrlInfoResponseDto.builder()
-                    .shareUrl("https://softeer.site/" + shareCode)
+                    .shareUrl(BASE_URL + shareUrl)
                     .build();
         }
     }

@@ -1,5 +1,7 @@
 package com.softeer.backend.global.util;
 
+import com.softeer.backend.global.annotation.EventLock;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -37,8 +39,51 @@ public class DrawRedisUtil {
         integerRedisTemplate.delete(key);
     }
 
-    // 참여자 수 삭제
-    public void deleteIntegerValue(String key) {
-        integerRedisTemplate.delete(key);
+    /**
+     * userId가 당첨자 목록에 있으면 등수, 없으면 0 반환
+     *
+     * @param userId 사용자 아이디
+     */
+    public int getRankingIfWinner(Integer userId) {
+        String drawWinnerKey;
+        for (int ranking = 1; ranking < 4; ranking++) {
+            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+            Set<Integer> drawTempSet = getAllDataAsSet(drawWinnerKey);
+            if (drawTempSet.contains(userId)) {
+                return ranking;
+            }
+        }
+        return 0;
+    }
+
+    @EventLock(key = "DRAW_WINNER_#{#ranking}")
+    public boolean isWinner(Integer userId, int ranking, int winnerNum) {
+        String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
+        Set<Integer> drawWinnerSet = getAllDataAsSet(drawWinnerKey);
+
+        // 레디스에서 해당 랭킹에 자리가 있는지 확인
+        if (drawWinnerSet.size() < winnerNum) {
+            // 자리가 있다면 당첨 성공. 당첨자 리스트에 추가
+            setIntegerValueToSet(drawWinnerKey, userId);
+            return true;
+        } else {
+            // 이미 자리가 가득 차서 당첨 실패
+            return false;
+        }
+    }
+
+    @EventLock(key = "DRAW_PARTICIPATION_COUNT")
+    public void increaseDrawParticipationCount() {
+        incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+    }
+
+    // 추첨 참여인원수 조회
+    public Integer getDrawParticipantCount() {
+        return integerRedisTemplate.opsForValue().get(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+    }
+
+    // 추첨 참여인원수 삭제
+    public void deleteDrawParticipantCount() {
+        integerRedisTemplate.delete(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 }

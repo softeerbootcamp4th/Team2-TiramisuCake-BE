@@ -75,7 +75,7 @@ public class DrawService {
             return drawResponseGenerateUtil.generateDrawLoserResponse(userId);
         }
 
-        increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
+        drawRedisUtil.increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가
         shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감
 
         // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
@@ -122,11 +122,6 @@ public class DrawService {
             drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가
             return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환
         }
-    }
-
-    @EventLock(key = "DRAW_PARTICIPATION_COUNT")
-    private void increaseDrawParticipationCount() {
-        drawRedisUtil.incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
     /**

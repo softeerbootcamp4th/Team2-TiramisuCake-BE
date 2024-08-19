@@ -76,4 +76,9 @@ public class DrawRedisUtil {
             return false;
         }
     }
+
+    @EventLock(key = "DRAW_PARTICIPATION_COUNT")
+    public void increaseDrawParticipationCount() {
+        incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+    }
 }

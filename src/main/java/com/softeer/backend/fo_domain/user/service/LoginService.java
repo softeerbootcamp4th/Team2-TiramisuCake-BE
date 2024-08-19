@@ -17,7 +17,6 @@ import com.softeer.backend.global.common.constant.RoleType;
 import com.softeer.backend.global.common.dto.JwtClaimsDto;
 import com.softeer.backend.global.util.JwtUtil;
 import com.softeer.backend.global.util.RandomCodeUtil;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

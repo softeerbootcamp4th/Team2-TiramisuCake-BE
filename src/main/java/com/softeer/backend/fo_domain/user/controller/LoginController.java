@@ -4,8 +4,6 @@ import com.softeer.backend.fo_domain.user.dto.LoginRequestDto;
 import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
 import com.softeer.backend.fo_domain.user.service.LoginService;
 import com.softeer.backend.global.common.response.ResponseDto;
-import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

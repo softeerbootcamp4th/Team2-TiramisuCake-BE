@@ -56,11 +56,11 @@ public class DbInsertScheduler {
     }
 
     public void scheduleTask() {
-        scheduledFuture = taskScheduler.schedule(this::updateFcfsSetting, new CronTrigger("0 0 1 * * *"));
+        scheduledFuture = taskScheduler.schedule(this::insertDate, new CronTrigger("0 0 2 * * *"));
     }
 
     @Transactional
-    protected void updateFcfsSetting() {
+    protected void insertDate() {
         LocalDate now = LocalDate.now();
         if (now.isBefore(drawSettingManager.getStartDate().plusDays(1)))
             return;
@@ -113,7 +113,7 @@ public class DbInsertScheduler {
             drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
             Set<Integer> winnerSet = drawRedisUtil.getAllDataAsSet(drawWinnerKey);
 
-            LocalDateTime winningDate = LocalDateTime.now().minusHours(2); // 하루 전 날 오후 11시로 설정
+            LocalDate winningDate = LocalDate.now().minusDays(1);
 
             for (Integer userId : winnerSet) {
                 User user = userRepository.findById(userId).orElseThrow(

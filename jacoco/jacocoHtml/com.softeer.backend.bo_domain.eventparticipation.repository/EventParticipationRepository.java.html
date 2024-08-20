@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EventParticipationRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.eventparticipation.repository</a> &gt; <span class="el_source">EventParticipationRepository.java</span></div><h1>EventParticipationRepository.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.eventparticipation.repository;
+
+import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public interface EventParticipationRepository extends JpaRepository&lt;EventParticipation, Integer&gt; {
+
+    @Query(&quot;SELECT e FROM EventParticipation e WHERE e.eventDate BETWEEN :startDate AND :endDate&quot;)
+    List&lt;EventParticipation&gt; findAllByEventDateBetween(@Param(&quot;startDate&quot;) LocalDate startDate, @Param(&quot;endDate&quot;) LocalDate endDate);
+
+    default EventParticipation findSingleEventParticipation() {
+<span class="nc" id="L18">        List&lt;EventParticipation&gt; results = findAll();</span>
+<span class="nc bnc" id="L19" title="All 2 branches missed.">        if (results.isEmpty()) {</span>
+<span class="nc" id="L20">            throw new EmptyResultDataAccessException(&quot;Entity not found&quot;, 1);</span>
+        }
+<span class="nc" id="L22">        return results.get(0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -119,7 +119,7 @@ public class LoginService {
 
         do {
             shareCode = randomCodeUtil.generateRandomCode(4);
-        } while (shareUrlInfoRepository.findUserIdByShareUrl(shareCode).isPresent());
+        } while (shareUrlInfoRepository.existsByShareUrl(shareCode));
 
         ShareUrlInfo shareUrlInfo = ShareUrlInfo.builder()
                 .userId(userId)

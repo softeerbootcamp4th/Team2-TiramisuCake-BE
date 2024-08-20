@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,8 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * 메인 페이지 응답을 처리하기 위한 클래스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,9 @@ public class MainPageService {
     private final DrawRepository drawRepository;
     private final StaticResourceUtil staticResourceUtil;
 
+    /**
+     * 메인 페이지에서 정적 정보를 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     @Cacheable(value = "staticResources", key = "'event'")
     public MainPageEventStaticResponseDto getEventPageStatic(){
@@ -74,6 +78,9 @@ public class MainPageService {
 
     }
 
+    /**
+     * 메인 페이지에서 이벤트 정보를 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     public MainPageEventInfoResponseDto getEventPageInfo(){
 
@@ -117,6 +124,9 @@ public class MainPageService {
 
     }
 
+    /**
+     * 메인 페이지에서 자동자 정보를 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     @Cacheable(value = "staticResources", key = "'car'")
     public MainPageCarResponseDto getCarPage() {

@@ -8,6 +8,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * 추첨 참여 정보 엔티티 클래스
+ */
 @Getter
 @Entity
 @Builder

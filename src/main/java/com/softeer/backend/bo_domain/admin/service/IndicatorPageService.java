@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 이벤트 지표 페이지 요청을 처리하는 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class IndicatorPageService {
@@ -19,6 +22,9 @@ public class IndicatorPageService {
     private final EventParticipationRepository eventParticipationRepository;
     private final DrawSettingRepository drawSettingRepository;
 
+    /**
+     * 이벤트 지표 데이터를 반환하는 메서드
+     */
     public EventIndicatorResponseDto getEventIndicator() {
 
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);

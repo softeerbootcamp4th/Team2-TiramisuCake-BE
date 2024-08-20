@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * 연속 출석일수를 처리하는 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class DrawAttendanceCountUtil {
@@ -15,9 +18,10 @@ public class DrawAttendanceCountUtil {
 
     /**
      * 연속 출석인지 판단
-     * 1. 연속 출석이면 연속 출석일수 1 증가하여 DB에 업데이트
-     * 2. 연속 출석이 아니면 DB에 연속 출석일수 1로 초기화
-     * 3. 현재 출석시각을 마지막 출석시각으로 DB에 업데이트
+     * 1. 첫 출석이면 연속 출석일수 1로 초기화하여 DB에 업데이트
+     * 2. 연속 출석이면 연속 출석일수 1 증가하여 DB에 업데이트
+     * 3. 연속 출석이 아니면 DB에 연속 출석일수 1로 초기화
+     * 4. 현재 출석시각을 마지막 출석시각으로 DB에 업데이트
      *
      * @param userId                사용자 아이디
      * @param drawParticipationInfo 참여 정보
@@ -26,7 +30,7 @@ public class DrawAttendanceCountUtil {
     public int handleAttendanceCount(Integer userId, DrawParticipationInfo drawParticipationInfo) {
         LocalDateTime lastAttendance = drawParticipationInfo.getLastAttendance();
 
-        // 한 번도 접속한 적이 없는 사람이라면
+        // 한 번도 출석한 적이 없는 사람이라면
         if (lastAttendance == null) {
             // 연속출석일수 1로 초기화
             drawParticipationInfoRepository.setAttendanceCountToOne(userId);
@@ -37,7 +41,7 @@ public class DrawAttendanceCountUtil {
             return 1;
         }
 
-        // 마지막 접속 시간이 오늘이라면 false 반환
+        // 마지막 출석 날짜가 오늘이라면 false 반환
         if (isLastAttendanceToday(lastAttendance)) {
             // lastAttendance를 현재 시각으로 설정
             drawParticipationInfoRepository.setLastAttendance(userId, LocalDateTime.now());
@@ -63,7 +67,7 @@ public class DrawAttendanceCountUtil {
     }
 
     /**
-     * 연속 출석인지 판단
+     * 연속 출석인지 판단하는 메서드
      *
      * @param lastAttendance 마지막 출석 날짜
      * @return 연속 출석이면 true, 연속출석이 아니면 false 반환
@@ -77,10 +81,10 @@ public class DrawAttendanceCountUtil {
     }
 
     /**
-     * 마지막 출석 시간이 오늘인지 판단
+     * 마지막 출석 날짜가 오늘인지 판단
      *
      * @param lastAttendance 마지막 출석 날짜
-     * @return 마지막 출석 시간이 오늘이면 true, 아니면 false 반환
+     * @return 마지막 출석 날짜가 오늘이면 true, 아니면 false 반환
      */
     private boolean isLastAttendanceToday(LocalDateTime lastAttendance) {
         LocalDateTime now = LocalDateTime.now();

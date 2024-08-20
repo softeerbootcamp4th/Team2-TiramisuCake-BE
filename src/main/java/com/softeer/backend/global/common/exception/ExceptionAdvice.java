@@ -138,7 +138,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         ModelAndView modelAndView = new ModelAndView();
 
-        if (redissonKeyName.contains("FCFS")){
+        if (redissonKeyName.contains("FCFS")) {
 
             modelAndView.setViewName("redirect:/fcfs/result");
             modelAndView.addObject("fcfsWin", false);

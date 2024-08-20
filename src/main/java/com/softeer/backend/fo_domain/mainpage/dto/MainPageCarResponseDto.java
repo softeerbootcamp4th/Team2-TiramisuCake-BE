@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * 자동차 정보 응답 DTO 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
@@ -12,6 +15,9 @@ public class MainPageCarResponseDto {
 
     private List<CarInfo> carInfoList;
 
+    /**
+     * 자동차 기본 정보
+     */
     @Getter
     @AllArgsConstructor
     @Builder
@@ -34,6 +40,9 @@ public class MainPageCarResponseDto {
         private List<CarDetailInfo> carDetailInfoList;
     }
 
+    /**
+     * 자동차 상세 정보
+     */
     @Getter
     @AllArgsConstructor
     @Builder

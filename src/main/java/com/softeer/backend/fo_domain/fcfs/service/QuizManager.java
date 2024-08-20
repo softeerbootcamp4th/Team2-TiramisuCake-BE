@@ -34,6 +34,9 @@ public class QuizManager {
         loadInitialData();
     }
 
+    /**
+     * 선착순 퀴즈 정보를 초기화하는 메서드
+     */
     public void loadInitialData() {
 
         List<Quiz> quizs = quizRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -56,6 +59,9 @@ public class QuizManager {
         });
     }
 
+    /**
+     * 현재 시간을 기준으로 다음 선착순 이벤트 문제의 힌트값을 반환하는 메서드
+     */
     public String getHint(){
 
         LocalDateTime now = LocalDateTime.now();
@@ -77,6 +83,9 @@ public class QuizManager {
         return null;
     }
 
+    /**
+     * 현재 Round값에 해당하는 quiz 정보를 담고있는 dto 클래스를 반환하는 메서드
+     */
     public QuizDto getQuiz(int round){
         log.info("quiz: {}", quizList.get(round-1));
         return quizList.get(round - 1);

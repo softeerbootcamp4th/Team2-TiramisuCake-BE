@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * 추첨 참여 정보 엔티티를 위한 레포지토리 클래스
+ */
 @Repository
 public interface DrawParticipationInfoRepository extends JpaRepository<DrawParticipationInfo, Integer> {
     Optional<DrawParticipationInfo> findDrawParticipationInfoByUserId(Integer userId);

@@ -12,6 +12,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * 기대평 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

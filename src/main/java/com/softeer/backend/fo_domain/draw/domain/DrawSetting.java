@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * 추첨 이벤트 설정 엔티티 클래스
+ */
 @Entity
 @Getter
 @Setter

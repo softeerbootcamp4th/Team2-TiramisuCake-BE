@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 선착순 이벤트 정보를 관리하는 클래스
+ * 선착순 이벤트 속성 정보를 관리하는 클래스
  */
 @Slf4j
 @Getter
@@ -45,12 +45,15 @@ public class FcfsSettingManager {
         loadInitialData();
     }
 
+    /**
+     * 선착순 round에 해당하는 선착순 설정 정보 Dto를 반환하는 메서드
+     */
     public FcfsSettingDto getFcfsSettingByRound(int round) {
         return fcfsSettingList.get(round - 1);
     }
 
     /**
-     * round 1에 해당하는 선착순 이벤트 속성으로 초기화
+     * 선착순 이벤트 속성 정보를 DB에서 가져와서 초기화하는 메서드
      */
     public void loadInitialData() {
 
@@ -71,6 +74,9 @@ public class FcfsSettingManager {
         });
     }
 
+    /**
+     * 인수로 넘어온 선착순 설정 정보를 바인딩하는 메서드
+     */
     public void setFcfsSettingList(List<FcfsSetting> fcfsSettings){
 
         fcfsSettings.forEach((fcfsSetting) -> {
@@ -83,6 +89,9 @@ public class FcfsSettingManager {
         });
     }
 
+    /**
+     * 인수로 넘어온 날짜값에 해당하는 선착순 rount값을 반환하는 메서드
+     */
     public int getRoundForScheduler(LocalDate localDate) {
         for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             if (fcfsSettingDto != null) {
@@ -98,10 +107,16 @@ public class FcfsSettingManager {
         return -1;  // 해당하는 데이터가 없는 경우
     }
 
+    /**
+     * 선착순 이벤트 당첨 가능한 인원수를 반환하는 메서드
+     */
     public int getFcfsWinnerNum(){
         return fcfsSettingList.get(0).getWinnerNum();
     }
 
+    /**
+     * 현재 시간을 기준으로 선착순 이벤트가 활성화 되어 있는지를 반환하는 메서드
+     */
     public boolean isFcfsEntryAvailable(LocalDateTime now){
         for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
@@ -115,6 +130,9 @@ public class FcfsSettingManager {
         return false;
     }
 
+    /**
+     * 현재 시간에 해당하는 선착순 이벤트의 round값을 반환하는 메서드
+     */
     public Integer getFcfsRound(LocalDateTime now){
 
         for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
@@ -129,6 +147,9 @@ public class FcfsSettingManager {
         return null;
     }
 
+    /**
+     * 현재 시간을 기준으로 다음 선착순 이벤트의 시작 시간을 반환하는 메서드
+     */
     public LocalDateTime getNextFcfsTime(LocalDateTime now){
 
         for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){

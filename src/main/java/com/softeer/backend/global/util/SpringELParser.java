@@ -1,6 +1,7 @@
 package com.softeer.backend.global.util;
 
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -16,6 +17,6 @@ public class SpringELParser {
             context.setVariable(parameterNames[i], args[i]);
         }
 
-        return parser.parseExpression(key).getValue(context, Object.class);
+        return parser.parseExpression(key, new TemplateParserContext()).getValue(context, Object.class);
     }
 }

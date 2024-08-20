@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawWinnerListResponseDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.dto.winner</a> &gt; <span class="el_source">DrawWinnerListResponseDto.java</span></div><h1>DrawWinnerListResponseDto.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.dto.winner;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.softeer.backend.bo_domain.admin.serializer.PhoneNumberSerializer;
+import com.softeer.backend.fo_domain.draw.domain.Draw;
+import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
+import lombok.*;
+
+import java.util.Comparator;
+import java.util.List;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@Getter
+public class DrawWinnerListResponseDto {
+
+    int rank;
+
+    private List&lt;DrawWinner&gt; drawWinnerList;
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class DrawWinner {
+
+        private String name;
+
+        @JsonSerialize(using = PhoneNumberSerializer.class)
+        private String phoneNumber;
+    }
+
+    public static DrawWinnerListResponseDto of(List&lt;Draw&gt; drawList, int rank) {
+<span class="nc" id="L34">        List&lt;DrawWinner&gt; drawWinnerList = drawList.stream()</span>
+<span class="nc" id="L35">                .map((draw) -&gt; DrawWinner.builder()</span>
+<span class="nc" id="L36">                        .name(draw.getUser().getName())</span>
+<span class="nc" id="L37">                        .phoneNumber(draw.getUser().getPhoneNumber())</span>
+<span class="nc" id="L38">                        .build())</span>
+<span class="nc" id="L39">                .sorted(Comparator.comparing(DrawWinnerListResponseDto.DrawWinner::getName))</span>
+<span class="nc" id="L40">                .toList();</span>
+
+<span class="nc" id="L42">        return DrawWinnerListResponseDto.builder()</span>
+<span class="nc" id="L43">                .rank(rank)</span>
+<span class="nc" id="L44">                .drawWinnerList(drawWinnerList)</span>
+<span class="nc" id="L45">                .build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

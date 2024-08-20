@@ -9,8 +9,8 @@ public class SchedulerConfig {
     @Bean
     public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(1);
-        taskScheduler.setThreadNamePrefix("DbInsertScheduler-");
+        taskScheduler.setPoolSize(2);
+        taskScheduler.setThreadNamePrefix("Scheduler-");
         return taskScheduler;
     }
 }

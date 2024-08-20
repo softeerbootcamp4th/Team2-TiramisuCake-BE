@@ -4,6 +4,7 @@ import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
+import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageCarResponseDto;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventInfoResponseDto;
 import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventStaticResponseDto;
@@ -40,6 +41,7 @@ public class MainPageService {
     private final EventLockRedisUtil eventLockRedisUtil;
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
+    private final QuizManager quizManager;
     private final DrawRepository drawRepository;
     private final StaticResourceUtil staticResourceUtil;
 
@@ -99,6 +101,7 @@ public class MainPageService {
                         textContentMap.get(StaticTextName.TOTAL_DRAW_WINNER.name()), decimalFormat.format(totalDrawWinner)))
                 .remainDrawCount(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.REMAIN_DRAW_COUNT.name()), decimalFormat.format(remainDrawCount)))
+                .fcfsHint(quizManager.getHint())
                 .fcfsStartTime(fcfsSettingManager.getNextFcfsTime(LocalDateTime.now()))
                 .build();
     }

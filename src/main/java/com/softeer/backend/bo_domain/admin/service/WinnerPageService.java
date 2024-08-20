@@ -32,13 +32,11 @@ public class WinnerPageService {
     private final DrawRepository drawRepository;
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
-    private final FcfsSettingManager fcfsSettingManager;
-    private final DrawSettingManager drawSettingManager;
 
     @Transactional(readOnly = true)
     public WinnerPageResponseDto getWinnerPage() {
 
-        return WinnerPageResponseDto.of(fcfsSettingManager, drawSettingManager);
+        return WinnerPageResponseDto.of(fcfsSettingRepository.findAll(), drawSettingRepository.findAll().get(0));
     }
 
     @Transactional(readOnly = true)
@@ -60,8 +58,6 @@ public class WinnerPageService {
         List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll();
 
         fcfsSettingList.forEach((fcfsSetting) -> fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum()));
-
-        fcfsSettingManager.setFcfsWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum());
     }
 
     @Transactional
@@ -71,9 +67,5 @@ public class WinnerPageService {
         drawSetting.setWinnerNum1(drawWinnerUpdateRequestDto.getFirstWinnerNum());
         drawSetting.setWinnerNum2(drawWinnerUpdateRequestDto.getSecondWinnerNum());
         drawSetting.setWinnerNum3(drawWinnerUpdateRequestDto.getThirdWinnerNum());
-
-        drawSettingManager.setDrawWinnerNum(drawWinnerUpdateRequestDto.getFirstWinnerNum(),
-                drawWinnerUpdateRequestDto.getSecondWinnerNum(),
-                drawWinnerUpdateRequestDto.getThirdWinnerNum());
     }
 }

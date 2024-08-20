@@ -40,6 +40,7 @@ public class FcfsService {
 
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
+    private final QuizManager quizManager;
     private final FcfsRedisUtil fcfsRedisUtil;
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
@@ -47,7 +48,7 @@ public class FcfsService {
 
     public FcfsPageResponseDto getFcfsPage(int round) {
 
-        QuizDto quiz = fcfsSettingManager.getQuiz(round);
+        QuizDto quiz = quizManager.getQuiz(round);
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
         return FcfsPageResponseDto.builder()
@@ -62,7 +63,7 @@ public class FcfsService {
 
     public FcfsPageResponseDto getFcfsTutorialPage() {
 
-        QuizDto tutorialQuiz = fcfsSettingManager.getTutorialQuiz();
+        QuizDto tutorialQuiz = quizManager.getTutorialQuiz();
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
         return FcfsPageResponseDto.builder()
@@ -81,9 +82,9 @@ public class FcfsService {
      */
     public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
 
-        if(!fcfsRequestDto.getAnswer().equals(fcfsSettingManager.getQuiz(round).getAnswerWord())) {
+        if(!fcfsRequestDto.getAnswer().equals(quizManager.getQuiz(round).getAnswerWord())) {
             log.error("fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}",
-                    fcfsSettingManager.getQuiz(round).getAnswerWord(), fcfsRequestDto.getAnswer());
+                    quizManager.getQuiz(round).getAnswerWord(), fcfsRequestDto.getAnswer());
             throw new FcfsException(ErrorStatus._BAD_REQUEST);
         }
 

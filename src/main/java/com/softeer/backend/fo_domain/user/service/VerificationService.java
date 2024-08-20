@@ -3,6 +3,7 @@ package com.softeer.backend.fo_domain.user.service;
 import com.softeer.backend.fo_domain.user.constatnt.RedisVerificationPrefix;
 import com.softeer.backend.fo_domain.user.constatnt.VerificationProperty;
 import com.softeer.backend.fo_domain.user.dto.verification.VerificationCodeResponseDto;
+import com.softeer.backend.fo_domain.user.dto.verification.VerificationCodeTestResponseDto;
 import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.properties.SmsProperties;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
@@ -75,6 +76,39 @@ public class VerificationService {
                 VerificationProperty.TIME_LIMIT.getValue());
 
         return VerificationCodeResponseDto.builder()
+                .timeLimit(VerificationProperty.TIME_LIMIT.getValue())
+                .build();
+    }
+
+    public VerificationCodeTestResponseDto sendVerificationCodeTest(String phoneNumber) {
+
+        // 인증코드 발급이 처음이면 redis에 발급 횟수를 저장(유효 기간: 밤 12시 전까지)
+        if (!stringRedisUtil.hasKey(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix() + phoneNumber)) {
+            stringRedisUtil.setDataExpireAt(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix(),
+                    String.valueOf(1), LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1));
+
+        }
+        // 인증코드 발급 제한 횟수를 초과하면 예외 발생
+        else {
+            long issueCount = stringRedisUtil.incrementData(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix() + phoneNumber);
+            if (issueCount > VerificationProperty.CODE_ISSUE_ATTEMPTS.getValue()) {
+                log.error("Exceeded the number of code issuance attempts.");
+                throw new UserException(ErrorStatus._AUTH_CODE_ISSUE_LIMIT_EXCEEDED);
+            }
+        }
+
+        // 인증코드의 인증 횟수 삭제 (초기화 기능)
+        stringRedisUtil.deleteData(RedisVerificationPrefix.VERIFICATION_ATTEMPTS.getPrefix() + phoneNumber);
+
+        String verificationCode = randomCodeUtil.generateRandomCode(
+                VerificationProperty.CODE_LENGTH.getValue());
+
+        // 인증코드 저장(유효시간 설정)
+        stringRedisUtil.setDataExpire(RedisVerificationPrefix.VERIFICATION_CODE.getPrefix() + phoneNumber, verificationCode,
+                VerificationProperty.TIME_LIMIT.getValue());
+
+        return VerificationCodeTestResponseDto.builder()
+                .verificationCode(verificationCode)
                 .timeLimit(VerificationProperty.TIME_LIMIT.getValue())
                 .build();
     }

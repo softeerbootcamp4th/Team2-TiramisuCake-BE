@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -30,5 +31,5 @@ public class Draw {
     private Integer rank;
 
     @Column(name = "winning_date")
-    private LocalDateTime winningDate;
+    private LocalDate winningDate;
 }

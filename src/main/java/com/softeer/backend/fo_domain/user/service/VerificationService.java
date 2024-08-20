@@ -44,7 +44,7 @@ public class VerificationService {
 
         // 인증코드 발급이 처음이면 redis에 발급 횟수를 저장(유효 기간: 밤 12시 전까지)
         if (!stringRedisUtil.hasKey(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix() + phoneNumber)) {
-            stringRedisUtil.setDataExpireAt(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix(),
+            stringRedisUtil.setDataExpireAt(RedisVerificationPrefix.VERIFICATION_ISSUE_COUNT.getPrefix() + phoneNumber,
                     String.valueOf(1), LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1));
 
         }

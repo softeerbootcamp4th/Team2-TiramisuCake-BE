@@ -17,7 +17,4 @@ public interface ShareUrlInfoRepository extends JpaRepository<ShareUrlInfo, Inte
     Optional<Integer> findUserIdByShareUrl(String shareUrl);
 
     boolean existsByShareUrl(String shareUrl);
-
-    @Query("SELECT s.shareUrl FROM ShareUrlInfo s")
-    List<String> findAllShareUrl();
 }

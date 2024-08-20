@@ -56,11 +56,11 @@ public class DbInsertScheduler {
     }
 
     public void scheduleTask() {
-        scheduledFuture = taskScheduler.schedule(this::insertDate, new CronTrigger("0 0 2 * * *"));
+        scheduledFuture = taskScheduler.schedule(this::insertData, new CronTrigger("0 0 2 * * *"));
     }
 
     @Transactional
-    protected void insertDate() {
+    protected void insertData() {
         LocalDate now = LocalDate.now();
         if (now.isBefore(drawSettingManager.getStartDate().plusDays(1)))
             return;
@@ -97,7 +97,7 @@ public class DbInsertScheduler {
             fcfsParticipantCount += fcfsRedisUtil.getValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
 
             fcfsRedisUtil.clearValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
-            fcfsRedisUtil.clearIntegerSet(RedisKeyPrefix.FCFS_LOCK_PREFIX.getPrefix() + round);
+            fcfsRedisUtil.clearIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);
             fcfsRedisUtil.clearStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round);
             fcfsRedisUtil.clearHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
         }

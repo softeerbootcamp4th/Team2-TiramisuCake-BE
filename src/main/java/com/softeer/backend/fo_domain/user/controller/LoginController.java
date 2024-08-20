@@ -16,7 +16,7 @@ public class LoginController {
 
     @PostMapping("/login")
     ResponseDto<JwtTokenResponseDto> handleLogin(@Valid @RequestBody LoginRequestDto loginRequestDto,
-                                                 @RequestHeader(value = "shareCode", required = false) String shareCode) {
+                                                 @RequestHeader(value = "X-Share-Code", required = false) String shareCode) {
         JwtTokenResponseDto jwtTokenResponseDto = loginService.handleLogin(loginRequestDto, shareCode);
 
         return ResponseDto.onSuccess(jwtTokenResponseDto);

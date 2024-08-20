@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WinnerPageService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.service</a> &gt; <span class="el_source">WinnerPageService.java</span></div><h1>WinnerPageService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.service;
+
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
+import com.softeer.backend.bo_domain.admin.dto.winner.*;
+import com.softeer.backend.bo_domain.admin.exception.AdminException;
+import com.softeer.backend.fo_domain.draw.domain.Draw;
+import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
+import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
+import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
+import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
+import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
+import com.softeer.backend.fo_domain.user.repository.UserRepository;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+<span class="nc" id="L26">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class WinnerPageService {
+
+    private final FcfsRepository fcfsRepository;
+    private final DrawRepository drawRepository;
+    private final FcfsSettingRepository fcfsSettingRepository;
+    private final DrawSettingRepository drawSettingRepository;
+
+    @Transactional(readOnly = true)
+    public WinnerPageResponseDto getWinnerPage() {
+
+<span class="nc" id="L39">        return WinnerPageResponseDto.of(fcfsSettingRepository.findAll(), drawSettingRepository.findAll().get(0));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public FcfsWinnerListResponseDto getFcfsWinnerList(int round) {
+<span class="nc" id="L44">        List&lt;Fcfs&gt; fcfsList = fcfsRepository.findFcfsWithUser(round);</span>
+
+<span class="nc" id="L46">        return FcfsWinnerListResponseDto.of(fcfsList, round);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public DrawWinnerListResponseDto getDrawWinnerList(int rank) {
+<span class="nc" id="L51">        List&lt;Draw&gt; drawList = drawRepository.findDrawWithUser(rank);</span>
+
+<span class="nc" id="L53">        return DrawWinnerListResponseDto.of(drawList, rank);</span>
+    }
+
+    @Transactional
+    public void updateFcfsWinnerNum(FcfsWinnerUpdateRequestDto fcfsWinnerUpdateRequestDto) {
+<span class="nc" id="L58">        List&lt;FcfsSetting&gt; fcfsSettingList = fcfsSettingRepository.findAll();</span>
+
+<span class="nc" id="L60">        fcfsSettingList.forEach((fcfsSetting) -&gt; fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum()));</span>
+<span class="nc" id="L61">    }</span>
+
+    @Transactional
+    public void updateDrawWinnerNum(DrawWinnerUpdateRequestDto drawWinnerUpdateRequestDto) {
+<span class="nc" id="L65">        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);</span>
+
+<span class="nc" id="L67">        drawSetting.setWinnerNum1(drawWinnerUpdateRequestDto.getFirstWinnerNum());</span>
+<span class="nc" id="L68">        drawSetting.setWinnerNum2(drawWinnerUpdateRequestDto.getSecondWinnerNum());</span>
+<span class="nc" id="L69">        drawSetting.setWinnerNum3(drawWinnerUpdateRequestDto.getThirdWinnerNum());</span>
+<span class="nc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

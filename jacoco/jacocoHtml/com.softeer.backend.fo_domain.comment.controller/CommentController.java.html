@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.comment.controller</a> &gt; <span class="el_source">CommentController.java</span></div><h1>CommentController.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.comment.controller;
+
+import com.softeer.backend.fo_domain.comment.dto.CommentsResponseDto;
+import com.softeer.backend.fo_domain.comment.exception.CommentException;
+import com.softeer.backend.fo_domain.comment.service.CommentService;
+import com.softeer.backend.global.annotation.AuthInfo;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+<span class="nc" id="L15">@Slf4j</span>
+@RequiredArgsConstructor
+@RestController
+public class CommentController {
+
+    private final CommentService commentService;
+
+    @GetMapping(&quot;/comment&quot;)
+    ResponseDto&lt;CommentsResponseDto&gt; getComment(@RequestParam(name = &quot;cursor&quot;, required = false) Integer cursor,
+                                                @Parameter(hidden = true) @AuthInfo Integer userId) {
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if (cursor == null) {</span>
+<span class="nc" id="L26">            cursor = Integer.MAX_VALUE;</span>
+        }
+
+<span class="nc" id="L29">        CommentsResponseDto commentsResponseDto = commentService.getComments(userId, cursor);</span>
+
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (commentsResponseDto.getNextCursor() != CommentsResponseDto.LAST_CURSOR)</span>
+<span class="nc" id="L32">            return ResponseDto.onSuccess(commentsResponseDto);</span>
+
+<span class="nc" id="L34">        return ResponseDto.onSuccess(commentsResponseDto);</span>
+    }
+
+    @PostMapping(&quot;/comment&quot;)
+    ResponseDto&lt;Void&gt; saveComment(@RequestParam(name = &quot;commentType&quot;) Integer commentType,
+                                  @Parameter(hidden = true) @AuthInfo Integer userId) {
+
+<span class="nc bnc" id="L41" title="All 6 branches missed.">        if(commentType == null || commentType&lt;1 || commentType &gt; 5){</span>
+
+<span class="nc" id="L43">            log.error(&quot;Invalid commentType value: {}. It must be between 1 and 5.&quot;, commentType);</span>
+<span class="nc" id="L44">            throw new CommentException(ErrorStatus._VALIDATION_ERROR);</span>
+        }
+
+<span class="nc" id="L47">        commentService.saveComment(userId, commentType);</span>
+
+<span class="nc" id="L49">        return ResponseDto.onSuccess();</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

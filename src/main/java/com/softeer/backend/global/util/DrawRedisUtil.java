@@ -55,7 +55,7 @@ public class DrawRedisUtil {
         return 0;
     }
 
-    @EventLock(key = "LOCK:DRAW_WINNER_LIST_#{#ranking}")
+    @EventLock(key = "DRAW_WINNER")
     public boolean isWinner(Integer userId, int ranking, int winnerNum) {
         String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
         Long winnerSetSize = getIntegerSetSize(drawWinnerKey);

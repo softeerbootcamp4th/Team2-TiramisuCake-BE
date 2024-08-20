@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScrollPaginationUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.comment.util</a> &gt; <span class="el_source">ScrollPaginationUtil.java</span></div><h1>ScrollPaginationUtil.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.comment.util;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * 커서 기반 스크롤 기능을 사용할 수 있는 Util 클래스
+ */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class ScrollPaginationUtil&lt;T&gt; {
+
+    // 마지막 스크롤인지를 확인하기 위해서 size+1의 개수만큼 item을 저장한다.
+    private final List&lt;T&gt; itemsWithNextCursor;
+
+    // 한번 스크롤 할 때의 데이터 개수
+    private final int countPerScroll;
+
+    public static &lt;T&gt; ScrollPaginationUtil&lt;T&gt; of(List&lt;T&gt; itemsWithNextCursor, int size) {
+<span class="nc" id="L23">        return new ScrollPaginationUtil&lt;&gt;(itemsWithNextCursor, size);</span>
+    }
+
+    // 마지막 스크롤인지를 확인하는 메서드
+    public boolean isLastScroll() {
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        return this.itemsWithNextCursor.size() &lt;= countPerScroll;</span>
+    }
+
+    // 마지막 스크롤일 경우, 그대로 데이터를 반환한다.
+    // 마지막 스크롤이 아닌 경우, 마지막 데이터를 제외하고 반환한다.
+    public List&lt;T&gt; getCurrentScrollItems() {
+        List&lt;T&gt; itemsList;
+
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (isLastScroll()) {</span>
+<span class="nc" id="L37">            itemsList = new ArrayList&lt;&gt;(this.itemsWithNextCursor);</span>
+        }
+        else{
+<span class="nc" id="L40">            itemsList = new ArrayList&lt;&gt;(itemsWithNextCursor.subList(0, countPerScroll));</span>
+        }
+<span class="nc" id="L42">        Collections.reverse(itemsList);</span>
+
+<span class="nc" id="L44">        return itemsList;</span>
+    }
+
+    // 다음 커서 값을 갖고 있는 데이터를 반환하는 메서드
+    public T getNextCursor() {
+<span class="nc" id="L49">        return itemsWithNextCursor.get(countPerScroll-1);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

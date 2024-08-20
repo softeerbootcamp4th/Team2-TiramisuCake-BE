@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShareUrlInfoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.share.service</a> &gt; <span class="el_source">ShareUrlInfoService.java</span></div><h1>ShareUrlInfoService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.share.service;
+
+import com.softeer.backend.fo_domain.share.dto.ShareUrlInfoResponseDto;
+import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
+import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class ShareUrlInfoService {
+    public static final String NON_USER_SHARE_URL = &quot;https://softeer.site&quot;;
+    public static final String BASE_URL = &quot;https://softeer.site/share/&quot;;
+
+    private final ShareUrlInfoRepository shareUrlInfoRepository;
+
+    public ShareUrlInfoResponseDto getShortenShareUrl(Integer userId) {
+<span class="nc bnc" id="L19" title="All 2 branches missed.">        if (userId == null) {</span>
+            // 로그인하지 않은 사용자
+<span class="nc" id="L21">            return ShareUrlInfoResponseDto.builder()</span>
+<span class="nc" id="L22">                    .shareUrl(NON_USER_SHARE_URL)</span>
+<span class="nc" id="L23">                    .build();</span>
+        } else {
+            // 로그인한 사용자
+<span class="nc" id="L26">            String shareCode = shareUrlInfoRepository.findShareUrlByUserId(userId).orElseThrow(</span>
+<span class="nc" id="L27">                    () -&gt; new ShareInfoException(ErrorStatus._NOT_FOUND)</span>
+            );
+
+            // DB에 이미 생성된 단축 url 코드 반환
+<span class="nc" id="L31">            return ShareUrlInfoResponseDto.builder()</span>
+<span class="nc" id="L32">                    .shareUrl(BASE_URL + shareCode)</span>
+<span class="nc" id="L33">                    .build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

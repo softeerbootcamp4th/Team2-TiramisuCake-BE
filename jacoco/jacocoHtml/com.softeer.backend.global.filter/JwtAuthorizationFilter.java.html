@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthorizationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.filter</a> &gt; <span class="el_source">JwtAuthorizationFilter.java</span></div><h1>JwtAuthorizationFilter.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.filter;
+
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RoleType;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
+import com.softeer.backend.global.common.exception.JwtAuthorizationException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.PatternMatchUtils;
+import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+/**
+ * 유저의 권한을 검증하는 필터 클래스
+ */
+<span class="nc" id="L22">@Slf4j</span>
+@NoArgsConstructor
+public class JwtAuthorizationFilter extends OncePerRequestFilter {
+
+    // 인가검사를 하지 않는 url 설정
+    private final String[] whiteListUrls = {
+            &quot;/admin/login&quot;, &quot;/admin/signup&quot;
+    };
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+<span class="nc bnc" id="L34" title="All 4 branches missed.">        if(CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())){</span>
+<span class="nc" id="L35">            filterChain.doFilter(request, response);</span>
+<span class="nc" id="L36">            return;</span>
+        }
+
+
+<span class="nc" id="L40">        JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) request.getAttribute(&quot;jwtClaims&quot;);</span>
+
+<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (jwtClaimsDto == null || jwtClaimsDto.getRoleType() != RoleType.ROLE_ADMIN) {</span>
+
+<span class="nc" id="L44">            log.error(&quot;JwtAuthorizationException has occurred&quot;);</span>
+<span class="nc" id="L45">            throw new JwtAuthorizationException(ErrorStatus._FORBIDDEN);</span>
+        }
+
+<span class="nc" id="L48">        filterChain.doFilter(request, response);</span>
+<span class="nc" id="L49">    }</span>
+
+    private boolean isUriInWhiteList(String url) {
+<span class="nc" id="L52">        return PatternMatchUtils.simpleMatch(whiteListUrls, url);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

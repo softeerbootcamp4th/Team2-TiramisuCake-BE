@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FcfsSettingManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.fcfs.service</a> &gt; <span class="el_source">FcfsSettingManager.java</span></div><h1>FcfsSettingManager.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.fcfs.service;
+
+import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
+import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
+import com.softeer.backend.fo_domain.fcfs.domain.Quiz;
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
+import com.softeer.backend.fo_domain.fcfs.dto.QuizDto;
+import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
+import com.softeer.backend.fo_domain.fcfs.repository.QuizRepository;
+import com.softeer.backend.global.util.EventLockRedisUtil;
+import jakarta.annotation.PostConstruct;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 선착순 이벤트 정보를 관리하는 클래스
+ */
+<span class="nc" id="L26">@Slf4j</span>
+@Getter
+@Component
+@RequiredArgsConstructor
+public class FcfsSettingManager {
+
+    private final FcfsSettingRepository fcfsSettingRepository;
+    private final ThreadPoolTaskScheduler taskScheduler;
+    private final EventLockRedisUtil eventLockRedisUtil;
+    private final EventParticipationRepository eventParticipationRepository;
+    private final QuizRepository quizRepository;
+
+    private List&lt;FcfsSettingDto&gt; fcfsSettingList;
+
+    @Setter
+    private boolean isFcfsClosed = false;
+
+    @PostConstruct
+    public void init() {
+<span class="nc" id="L45">        loadInitialData();</span>
+<span class="nc" id="L46">    }</span>
+
+    public FcfsSettingDto getFcfsSettingByRound(int round) {
+<span class="nc" id="L49">        return fcfsSettingList.get(round - 1);</span>
+    }
+
+    /**
+     * round 1에 해당하는 선착순 이벤트 속성으로 초기화
+     */
+    public void loadInitialData() {
+
+<span class="nc" id="L57">        List&lt;FcfsSetting&gt; fcfsSettings = fcfsSettingRepository.findAll();</span>
+<span class="nc" id="L58">        fcfsSettingList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        for (int i = 0; i &lt; 4; i++) {</span>
+<span class="nc" id="L61">            fcfsSettingList.add(null);  // 인덱스 0부터 3까지 빈 슬롯을 추가</span>
+        }
+
+<span class="nc" id="L64">        fcfsSettings.forEach((fcfsSetting) -&gt; {</span>
+<span class="nc" id="L65">            fcfsSettingList.set(fcfsSetting.getRound() - 1, FcfsSettingDto.builder()</span>
+<span class="nc" id="L66">                    .round(fcfsSetting.getRound())</span>
+<span class="nc" id="L67">                    .startTime(fcfsSetting.getStartTime())</span>
+<span class="nc" id="L68">                    .endTime(fcfsSetting.getEndTime())</span>
+<span class="nc" id="L69">                    .winnerNum(fcfsSetting.getWinnerNum())</span>
+<span class="nc" id="L70">                    .build());</span>
+<span class="nc" id="L71">        });</span>
+<span class="nc" id="L72">    }</span>
+
+    public void setFcfsSettingList(List&lt;FcfsSetting&gt; fcfsSettings){
+
+<span class="nc" id="L76">        fcfsSettings.forEach((fcfsSetting) -&gt; {</span>
+<span class="nc" id="L77">            fcfsSettingList.set(fcfsSetting.getRound() - 1, FcfsSettingDto.builder()</span>
+<span class="nc" id="L78">                    .round(fcfsSetting.getRound())</span>
+<span class="nc" id="L79">                    .startTime(fcfsSetting.getStartTime())</span>
+<span class="nc" id="L80">                    .endTime(fcfsSetting.getEndTime())</span>
+<span class="nc" id="L81">                    .winnerNum(fcfsSetting.getWinnerNum())</span>
+<span class="nc" id="L82">                    .build());</span>
+<span class="nc" id="L83">        });</span>
+<span class="nc" id="L84">    }</span>
+
+    public int getRoundForScheduler(LocalDate localDate) {
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">            if (fcfsSettingDto != null) {</span>
+<span class="nc" id="L89">                LocalDate startDate = fcfsSettingDto.getStartTime().toLocalDate();</span>
+<span class="nc" id="L90">                LocalDate dayAfterStartDate = startDate.plusDays(1);</span>
+
+                // localDate가 startDate의 하루 다음날과 같은지 확인
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                if (localDate.equals(dayAfterStartDate)) {</span>
+<span class="nc" id="L94">                    return fcfsSettingDto.getRound();</span>
+                }
+            }
+<span class="nc" id="L97">        }</span>
+<span class="nc" id="L98">        return -1;  // 해당하는 데이터가 없는 경우</span>
+    }
+
+    public int getFcfsWinnerNum(){
+<span class="nc" id="L102">        return fcfsSettingList.get(0).getWinnerNum();</span>
+    }
+
+    public boolean isFcfsEntryAvailable(LocalDateTime now){
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){</span>
+<span class="nc" id="L107">            LocalDateTime startTime = fcfsSettingDto.getStartTime();</span>
+<span class="nc" id="L108">            LocalDateTime endTime = fcfsSettingDto.getEndTime();</span>
+
+<span class="nc bnc" id="L110" title="All 4 branches missed.">            if((now.isEqual(startTime) || now.isAfter(startTime))</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">                    &amp;&amp; (now.isEqual(endTime) || now.isBefore(endTime))) {</span>
+<span class="nc" id="L112">                return true;</span>
+            }
+<span class="nc" id="L114">        }</span>
+<span class="nc" id="L115">        return false;</span>
+    }
+
+    public Integer getFcfsRound(LocalDateTime now){
+
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){</span>
+<span class="nc" id="L121">            LocalDateTime startTime = fcfsSettingDto.getStartTime();</span>
+<span class="nc" id="L122">            LocalDateTime endTime = fcfsSettingDto.getEndTime();</span>
+
+<span class="nc bnc" id="L124" title="All 4 branches missed.">            if((now.isEqual(startTime) || now.isAfter(startTime))</span>
+<span class="nc bnc" id="L125" title="All 4 branches missed.">                    &amp;&amp; (now.isEqual(endTime) || now.isBefore(endTime))) {</span>
+<span class="nc" id="L126">                return fcfsSettingDto.getRound();</span>
+            }
+<span class="nc" id="L128">        }</span>
+<span class="nc" id="L129">        return null;</span>
+    }
+
+    public LocalDateTime getNextFcfsTime(LocalDateTime now){
+
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){</span>
+<span class="nc" id="L135">            LocalDateTime startTime = fcfsSettingDto.getStartTime();</span>
+
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if(now.isBefore(startTime)) {</span>
+<span class="nc" id="L138">                return startTime;</span>
+            }
+<span class="nc" id="L140">        }</span>
+<span class="nc" id="L141">        return null;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

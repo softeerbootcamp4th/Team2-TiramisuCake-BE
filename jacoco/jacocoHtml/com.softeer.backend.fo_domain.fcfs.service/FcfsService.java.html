@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FcfsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.fcfs.service</a> &gt; <span class="el_source">FcfsService.java</span></div><h1>FcfsService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.fcfs.service;
+
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.dto.*;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
+import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
+import com.softeer.backend.global.annotation.EventLock;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.constant.StaticTextName;
+import com.softeer.backend.global.staticresources.domain.S3Content;
+import com.softeer.backend.global.staticresources.domain.TextContent;
+import com.softeer.backend.global.staticresources.repository.S3ContentRepository;
+import com.softeer.backend.global.staticresources.repository.TextContentRepository;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
+import com.softeer.backend.global.util.FcfsRedisUtil;
+import com.softeer.backend.global.util.RandomCodeUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 선착순 관련 이벤트를 처리하는 클래스
+ */
+<span class="nc" id="L34">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class FcfsService {
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(&quot;M월 d일&quot;);
+    private final ObjectProvider&lt;FcfsService&gt; fcfsServiceProvider;
+
+    private final FcfsSettingManager fcfsSettingManager;
+    private final DrawSettingManager drawSettingManager;
+    private final QuizManager quizManager;
+    private final FcfsRedisUtil fcfsRedisUtil;
+    private final RandomCodeUtil randomCodeUtil;
+    private final StaticResourceUtil staticResourceUtil;
+
+
+    public FcfsPageResponseDto getFcfsPage(int round) {
+
+<span class="nc" id="L51">        QuizDto quiz = quizManager.getQuiz(round);</span>
+<span class="nc" id="L52">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+
+<span class="nc" id="L54">        return FcfsPageResponseDto.builder()</span>
+<span class="nc" id="L55">                .answerWord(quiz.getAnswerWord())</span>
+<span class="nc" id="L56">                .answerSentence(quiz.getAnswerSentence())</span>
+<span class="nc" id="L57">                .startIndex(quiz.getStartIndex())</span>
+<span class="nc" id="L58">                .endIndex(quiz.getEndIndex())</span>
+<span class="nc" id="L59">                .quizDescription(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_QUIZ_DESCRIPTION.name()),</span>
+<span class="nc" id="L60">                        fcfsSettingManager.getFcfsWinnerNum()))</span>
+<span class="nc" id="L61">                .build();</span>
+    }
+
+    public FcfsPageResponseDto getFcfsTutorialPage() {
+
+<span class="nc" id="L66">        QuizDto tutorialQuiz = quizManager.getTutorialQuiz();</span>
+<span class="nc" id="L67">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+
+<span class="nc" id="L69">        return FcfsPageResponseDto.builder()</span>
+<span class="nc" id="L70">                .answerWord(tutorialQuiz.getAnswerWord())</span>
+<span class="nc" id="L71">                .answerSentence(tutorialQuiz.getAnswerSentence())</span>
+<span class="nc" id="L72">                .startIndex(tutorialQuiz.getStartIndex())</span>
+<span class="nc" id="L73">                .endIndex(tutorialQuiz.getEndIndex())</span>
+<span class="nc" id="L74">                .quizDescription(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_QUIZ_DESCRIPTION.name()),</span>
+<span class="nc" id="L75">                        fcfsSettingManager.getFcfsWinnerNum()))</span>
+<span class="nc" id="L76">                .build();</span>
+    }
+
+    /**
+     * 1. 선착순 당첨자가 아직 다 결정되지 않았으면, 선착순 당첨 응답 생성 및 반환
+     * 2. 선착순 당첨자가 다 결정됐다면, Redisson lock을 사용하지 않고 Redis에 저장된 선착순 이벤트 참여자 수를 1명씩 더한다.
+     */
+    public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if(!fcfsRequestDto.getAnswer().equals(quizManager.getQuiz(round).getAnswerWord())) {</span>
+<span class="nc" id="L86">            log.error(&quot;fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}&quot;,</span>
+<span class="nc" id="L87">                    quizManager.getQuiz(round).getAnswerWord(), fcfsRequestDto.getAnswer());</span>
+<span class="nc" id="L88">            throw new FcfsException(ErrorStatus._BAD_REQUEST);</span>
+        }
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (fcfsSettingManager.isFcfsClosed()){</span>
+<span class="nc" id="L92">            countFcfsParticipant(round);</span>
+
+<span class="nc" id="L94">            return getFcfsResult(false, null);</span>
+        }
+<span class="nc" id="L96">        FcfsService fcfsService = fcfsServiceProvider.getObject();</span>
+<span class="nc" id="L97">        return fcfsService.saveFcfsWinners(userId, round);</span>
+    }
+
+    @EventLock(key = &quot;FCFS_#{#round}&quot;)
+    public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
+
+<span class="nc" id="L103">        long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (numOfWinners &lt; fcfsSettingManager.getFcfsWinnerNum()</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                &amp;&amp; !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId)) {</span>
+
+            // redis에 userId 등록
+<span class="nc" id="L109">            fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId);</span>
+
+            // redis에 code 등록
+<span class="nc" id="L112">            String code = makeFcfsCode(round);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {</span>
+<span class="nc" id="L114">                code = makeFcfsCode(round);</span>
+            }
+<span class="nc" id="L116">            fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);</span>
+
+            // redis에 code-userId 형태로 등록(hash)
+<span class="nc" id="L119">            fcfsRedisUtil.addToHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round, code, userId);</span>
+
+            // redis에 선착순 참가자 수 +1
+<span class="nc" id="L122">            countFcfsParticipant(round);</span>
+
+            // 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClodes 변수값을 true로 설정
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (numOfWinners + 1 == fcfsSettingManager.getFcfsWinnerNum()) {</span>
+<span class="nc" id="L126">                fcfsSettingManager.setFcfsClosed(true);</span>
+            }
+
+<span class="nc" id="L129">            return getFcfsResult(true, code);</span>
+        }
+
+<span class="nc" id="L132">        return getFcfsResult(false, null);</span>
+
+    }
+
+    private String makeFcfsCode(int round){
+<span class="nc" id="L137">        return (char)('A'+round-1) + randomCodeUtil.generateRandomCode(5);</span>
+    }
+
+    private void countFcfsParticipant(int round) {
+<span class="nc" id="L141">        fcfsRedisUtil.incrementValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);</span>
+<span class="nc" id="L142">    }</span>
+
+    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode){
+
+<span class="nc" id="L146">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+<span class="nc" id="L147">        Map&lt;String, String&gt; s3ContentMap = staticResourceUtil.getS3ContentMap();</span>
+
+<span class="nc" id="L149">        FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);</span>
+
+<span class="nc" id="L151">        FcfsService fcfsService = fcfsServiceProvider.getObject();</span>
+
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if(fcfsWin){</span>
+<span class="nc" id="L154">            FcfsSuccessResult fcfsSuccessResult = fcfsService.getFcfsSuccessResult(</span>
+                    textContentMap, s3ContentMap, firstFcfsSetting
+            );
+<span class="nc" id="L157">            fcfsSuccessResult.setFcfsCode(fcfsCode);</span>
+
+<span class="nc" id="L159">            return FcfsResultResponseDto.builder()</span>
+<span class="nc" id="L160">                    .isFcfsWinner(fcfsWin)</span>
+<span class="nc" id="L161">                    .fcfsResult(fcfsSuccessResult)</span>
+<span class="nc" id="L162">                    .build();</span>
+        }
+
+<span class="nc" id="L165">        FcfsFailResult fcfsFailResult = fcfsService.getFcfsFailResult(textContentMap);</span>
+
+<span class="nc" id="L167">        return FcfsResultResponseDto.builder()</span>
+<span class="nc" id="L168">                .isFcfsWinner(fcfsWin)</span>
+<span class="nc" id="L169">                .fcfsResult(fcfsFailResult)</span>
+<span class="nc" id="L170">                .build();</span>
+    }
+
+    @Cacheable(value = &quot;staticResources&quot;, key = &quot;'fcfsSuccess'&quot;)
+    public FcfsSuccessResult getFcfsSuccessResult(Map&lt;String, String&gt; textContentMap, Map&lt;String, String&gt; s3ContentMap,
+                                                  FcfsSettingDto firstFcfsSetting){
+
+<span class="nc" id="L177">        return FcfsSuccessResult.builder()</span>
+<span class="nc" id="L178">                .title(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_WINNER_TITLE.name()),</span>
+<span class="nc" id="L179">                        fcfsSettingManager.getFcfsWinnerNum()))</span>
+<span class="nc" id="L180">                .subTitle(textContentMap.get(StaticTextName.FCFS_WINNER_SUBTITLE.name()))</span>
+<span class="nc" id="L181">                .qrCode(s3ContentMap.get(S3FileName.BARCODE_IMAGE.name()))</span>
+<span class="nc" id="L182">                .codeWord(textContentMap.get(StaticTextName.FCFS_WINNER_CODE_WORD.name()))</span>
+<span class="nc" id="L183">                .expirationDate(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_WINNER_EXPIRY_DATE.name()),</span>
+<span class="nc" id="L184">                        firstFcfsSetting.getStartTime().getYear(),</span>
+<span class="nc" id="L185">                        firstFcfsSetting.getStartTime().format(dateFormatter),</span>
+<span class="nc" id="L186">                        drawSettingManager.getEndDate().plusDays(14).format(dateFormatter)))</span>
+<span class="nc" id="L187">                .caution(textContentMap.get(StaticTextName.FCFS_WINNER_CAUTION.name()))</span>
+<span class="nc" id="L188">                .build();</span>
+    }
+
+    @Cacheable(value = &quot;staticResources&quot;, key = &quot;'fcfsFail'&quot;)
+    public FcfsFailResult getFcfsFailResult(Map&lt;String, String&gt; textContentMap){
+
+<span class="nc" id="L194">        return FcfsFailResult.builder()</span>
+<span class="nc" id="L195">                .title(textContentMap.get(StaticTextName.FCFS_LOSER_TITLE.name()))</span>
+<span class="nc" id="L196">                .subTitle(textContentMap.get(StaticTextName.FCFS_LOSER_SUBTITLE.name()))</span>
+<span class="nc" id="L197">                .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))</span>
+<span class="nc" id="L198">                .build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

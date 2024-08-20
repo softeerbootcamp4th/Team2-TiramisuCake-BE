@@ -88,6 +88,12 @@ public class LoginService {
         // 전화번호로 User 객체 조회
         else {
             User user = userRepository.findByPhoneNumber(loginRequestDto.getPhoneNumber());
+
+            if(!user.getName().equals(loginRequestDto.getName()))
+                throw new UserException(ErrorStatus._AUTH_USERNAME_NOT_MATCH);
+
+            user.setMarketingConsent(loginRequestDto.getMarketingConsent());
+
             userId = user.getId();
         }
 

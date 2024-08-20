@@ -3,6 +3,7 @@ package com.softeer.backend.fo_domain.user.controller;
 import com.softeer.backend.fo_domain.user.dto.verification.ConfirmCodeRequestDto;
 import com.softeer.backend.fo_domain.user.dto.verification.VerificationCodeRequestDto;
 import com.softeer.backend.fo_domain.user.dto.verification.VerificationCodeResponseDto;
+import com.softeer.backend.fo_domain.user.dto.verification.VerificationCodeTestResponseDto;
 import com.softeer.backend.fo_domain.user.service.VerificationService;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.validation.Valid;
@@ -22,6 +23,15 @@ public class VerificationController {
     public ResponseDto<VerificationCodeResponseDto> sendVerificationCode(@Valid @RequestBody VerificationCodeRequestDto verificationCodeRequestDto) {
 
         VerificationCodeResponseDto response = verificationService.sendVerificationCode(verificationCodeRequestDto.getPhoneNumber());
+
+        return ResponseDto.onSuccess(response);
+
+    }
+
+    @PostMapping("/send/test")
+    public ResponseDto<VerificationCodeTestResponseDto> sendVerificationCodeTest(@Valid @RequestBody VerificationCodeRequestDto verificationCodeRequestDto) {
+
+        VerificationCodeTestResponseDto response = verificationService.sendVerificationCodeTest(verificationCodeRequestDto.getPhoneNumber());
 
         return ResponseDto.onSuccess(response);
 

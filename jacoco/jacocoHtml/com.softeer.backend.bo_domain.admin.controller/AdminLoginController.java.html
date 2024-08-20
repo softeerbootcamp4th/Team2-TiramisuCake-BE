@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminLoginController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.controller</a> &gt; <span class="el_source">AdminLoginController.java</span></div><h1>AdminLoginController.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.controller;
+
+import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.login.AdminSignUpRequestDto;
+import com.softeer.backend.bo_domain.admin.service.AdminLoginService;
+import com.softeer.backend.global.annotation.AuthInfo;
+import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
+import com.softeer.backend.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(&quot;/admin&quot;)
+public class AdminLoginController {
+
+    private final AdminLoginService adminLoginService;
+
+    @PostMapping(&quot;/login&quot;)
+    ResponseDto&lt;JwtTokenResponseDto&gt; handleLogin(@Valid @RequestBody AdminLoginRequestDto adminLoginRequestDto) {
+<span class="nc" id="L26">        JwtTokenResponseDto jwtTokenResponseDto = adminLoginService.handleLogin(adminLoginRequestDto);</span>
+
+<span class="nc" id="L28">        return ResponseDto.onSuccess(jwtTokenResponseDto);</span>
+    }
+
+    @PostMapping(&quot;/logout&quot;)
+    ResponseDto&lt;Void&gt; handleLogout(@Parameter(hidden = true) @AuthInfo Integer adminId) {
+<span class="nc" id="L33">        adminLoginService.handleLogout(adminId);</span>
+
+<span class="nc" id="L35">        return ResponseDto.onSuccess();</span>
+    }
+
+    @PostMapping(&quot;/signup&quot;)
+    ResponseDto&lt;Void&gt; handleSignUp(@Valid @RequestBody AdminSignUpRequestDto adminSignUpRequestDto) {
+
+<span class="nc" id="L41">        adminLoginService.handleSignUp(adminSignUpRequestDto);</span>
+
+<span class="nc" id="L43">        return ResponseDto.onSuccess();</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

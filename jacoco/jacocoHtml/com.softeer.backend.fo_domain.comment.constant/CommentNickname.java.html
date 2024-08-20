@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommentNickname.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.comment.constant</a> &gt; <span class="el_source">CommentNickname.java</span></div><h1>CommentNickname.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.comment.constant;
+
+import lombok.Getter;
+
+/**
+ * 기대평 닉네임을 관리하는 Enum 클래스
+ */
+<span class="nc" id="L8">@Getter</span>
+public enum CommentNickname {
+<span class="nc" id="L10">    NICKNAME_1(&quot;곰&quot;),</span>
+<span class="nc" id="L11">    NICKNAME_2(&quot;코끼리&quot;),</span>
+<span class="nc" id="L12">    NICKNAME_3(&quot;토끼&quot;),</span>
+<span class="nc" id="L13">    NICKNAME_4(&quot;기린&quot;),</span>
+<span class="nc" id="L14">    NICKNAME_5(&quot;돌고래&quot;),</span>
+<span class="nc" id="L15">    NICKNAME_6(&quot;개구리&quot;),</span>
+<span class="nc" id="L16">    NICKNAME_7(&quot;고양이&quot;),</span>
+<span class="nc" id="L17">    NICKNAME_8(&quot;악어&quot;),</span>
+<span class="nc" id="L18">    NICKNAME_9(&quot;판다&quot;),</span>
+<span class="nc" id="L19">    NICKNAME_10(&quot;호랑이&quot;);</span>
+
+    public static final String NICKNAME_PREFIX = &quot;익명의 &quot;;
+    public static final String MY_NICKNAME_SUFFIX = &quot;(나)&quot;;
+
+    private final String nickname;
+
+<span class="nc" id="L26">    CommentNickname(String nickname) {</span>
+<span class="nc" id="L27">        this.nickname = nickname;</span>
+<span class="nc" id="L28">    }</span>
+
+    // 인증 하지 않은 유저의 닉네임 생성 메서드
+    public static String getRandomNickname() {
+<span class="nc" id="L32">        CommentNickname[] nicknames = values();</span>
+<span class="nc" id="L33">        int index = (int) (Math.random() * nicknames.length);</span>
+<span class="nc" id="L34">        return NICKNAME_PREFIX + nicknames[index].getNickname();</span>
+    }
+
+    // 인증한 유저의 닉네임 생성 메서드
+    public static String getMyRandomNickname(int userId) {
+<span class="nc" id="L39">        CommentNickname[] nicknames = values();</span>
+<span class="nc" id="L40">        int index = userId % nicknames.length;</span>
+<span class="nc" id="L41">        return NICKNAME_PREFIX + nicknames[index].getNickname();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

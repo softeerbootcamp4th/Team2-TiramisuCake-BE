@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EventPageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.controller</a> &gt; <span class="el_source">EventPageController.java</span></div><h1>EventPageController.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.controller;
+
+import com.softeer.backend.bo_domain.admin.dto.event.DrawEventTimeRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;
+import com.softeer.backend.bo_domain.admin.dto.event.FcfsEventTimeRequestDto;
+import com.softeer.backend.bo_domain.admin.service.EventPageService;
+import com.softeer.backend.global.common.response.ResponseDto;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(&quot;/admin/event&quot;)
+public class EventPageController {
+
+    private final EventPageService eventPageService;
+
+    @GetMapping
+    public ResponseDto&lt;EventPageResponseDto&gt; getEventPage() {
+<span class="nc" id="L21">        EventPageResponseDto eventPageResponseDto = eventPageService.getEventPage();</span>
+
+<span class="nc" id="L23">        return ResponseDto.onSuccess(eventPageResponseDto);</span>
+    }
+
+    @PostMapping(&quot;/fcfs&quot;)
+    public ResponseDto&lt;Void&gt; updateFcfsEventTime(@Valid @RequestBody FcfsEventTimeRequestDto fcfsEventTimeRequestDto) {
+<span class="nc" id="L28">        eventPageService.updateFcfsEventTime(fcfsEventTimeRequestDto);</span>
+
+<span class="nc" id="L30">        return ResponseDto.onSuccess();</span>
+    }
+
+    @PostMapping(&quot;/draw&quot;)
+    public ResponseDto&lt;Void&gt; updateDrawEventTime(@Valid @RequestBody DrawEventTimeRequestDto drawEventTimeRequestDto) {
+<span class="nc" id="L35">        eventPageService.updateDrawEventTime(drawEventTimeRequestDto);</span>
+
+<span class="nc" id="L37">        return ResponseDto.onSuccess();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

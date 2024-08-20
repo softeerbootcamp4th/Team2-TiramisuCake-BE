@@ -53,19 +53,15 @@ public class DrawSettingManager {
         winnerNum3 = drawSetting.getWinnerNum3();
     }
 
-    public void setDrawDate(DrawSetting drawSetting) {
+    public void setDrawSetting(DrawSetting drawSetting) {
         this.startDate = drawSetting.getStartDate();
         this.endDate = drawSetting.getEndDate();
-    }
-
-    public void setDrawTime(DrawSetting drawSetting) {
         this.startTime = drawSetting.getStartTime();
         this.endTime = drawSetting.getEndTime();
+
+        this.winnerNum1 = drawSetting.getWinnerNum1();
+        this.winnerNum2 = drawSetting.getWinnerNum2();
+        this.winnerNum3 = drawSetting.getWinnerNum3();
     }
 
-    public void setDrawWinnerNum(int winnerNum1, int winnerNum2, int winnerNum3) {
-        this.winnerNum1 = winnerNum1;
-        this.winnerNum2 = winnerNum2;
-        this.winnerNum3 = winnerNum3;
-    }
 }

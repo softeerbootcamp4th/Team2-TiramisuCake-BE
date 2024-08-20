@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.config.cache</a> &gt; <span class="el_source">CacheConfig.java</span></div><h1>CacheConfig.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.config.cache;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+<span class="nc" id="L15">@Slf4j</span>
+@Configuration
+@EnableCaching
+<span class="nc" id="L18">public class CacheConfig {</span>
+
+    @Bean
+    public CacheManager cacheManager() {
+<span class="nc" id="L22">        CaffeineCacheManager cacheManager = new CaffeineCacheManager();</span>
+<span class="nc" id="L23">        cacheManager.setCaffeine(</span>
+<span class="nc" id="L24">                Caffeine.newBuilder()</span>
+<span class="nc" id="L25">                        .expireAfterAccess(1, TimeUnit.DAYS) //첫 번재 접근 후 1일 경과 후, 제거</span>
+<span class="nc" id="L26">                        .initialCapacity(200) //초기 크기 설정</span>
+<span class="nc" id="L27">                        .softValues() // 값 객체에 대한 부드러움 참조: 메모리가 부족할 때만 GC가 일어남. GC가 수집 대상으로 판단하더라도 GC가 일어나지 않음</span>
+<span class="nc" id="L28">                        .maximumSize(1000) // 최대 크기 설정</span>
+<span class="nc" id="L29">                        .recordStats() // 캐시 지표 기록</span>
+<span class="nc" id="L30">                        .removalListener((key ,value, cause) -&gt; log.debug(&quot;key: {}, value: {}가 제거 되었습니다. cause: {}&quot;, key, value, cause))</span>
+        );
+<span class="nc" id="L32">        return cacheManager;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

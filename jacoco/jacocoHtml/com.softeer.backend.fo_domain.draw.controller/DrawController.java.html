@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.draw.controller</a> &gt; <span class="el_source">DrawController.java</span></div><h1>DrawController.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.draw.controller;
+
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.service.DrawService;
+import com.softeer.backend.global.annotation.AuthInfo;
+import com.softeer.backend.global.common.response.ResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class DrawController {
+    private final DrawService drawService;
+
+    @GetMapping(&quot;/event/draw&quot;)
+    public ResponseDto&lt;DrawMainResponseDto&gt; getDrawMainPageInfo(@AuthInfo Integer userId) {
+<span class="nc" id="L24">        return ResponseDto.onSuccess(drawService.getDrawMainPageInfo(userId));</span>
+    }
+
+    @PostMapping(&quot;/event/draw&quot;)
+    public ResponseEntity&lt;Void&gt; participateDrawEvent() {
+<span class="nc" id="L29">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L30">        headers.add(&quot;Location&quot;, &quot;/event/draw-result&quot;);</span>
+<span class="nc" id="L31">        return new ResponseEntity&lt;&gt;(headers, HttpStatus.FOUND); // HTTP 302 Found 응답</span>
+    }
+
+    @GetMapping(&quot;/event/draw-result&quot;)
+    public ResponseDto&lt;DrawModalResponseDto&gt; getDrawResult(@AuthInfo Integer userId) {
+<span class="nc" id="L36">        return ResponseDto.onSuccess(drawService.participateDrawEvent(userId));</span>
+    }
+
+    @GetMapping(&quot;/event/draw/history&quot;)
+    public ResponseDto&lt;DrawHistoryResponseDto&gt; getDrawHistory(@AuthInfo Integer userId) {
+<span class="nc" id="L41">        return ResponseDto.onSuccess(drawService.getDrawHistory(userId));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

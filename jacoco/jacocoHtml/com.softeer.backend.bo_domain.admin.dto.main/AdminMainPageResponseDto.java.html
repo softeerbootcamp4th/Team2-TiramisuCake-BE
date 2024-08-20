@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminMainPageResponseDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.dto.main</a> &gt; <span class="el_source">AdminMainPageResponseDto.java</span></div><h1>AdminMainPageResponseDto.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.dto.main;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.softeer.backend.bo_domain.admin.serializer.PercentageSerializer;
+import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
+import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@Getter
+public class AdminMainPageResponseDto {
+    public static final int EXPECTED_PARTICIPANT_COUNT = 10000;
+
+    private List&lt;FcfsEvent&gt; fcfsEventList;
+
+    private DrawEvent drawEvent;
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class FcfsEvent {
+
+        private int round;
+
+        @JsonFormat(pattern = &quot;yyyy-MM-dd hh:mm:ss&quot;)
+        private LocalDateTime startTime;
+
+        @JsonFormat(pattern = &quot;yyyy-MM-dd hh:mm:ss&quot;)
+        private LocalDateTime endTime;
+
+        private int winnerNum;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class DrawEvent {
+
+        @JsonFormat(pattern = &quot;yyyy-MM-dd&quot;)
+        private LocalDate startDate;
+
+        @JsonFormat(pattern = &quot;yyyy-MM-dd&quot;)
+        private LocalDate endDate;
+
+        @JsonFormat(pattern = &quot;hh:mm:ss&quot;)
+        private LocalTime startTime;
+
+        @JsonFormat(pattern = &quot;hh:mm:ss&quot;)
+        private LocalTime endTime;
+
+        private List&lt;DrawInfo&gt; drawInfoList;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class DrawInfo {
+
+        private int rank;
+
+        private int winnerNum;
+
+        @JsonSerialize(using = PercentageSerializer.class)
+        private double probability;
+    }
+
+    public static AdminMainPageResponseDto of(List&lt;FcfsSetting&gt; fcfsSettingList, List&lt;DrawSetting&gt; drawSettingList) {
+<span class="nc" id="L77">        List&lt;FcfsEvent&gt; fcfsEventList = fcfsSettingList.stream()</span>
+<span class="nc" id="L78">                .map((fcfsSetting) -&gt;</span>
+<span class="nc" id="L79">                        FcfsEvent.builder()</span>
+<span class="nc" id="L80">                                .round(fcfsSetting.getRound())</span>
+<span class="nc" id="L81">                                .startTime(fcfsSetting.getStartTime())</span>
+<span class="nc" id="L82">                                .endTime(fcfsSetting.getEndTime())</span>
+<span class="nc" id="L83">                                .winnerNum(fcfsSetting.getWinnerNum())</span>
+<span class="nc" id="L84">                                .build())</span>
+<span class="nc" id="L85">                .toList();</span>
+
+<span class="nc" id="L87">        DrawSetting drawSetting = drawSettingList.get(0);</span>
+<span class="nc" id="L88">        DrawInfo drawInfoFirst = DrawInfo.builder()</span>
+<span class="nc" id="L89">                .rank(1)</span>
+<span class="nc" id="L90">                .winnerNum(drawSetting.getWinnerNum1())</span>
+<span class="nc" id="L91">                .probability(calculateWinningProbability(drawSetting.getWinnerNum1()))</span>
+<span class="nc" id="L92">                .build();</span>
+<span class="nc" id="L93">        DrawInfo drawInfoSecond = DrawInfo.builder()</span>
+<span class="nc" id="L94">                .rank(2)</span>
+<span class="nc" id="L95">                .winnerNum(drawSetting.getWinnerNum2())</span>
+<span class="nc" id="L96">                .probability(calculateWinningProbability(drawSetting.getWinnerNum2()))</span>
+<span class="nc" id="L97">                .build();</span>
+<span class="nc" id="L98">        DrawInfo drawInfoThird = DrawInfo.builder()</span>
+<span class="nc" id="L99">                .rank(3)</span>
+<span class="nc" id="L100">                .winnerNum(drawSetting.getWinnerNum3())</span>
+<span class="nc" id="L101">                .probability(calculateWinningProbability(drawSetting.getWinnerNum3()))</span>
+<span class="nc" id="L102">                .build();</span>
+
+<span class="nc" id="L104">        List&lt;DrawInfo&gt; drawInfoList = Arrays.asList(drawInfoFirst, drawInfoSecond, drawInfoThird);</span>
+<span class="nc" id="L105">        DrawEvent drawEvent = DrawEvent.builder()</span>
+<span class="nc" id="L106">                .startDate(drawSetting.getStartDate())</span>
+<span class="nc" id="L107">                .endDate(drawSetting.getEndDate())</span>
+<span class="nc" id="L108">                .startTime(drawSetting.getStartTime())</span>
+<span class="nc" id="L109">                .endTime(drawSetting.getEndTime())</span>
+<span class="nc" id="L110">                .drawInfoList(drawInfoList)</span>
+<span class="nc" id="L111">                .build();</span>
+
+<span class="nc" id="L113">        return AdminMainPageResponseDto.builder()</span>
+<span class="nc" id="L114">                .fcfsEventList(fcfsEventList)</span>
+<span class="nc" id="L115">                .drawEvent(drawEvent)</span>
+<span class="nc" id="L116">                .build();</span>
+
+    }
+
+    private static double calculateWinningProbability(int winnerNum) {
+<span class="nc" id="L121">        return (double) winnerNum / (double) EXPECTED_PARTICIPANT_COUNT;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

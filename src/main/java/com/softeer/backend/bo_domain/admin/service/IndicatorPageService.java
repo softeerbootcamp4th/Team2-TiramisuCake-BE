@@ -17,16 +17,17 @@ import java.util.List;
 public class IndicatorPageService {
 
     private final EventParticipationRepository eventParticipationRepository;
-    private final DrawSettingManager drawSettingManager;
+    private final DrawSettingRepository drawSettingRepository;
 
     public EventIndicatorResponseDto getEventIndicator() {
 
+        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
 
         List<EventParticipation> eventParticipationList = eventParticipationRepository.findAllByEventDateBetween(
-                drawSettingManager.getStartDate(), drawSettingManager.getEndDate()
+                drawSetting.getStartDate(), drawSetting.getEndDate()
         );
 
-        return EventIndicatorResponseDto.of(eventParticipationList, drawSettingManager);
+        return EventIndicatorResponseDto.of(eventParticipationList, drawSetting);
     }
 
 }

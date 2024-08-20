@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.softeer.backend.bo_domain.admin.serializer.PercentageSerializer;
 import com.softeer.backend.bo_domain.admin.serializer.PhoneNumberSerializer;
 import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
+import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import lombok.*;
 
@@ -49,9 +50,9 @@ public class EventIndicatorResponseDto {
         private int visitorNum;
     }
 
-    public static EventIndicatorResponseDto of(List<EventParticipation> eventParticipationList, DrawSettingManager drawSettingManager) {
-        LocalDate startDate = drawSettingManager.getStartDate();
-        LocalDate endDate = drawSettingManager.getEndDate();
+    public static EventIndicatorResponseDto of(List<EventParticipation> eventParticipationList, DrawSetting drawSetting) {
+        LocalDate startDate = drawSetting.getStartDate();
+        LocalDate endDate = drawSetting.getEndDate();
 
         int totalVisitorCount = eventParticipationList.stream()
                 .mapToInt(EventParticipation::getVisitorCount)

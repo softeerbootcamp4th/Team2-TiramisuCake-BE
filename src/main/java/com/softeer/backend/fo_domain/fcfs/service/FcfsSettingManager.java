@@ -36,13 +36,9 @@ public class FcfsSettingManager {
     private final QuizRepository quizRepository;
 
     private List<FcfsSettingDto> fcfsSettingList;
-    private QuizDto tutorialQuiz;
-    private List<QuizDto> quizList;
-
 
     @Setter
     private boolean isFcfsClosed = false;
-
 
     @PostConstruct
     public void init() {
@@ -73,41 +69,17 @@ public class FcfsSettingManager {
                     .winnerNum(fcfsSetting.getWinnerNum())
                     .build());
         });
-
-        List<Quiz> quizs = quizRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-        quizList = new ArrayList<>();
-
-        quizs.forEach((quiz) -> {
-
-            QuizDto quizDto = QuizDto.builder()
-                    .hint(quiz.getHint())
-                    .answerWord(quiz.getAnswerWord())
-                    .answerSentence(quiz.getAnswerSentence().replace("\\n", "\n"))
-                    .startIndex(quiz.getStartIndex())
-                    .endIndex(quiz.getEndIndex())
-                    .build();
-
-            if(quiz.getHint().equals("튜토리얼"))
-                tutorialQuiz = quizDto;
-            else
-                quizList.add(quizDto);
-        });
-
-
     }
 
-    public void setFcfsTime(List<FcfsSetting> fcfsSettingList) {
-        fcfsSettingList
-                .forEach((fcfsSetting) -> {
-                    FcfsSettingDto fcfsSettingDto = this.fcfsSettingList.get(fcfsSetting.getRound()-1);
-                    fcfsSettingDto.setStartTime(fcfsSetting.getStartTime());
-                    fcfsSettingDto.setEndTime(fcfsSetting.getEndTime());
-                });
-    }
+    public void setFcfsSettingList(List<FcfsSetting> fcfsSettings){
 
-    public void setFcfsWinnerNum(int fcfsWinnerNum) {
-        fcfsSettingList.forEach((fcfsSettingDto) -> {
-            fcfsSettingDto.setWinnerNum(fcfsWinnerNum);
+        fcfsSettings.forEach((fcfsSetting) -> {
+            fcfsSettingList.set(fcfsSetting.getRound() - 1, FcfsSettingDto.builder()
+                    .round(fcfsSetting.getRound())
+                    .startTime(fcfsSetting.getStartTime())
+                    .endTime(fcfsSetting.getEndTime())
+                    .winnerNum(fcfsSetting.getWinnerNum())
+                    .build());
         });
     }
 
@@ -128,32 +100,6 @@ public class FcfsSettingManager {
 
     public int getFcfsWinnerNum(){
         return fcfsSettingList.get(0).getWinnerNum();
-    }
-
-    public String getHint(){
-
-        LocalDateTime now = LocalDateTime.now();
-
-        for (int i=0; i<fcfsSettingList.size(); i++) {
-
-            FcfsSettingDto fcfsSettingDto = fcfsSettingList.get(i);
-
-            if (fcfsSettingDto != null) {
-                LocalDateTime endTime = fcfsSettingDto.getEndTime();
-
-                // localDate가 startDate의 하루 다음날과 같은지 확인
-                if (endTime.isBefore(now)) {
-                    return quizList.get(i).getHint();
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public QuizDto getQuiz(int round){
-        log.info("quiz: {}", quizList.get(round-1));
-        return quizList.get(round - 1);
     }
 
     public boolean isFcfsEntryAvailable(LocalDateTime now){

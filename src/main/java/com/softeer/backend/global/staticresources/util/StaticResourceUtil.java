@@ -24,7 +24,8 @@ public class StaticResourceUtil {
 
     public Map<String, String> getTextContentMap() {
         return textContentRepository.findAll().stream()
-                .collect(Collectors.toMap(TextContent::getTextName, TextContent::getContent));
+                .collect(Collectors.toMap(TextContent::getTextName,
+                        textContent -> textContent.getContent().replace("\\n", "\n")));
     }
 
     public Map<String, String> getS3ContentMap() {

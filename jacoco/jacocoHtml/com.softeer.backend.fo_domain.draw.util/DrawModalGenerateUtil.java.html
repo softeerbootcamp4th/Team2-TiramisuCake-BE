@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawModalGenerateUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.draw.util</a> &gt; <span class="el_source">DrawModalGenerateUtil.java</span></div><h1>DrawModalGenerateUtil.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.draw.util;
+
+import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.constant.StaticTextName;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+@RequiredArgsConstructor
+public class DrawModalGenerateUtil {
+
+    private final StaticResourceUtil staticResourceUtil;
+
+    /**
+     * @return 등수에 따른 WinModal을 반환
+     */
+    @Cacheable(value = &quot;staticResources&quot;, key = &quot;'draw_modal_' + #ranking&quot;)
+    public WinModal generateWinModal(int ranking) {
+
+<span class="nc" id="L25">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+<span class="nc" id="L26">        Map&lt;String, String&gt; s3ContentMap = staticResourceUtil.getS3ContentMap();</span>
+
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (ranking == 1) {</span>
+<span class="nc" id="L29">            return generateFirstWinModal(textContentMap, s3ContentMap);</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        } else if (ranking == 2) {</span>
+<span class="nc" id="L31">            return generateSecondWinModal(textContentMap, s3ContentMap);</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        } else if (ranking == 3) {</span>
+<span class="nc" id="L33">            return generateThirdWinModal(textContentMap, s3ContentMap);</span>
+        } else {
+<span class="nc" id="L35">            return generateFullAttendModal(textContentMap, s3ContentMap);</span>
+        }
+    }
+
+    /**
+     * @return 1등 WinModal 반환
+     */
+
+    private WinModal generateFirstWinModal(Map&lt;String, String&gt; textContentMap, Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L44">        return WinModal.builder()</span>
+<span class="nc" id="L45">                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))</span>
+<span class="nc" id="L46">                .subtitle(textContentMap.get(StaticTextName.DRAW_FIRST_WINNER_SUBTITLE.name()))</span>
+<span class="nc" id="L47">                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_1.name()))</span>
+<span class="nc" id="L48">                .description(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name())</span>
+<span class="nc" id="L49">                .build();</span>
+    }
+
+    /**
+     * @return 2등 WinModal 반환
+     */
+    private WinModal generateSecondWinModal(Map&lt;String, String&gt; textContentMap, Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L56">        return WinModal.builder()</span>
+<span class="nc" id="L57">                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))</span>
+<span class="nc" id="L58">                .subtitle(textContentMap.get(StaticTextName.DRAW_SECOND_WINNER_SUBTITLE.name()))</span>
+<span class="nc" id="L59">                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_2.name()))</span>
+<span class="nc" id="L60">                .description(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name()))</span>
+<span class="nc" id="L61">                .build();</span>
+    }
+
+    /**
+     * @return 3등 WinModal 반환
+     */
+    private WinModal generateThirdWinModal(Map&lt;String, String&gt; textContentMap, Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L68">        return WinModal.builder()</span>
+<span class="nc" id="L69">                .title(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_TITLE.name()))</span>
+<span class="nc" id="L70">                .subtitle(textContentMap.get(StaticTextName.DRAW_THIRD_WINNER_SUBTITLE.name()))</span>
+<span class="nc" id="L71">                .img(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_3.name()))</span>
+<span class="nc" id="L72">                .description(textContentMap.get(StaticTextName.DRAW_WINNER_MODAL_DESCRIPTION.name()))</span>
+<span class="nc" id="L73">                .build();</span>
+    }
+
+    /**
+     * 7일 연속 출석자 상품 정보 반환 메서드
+     *
+     * @return FullAttendModal 반환
+     */
+    public WinModal generateFullAttendModal(Map&lt;String, String&gt; textContentMap, Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L82">        return WinModal.builder()</span>
+<span class="nc" id="L83">                .title(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_TITLE.name()))</span>
+<span class="nc" id="L84">                .subtitle(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_SUBTITLE.name()))</span>
+<span class="nc" id="L85">                .img(s3ContentMap.get(S3FileName.ATTENDANCE_REWARD_IMAGE.name()))</span>
+<span class="nc" id="L86">                .description(textContentMap.get(StaticTextName.FULL_ATTEND_MODAL_DESCRIPTION.name()))</span>
+<span class="nc" id="L87">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

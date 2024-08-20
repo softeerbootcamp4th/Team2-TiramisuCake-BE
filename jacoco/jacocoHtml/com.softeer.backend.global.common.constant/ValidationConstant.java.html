@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidationConstant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.common.constant</a> &gt; <span class="el_source">ValidationConstant.java</span></div><h1>ValidationConstant.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.common.constant;
+
+import lombok.Getter;
+
+<span class="nc" id="L5">public class ValidationConstant {</span>
+    public static final String PHONE_NUMBER_REGEX = &quot;^01[016789]\\d{8}$&quot;;
+    public static final String PHONE_NUMBER_MSG = &quot;잘못된 전화번호 형식입니다.&quot;;
+
+    public static final String VERIFICATION_CODE_REGEX = &quot;^[a-zA-Z0-9]{6}$&quot;;
+    public static final String VERIFICATION_CODE_MSG = &quot;잘못된 인증코드 형식입니다.&quot;;
+
+    // 최소 4자에서 최대 20자까지 허용
+    // 영어 대문자, 소문자, 숫자 허용
+    public static final String ADMIN_ACCOUNT_REGEX = &quot;^[a-zA-Z0-9]{4,20}$&quot;;
+    public static final String ADMIN_ACCOUNT_MSG = &quot;잘못된 아이디 형식입니다.&quot;;
+
+    // 최소 8자에서 최대 20자까지 허용
+    // 적어도 하나의 대문자, 소문자, 숫자, 특수문자 포함
+    // 허용할 특수문자: @, #, $, %, &amp;, *, !, ^
+    public static final String ADMIN_PASSWORD_REGEX = &quot;^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&amp;*!])[A-Za-z\\d@#$%^&amp;*!]{8,20}$&quot;;
+    public static final String ADMIN_PASSWORD_MSG = &quot;잘못된 비밀번호 형식입니다.&quot;;
+
+    public static final String MIN_VALUE_MSG = &quot;값은 최소 {value}이어야 합니다.&quot;;
+    public static final String MAX_VALUE_MSG = &quot;값은 최대 {value}이어야 합니다.&quot;;
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

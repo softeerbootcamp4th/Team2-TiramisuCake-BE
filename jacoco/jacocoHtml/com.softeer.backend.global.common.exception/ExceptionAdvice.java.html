@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.common.exception</a> &gt; <span class="el_source">ExceptionAdvice.java</span></div><h1>ExceptionAdvice.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.common.exception;
+
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.response.ResponseDto;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.*;
+
+
+/**
+ * 예외를 한 곳에서 처리하는 클래스
+ */
+<span class="nc" id="L25">@Slf4j</span>
+@RestControllerAdvice
+<span class="nc" id="L27">public class ExceptionAdvice extends ResponseEntityExceptionHandler {</span>
+
+    /**
+     * GeneralException을 처리하는 메서드
+     *
+     * @param generalException 커스텀 예외의 최고 조상 클래스
+     * @param webRequest       client 요청 객체
+     * @return client 응답 객체
+     */
+    @ExceptionHandler
+    public ResponseEntity&lt;Object&gt; handleGeneralException(GeneralException generalException, WebRequest webRequest) {
+<span class="nc" id="L38">        ResponseDto.ErrorReasonDto errorReasonHttpStatus = generalException.getErrorReason();</span>
+<span class="nc" id="L39">        return handleGeneralExceptionInternal(generalException, errorReasonHttpStatus, HttpHeaders.EMPTY, webRequest);</span>
+    }
+
+    @ExceptionHandler
+    public ModelAndView handleEventLockException(EventLockException eventLockException, WebRequest webRequest) {
+<span class="nc" id="L44">        return handleEventLockExceptionInternal(eventLockException, HttpHeaders.EMPTY, webRequest);</span>
+    }
+
+    /**
+     * ConstraintViolationException을 처리하는 메서드
+     *
+     * @param constraintViolationException 검증 예외
+     * @param request                      client 요청 객체
+     * @return client 응답 객체
+     */
+    @ExceptionHandler
+    public ResponseEntity&lt;Object&gt; handleValidationException(ConstraintViolationException constraintViolationException, WebRequest request) {
+
+<span class="nc" id="L57">        List&lt;String&gt; errorMessages = constraintViolationException.getConstraintViolations().stream()</span>
+<span class="nc" id="L58">                .map(violation -&gt; Optional.ofNullable(violation.getMessage()).orElse(&quot;&quot;))</span>
+<span class="nc" id="L59">                .toList();</span>
+
+<span class="nc" id="L61">        return handleConstraintExceptionInternal(constraintViolationException, ErrorStatus._VALIDATION_ERROR, HttpHeaders.EMPTY, request,</span>
+                errorMessages);
+    }
+
+    /**
+     * MethodArgumentNotValidException을 처리하는 메서드
+     * &lt;p&gt;
+     * ResponseEntityExceptionHandler의 메서드를 오버라이딩하여 사용한다.
+     *
+     * @param methodArgumentNotValidException 컨트롤러 메서드의 파라미터 객체에 대한 검증 예외
+     * @param headers                         헤더 객체
+     * @param status                          HttpStatusCode 값
+     * @param request                         client 요청 객체
+     * @return client 응답 객체
+     */
+    @Override
+    public ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(
+            MethodArgumentNotValidException methodArgumentNotValidException,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+<span class="nc" id="L81">        Map&lt;String, String&gt; errors = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="nc" id="L83">        methodArgumentNotValidException.getBindingResult().getFieldErrors()</span>
+<span class="nc" id="L84">                .forEach(fieldError -&gt; {</span>
+<span class="nc" id="L85">                    String fieldName = fieldError.getField();</span>
+<span class="nc" id="L86">                    String errorMessage = Optional.ofNullable(fieldError.getDefaultMessage()).orElse(&quot;&quot;);</span>
+<span class="nc" id="L87">                    errors.merge(fieldName, errorMessage, (existingErrorMessage, newErrorMessage)</span>
+<span class="nc" id="L88">                            -&gt; existingErrorMessage + &quot;, &quot; + newErrorMessage);</span>
+<span class="nc" id="L89">                });</span>
+
+<span class="nc" id="L91">        return handleArgsExceptionInternal(methodArgumentNotValidException, HttpHeaders.EMPTY, ErrorStatus._VALIDATION_ERROR, request, errors);</span>
+    }
+
+    /**
+     * 나머지 모든 예외들을 처리하는 메서드
+     *
+     * @param e       Exception을 상속한 예외 객체
+     * @param request client 요청 객체
+     * @return client 응답 객체
+     */
+    @ExceptionHandler
+    public ResponseEntity&lt;Object&gt; handleGlobalException(Exception e, WebRequest request) {
+
+<span class="nc" id="L104">        return handleGlobalExceptionInternal(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(), request, e.getMessage());</span>
+    }
+
+    /**
+     * DB 관련 예외 처리
+     */
+    @ExceptionHandler
+    public void handleDataAccessException(DataAccessException e) {
+<span class="nc" id="L112">        log.error(&quot;DataAccessException occurred: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L113">    }</span>
+
+    // GeneralException에 대한 client 응답 객체를 생성하는 메서드
+    private ResponseEntity&lt;Object&gt; handleGeneralExceptionInternal(Exception e, ResponseDto.ErrorReasonDto reason,
+                                                                  HttpHeaders headers, WebRequest webRequest) {
+
+<span class="nc" id="L119">        log.error(&quot;GeneralException captured in ExceptionAdvice&quot;, e);</span>
+
+<span class="nc" id="L121">        ResponseDto&lt;Object&gt; body = ResponseDto.onFailure(reason.getCode(), reason.getMessage(), null);</span>
+
+<span class="nc" id="L123">        return super.handleExceptionInternal(</span>
+                e,
+                body,
+                headers,
+<span class="nc" id="L127">                reason.getHttpStatus(),</span>
+                webRequest
+        );
+    }
+
+    // EventLockException에 대한 client 응답 객체를 생성하는 메서드
+    private ModelAndView handleEventLockExceptionInternal(EventLockException e, HttpHeaders headers, WebRequest webRequest) {
+
+<span class="nc" id="L135">        log.error(&quot;EventLockException captured in ExceptionAdvice&quot;, e);</span>
+
+<span class="nc" id="L137">        String redissonKeyName = e.getRedissonKeyName();</span>
+
+<span class="nc" id="L139">        ModelAndView modelAndView = new ModelAndView();</span>
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (redissonKeyName.contains(&quot;FCFS&quot;)){</span>
+
+<span class="nc" id="L143">            modelAndView.setViewName(&quot;redirect:/fcfs/result&quot;);</span>
+<span class="nc" id="L144">            modelAndView.addObject(&quot;fcfsWin&quot;, false);</span>
+        }
+
+        //TODO
+        // DRAW 관련 예외일 경우, body 구성하는 코드 필요
+
+<span class="nc" id="L150">        return modelAndView;</span>
+    }
+
+    // ConstraintViolationException에 대한 client 응답 객체를 생성하는 메서드
+    private ResponseEntity&lt;Object&gt; handleConstraintExceptionInternal(Exception e, ErrorStatus errorCommonStatus,
+                                                                     HttpHeaders headers, WebRequest request,
+                                                                     List&lt;String&gt; errorMessages) {
+
+<span class="nc" id="L158">        log.error(&quot;ConstraintViolationException captured in ExceptionAdvice&quot;, e);</span>
+
+<span class="nc" id="L160">        ResponseDto&lt;Object&gt; body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorMessages);</span>
+<span class="nc" id="L161">        return super.handleExceptionInternal(</span>
+                e,
+                body,
+                headers,
+<span class="nc" id="L165">                errorCommonStatus.getHttpStatus(),</span>
+                request
+        );
+    }
+
+    // MethodArgumentNotValidException에 대한 client 응답 객체를 생성하는 메서드
+    private ResponseEntity&lt;Object&gt; handleArgsExceptionInternal(Exception e, HttpHeaders headers, ErrorStatus errorCommonStatus,
+                                                               WebRequest request, Map&lt;String, String&gt; errorArgs) {
+<span class="nc" id="L173">        log.error(&quot;MethodArgumentNotValidException captured in ExceptionAdvice&quot;, e);</span>
+
+<span class="nc" id="L175">        ResponseDto&lt;Object&gt; body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorArgs);</span>
+<span class="nc" id="L176">        return super.handleExceptionInternal(</span>
+                e,
+                body,
+                headers,
+<span class="nc" id="L180">                errorCommonStatus.getHttpStatus(),</span>
+                request
+        );
+    }
+
+    // 나머지 모든 예외에 대한 client 응답 객체를 생성하는 메서드
+    private ResponseEntity&lt;Object&gt; handleGlobalExceptionInternal(Exception e, ErrorStatus errorCommonStatus,
+                                                                 HttpHeaders headers, HttpStatus status, WebRequest request, String errorPoint) {
+<span class="nc" id="L188">        log.error(&quot;Exception captured in ExceptionAdvice&quot;, e);</span>
+
+<span class="nc" id="L190">        ResponseDto&lt;Object&gt; body = ResponseDto.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);</span>
+<span class="nc" id="L191">        return super.handleExceptionInternal(</span>
+                e,
+                body,
+                headers,
+                status,
+                request
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShareController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.share.controller</a> &gt; <span class="el_source">ShareController.java</span></div><h1>ShareController.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.share.controller;
+
+import com.softeer.backend.fo_domain.share.dto.ShareUrlInfoResponseDto;
+import com.softeer.backend.fo_domain.share.service.ShareUrlInfoService;
+import com.softeer.backend.global.annotation.AuthInfo;
+import com.softeer.backend.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class ShareController {
+    private final ShareUrlInfoService shareUrlInfoService;
+
+    @GetMapping(&quot;/share-shorten-url&quot;)
+    public ResponseDto&lt;ShareUrlInfoResponseDto&gt; getShortenShareUrl(@Parameter(hidden = true) @AuthInfo Integer userId) {
+<span class="nc" id="L27">        return ResponseDto.onSuccess(shareUrlInfoService.getShortenShareUrl(userId));</span>
+    }
+
+    @GetMapping(&quot;/share/{shareUrl}&quot;)
+    public ResponseEntity&lt;Void&gt; redirectWithShareUrl(@PathVariable String shareUrl, HttpServletRequest request, HttpServletResponse response) {
+        // session을 이용해 공유 url 저장
+<span class="nc" id="L33">        Cookie shareCodeCookie = new Cookie(&quot;shareCode&quot;, shareUrl);</span>
+<span class="nc" id="L34">        shareCodeCookie.setPath(&quot;/&quot;);</span>
+<span class="nc" id="L35">        shareCodeCookie.setHttpOnly(false); // HttpOnly 속성을 비활성화</span>
+<span class="nc" id="L36">        shareCodeCookie.setDomain(&quot;softeer.site&quot;); // 도메인 설정. 이렇게 해서 softeer.site 포함 하위 모든 도메인에서 해당 쿠키 사용 가능</span>
+<span class="nc" id="L37">        response.addCookie(shareCodeCookie);</span>
+
+        // 헤더를 이용해 redirect
+<span class="nc" id="L40">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L41">        headers.add(&quot;Location&quot;, &quot;https://softeer.site&quot;);</span>
+<span class="nc" id="L42">        return new ResponseEntity&lt;&gt;(headers, HttpStatus.FOUND); // HTTP 302 Found 응답</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -19,14 +19,13 @@ public class DrawRedisUtil {
     // 추첨 당첨자 목록: DRAW_WINNER_LIST_{ranking}, Set<Integer>
     // 추첨 참여자 수:  DRAW_PARTICIPANT_COUNT, Integer
 
-    // 추첨 참여자 수 증가
-    public void incrementIntegerValue(String key) {
-        integerRedisTemplate.opsForValue().increment(key);
-    }
-
     // ranking의 추첨 당첨자 목록 반환
     public Set<Integer> getAllDataAsSet(String key) {
         return integerRedisTemplate.opsForSet().members(key);
+    }
+
+    private Long getIntegerSetSize(String key) {
+        return integerRedisTemplate.opsForSet().size(key);
     }
 
     // ranking의 당첨자 목록 업데이트
@@ -72,8 +71,9 @@ public class DrawRedisUtil {
         }
     }
 
+    // 추첨 참여자수 증가
     public void increaseDrawParticipationCount() {
-        incrementIntegerValue(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
+        integerRedisTemplate.opsForValue().increment(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
     // 추첨 참여인원수 조회

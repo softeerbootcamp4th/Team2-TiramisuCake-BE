@@ -31,13 +31,10 @@ public class EventPageService {
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
 
-    private final FcfsSettingManager fcfsSettingManager;
-    private final DrawSettingManager drawSettingManager;
-
     @Transactional(readOnly = true)
     public EventPageResponseDto getEventPage() {
 
-        return EventPageResponseDto.of(fcfsSettingManager, drawSettingManager);
+        return EventPageResponseDto.of(fcfsSettingRepository.findAll(), drawSettingRepository.findAll().get(0));
     }
 
     public void updateFcfsEventTime(FcfsEventTimeRequestDto fcfsEventTimeRequestDto) {
@@ -60,17 +57,15 @@ public class EventPageService {
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
         updateDrawSetting(drawSetting, startDate, endDate);
 
-        fcfsSettingManager.setFcfsTime(fcfsSettingList);
-
     }
 
-    private void updateFcfsSetting(FcfsSetting setting, LocalDate date, LocalTime time) {
+    private void updateFcfsSetting(FcfsSetting fcfsSetting, LocalDate date, LocalTime time) {
 
         LocalDateTime newStartTime = LocalDateTime.of(date, time);
         LocalDateTime newEndTime = newStartTime.plusHours(2);
 
-        setting.setStartTime(newStartTime);
-        setting.setEndTime(newEndTime);
+        fcfsSetting.setStartTime(newStartTime);
+        fcfsSetting.setEndTime(newEndTime);
 
     }
 
@@ -83,7 +78,6 @@ public class EventPageService {
         drawSetting.setStartDate(startDateOfDraw);
         drawSetting.setEndDate(endDateOfDraw);
 
-        drawSettingManager.setDrawDate(drawSetting);
     }
 
     public void updateDrawEventTime(DrawEventTimeRequestDto drawEventTimeRequestDto) {
@@ -92,7 +86,6 @@ public class EventPageService {
         drawSetting.setStartTime(drawEventTimeRequestDto.getStartTime());
         drawSetting.setEndTime(drawEventTimeRequestDto.getEndTime());
 
-        drawSettingManager.setDrawTime(drawSetting);
     }
 
 

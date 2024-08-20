@@ -58,10 +58,10 @@ public class DrawRedisUtil {
     @EventLock(key = "LOCK:DRAW_WINNER_LIST_#{#ranking}")
     public boolean isWinner(Integer userId, int ranking, int winnerNum) {
         String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-        Set<Integer> drawWinnerSet = getAllDataAsSet(drawWinnerKey);
+        Long winnerSetSize = getIntegerSetSize(drawWinnerKey);
 
         // 레디스에서 해당 랭킹에 자리가 있는지 확인
-        if (drawWinnerSet.size() < winnerNum) {
+        if (winnerSetSize < winnerNum) {
             // 자리가 있다면 당첨 성공. 당첨자 리스트에 추가
             setIntegerValueToSet(drawWinnerKey, userId);
             return true;

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawResponseGenerateUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.draw.util</a> &gt; <span class="el_source">DrawResponseGenerateUtil.java</span></div><h1>DrawResponseGenerateUtil.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.draw.util;
+
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
+import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
+import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class DrawResponseGenerateUtil {
+    public static final String BASE_URL = &quot;https://softeer.shop/share/&quot;;
+
+    private final ShareUrlInfoRepository shareUrlInfoRepository;
+    private final DrawUtil drawUtil;
+    private final DrawModalGenerateUtil drawModalGenerateUtil;
+
+
+    /**
+     * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
+     * @param drawAttendanceCount 연속 출석 일수
+     * @return 7일 연속 출석 상품 모달
+     */
+    public DrawMainFullAttendResponseDto generateMainFullAttendResponse(int invitedNum, int remainDrawCount, int drawAttendanceCount) {
+<span class="nc" id="L34">        return DrawMainFullAttendResponseDto.builder()</span>
+<span class="nc" id="L35">                .invitedNum(invitedNum)</span>
+<span class="nc" id="L36">                .remainDrawCount(remainDrawCount)</span>
+<span class="nc" id="L37">                .drawAttendanceCount(drawAttendanceCount)</span>
+<span class="nc" id="L38">                .fullAttendModal(drawModalGenerateUtil.generateWinModal(7))</span>
+<span class="nc" id="L39">                .build();</span>
+    }
+
+    /**
+     * 7일 미만 출석 시 모달 만들어서 반환하는 메서드
+     *
+     * @param invitedNum             초대한 사람 수
+     * @param remainDrawCount        남은 추첨 기회
+     * @param drawAttendanceCount 연속 출석 일수
+     * @return 7일 미만 출석 상품 모달
+     */
+    public DrawMainResponseDto generateMainNotAttendResponse(int invitedNum, int remainDrawCount, int drawAttendanceCount) {
+<span class="nc" id="L51">        return DrawMainResponseDto.builder()</span>
+<span class="nc" id="L52">                .invitedNum(invitedNum)</span>
+<span class="nc" id="L53">                .remainDrawCount(remainDrawCount)</span>
+<span class="nc" id="L54">                .drawAttendanceCount(drawAttendanceCount)</span>
+<span class="nc" id="L55">                .build();</span>
+    }
+
+    /**
+     * 낙첨자 응답 만들어서 반환
+     *
+     * @param userId 를 이용하여 공유 url 조회
+     * @return 낙첨자 응답
+     */
+    public DrawLoseModalResponseDto generateDrawLoserResponse(Integer userId) {
+<span class="nc" id="L65">        return DrawLoseModalResponseDto.builder()</span>
+<span class="nc" id="L66">                .isDrawWin(false)</span>
+<span class="nc" id="L67">                .images(drawUtil.generateLoseImages())</span>
+<span class="nc" id="L68">                .shareUrl(getShareUrl(userId))</span>
+<span class="nc" id="L69">                .build();</span>
+    }
+
+    /**
+     * 당첨자 응답 만들어서 반환
+     *
+     * @return 당첨자 응답
+     */
+    public DrawWinModalResponseDto generateDrawWinnerResponse(int ranking) {
+<span class="nc" id="L78">        return DrawWinModalResponseDto.builder()</span>
+<span class="nc" id="L79">                .isDrawWin(true)</span>
+<span class="nc" id="L80">                .images(drawUtil.generateWinImages())</span>
+<span class="nc" id="L81">                .winModal(drawModalGenerateUtil.generateWinModal(ranking))</span>
+<span class="nc" id="L82">                .build();</span>
+    }
+
+    /**
+     * 당첨내역이 있는 경우 당첨 내역 응답 만들어서 반환
+     * @param ranking 등수
+     * @return 당첨 내역 응답
+     */
+    public DrawHistoryWinnerResponseDto generateDrawHistoryWinnerResponse(int ranking) {
+<span class="nc" id="L91">        return DrawHistoryWinnerResponseDto.builder()</span>
+<span class="nc" id="L92">                .isDrawWin(true)</span>
+<span class="nc" id="L93">                .winModal(drawModalGenerateUtil.generateWinModal(ranking))</span>
+<span class="nc" id="L94">                .build();</span>
+    }
+
+    /**
+     * 당첨내역이 없는 경우 낙첨 응답 만들어서 반환
+     * @param userId 사용자 아이디
+     * @return 낙첨 내역 응답
+     */
+    public DrawHistoryLoserResponseDto generateDrawHistoryLoserResponse(Integer userId) {
+<span class="nc" id="L103">        return DrawHistoryLoserResponseDto.builder()</span>
+<span class="nc" id="L104">                .isDrawWin(false)</span>
+<span class="nc" id="L105">                .shareUrl(getShareUrl(userId))</span>
+<span class="nc" id="L106">                .build();</span>
+    }
+
+    /**
+     * 공유 url 조회
+     *
+     * @param userId 사용자 아이디
+     * @return 공유 url
+     */
+    private String getShareUrl(Integer userId) {
+<span class="nc" id="L116">        return BASE_URL + shareUrlInfoRepository.findShareUrlByUserId(userId)</span>
+<span class="nc" id="L117">                .orElseThrow(() -&gt; new ShareUrlInfoException(ErrorStatus._NOT_FOUND));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

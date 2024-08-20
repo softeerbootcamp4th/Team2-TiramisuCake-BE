@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.util</a> &gt; <span class="el_source">JwtUtil.java</span></div><h1>JwtUtil.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.util;
+
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.common.constant.RoleType;
+import com.softeer.backend.global.common.dto.JwtClaimsDto;
+import com.softeer.backend.global.common.exception.JwtAuthenticationException;
+import com.softeer.backend.global.config.properties.JwtProperties;
+import com.softeer.backend.global.common.dto.JwtTokenResponseDto;
+import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Optional;
+
+<span class="nc" id="L20">@Slf4j</span>
+@RequiredArgsConstructor
+@Component
+public class JwtUtil {
+    private final JwtProperties jwtProperties;
+    private final StringRedisUtil stringRedisUtil;
+
+    // HttpServletRequest 부터 Access Token 추출
+    public Optional&lt;String&gt; extractAccessToken(HttpServletRequest request) {
+
+<span class="nc" id="L30">        log.info(&quot;Authorization 헤더: {}&quot;, request.getHeader(&quot;Authorization&quot;));</span>
+
+<span class="nc" id="L32">        return Optional.ofNullable(request.getHeader(jwtProperties.getAccessHeader()))</span>
+<span class="nc" id="L33">                .filter(StringUtils::hasText)</span>
+<span class="nc" id="L34">                .filter(accessToken -&gt; accessToken.startsWith(jwtProperties.getBearer()))</span>
+<span class="nc" id="L35">                .map(accessToken -&gt; accessToken.substring(jwtProperties.getBearer().length() + 1));</span>
+    }
+
+    // HttpServletRequest 부터 Refresh Token 추출
+    public Optional&lt;String&gt; extractRefreshToken(HttpServletRequest request) {
+<span class="nc" id="L40">        return Optional.ofNullable(request.getHeader(jwtProperties.getRefreshHeader()));</span>
+    }
+
+    // access token 생성
+    public String createAccessToken(JwtClaimsDto jwtClaimsDto) {
+<span class="nc" id="L45">        return this.createToken(jwtClaimsDto, jwtProperties.getAccessExpiration());</span>
+    }
+
+    // refresh token 생성
+    public String createRefreshToken(JwtClaimsDto jwtClaimsDto) {
+<span class="nc" id="L50">        return this.createToken(jwtClaimsDto, jwtProperties.getRefreshExpiration());</span>
+
+    }
+
+    // access token 으로부터 jwt claim 정보 추출
+    public JwtClaimsDto getJwtClaimsFromAccessToken(String token) {
+        try {
+
+<span class="nc" id="L58">            return getAuthInfoFromToken(token);</span>
+
+<span class="nc" id="L60">        } catch (Exception exception) {</span>
+<span class="nc" id="L61">            log.error(&quot;Access Token is invalid.&quot;);</span>
+<span class="nc" id="L62">            throw new JwtAuthenticationException(ErrorStatus._UNAUTHORIZED);</span>
+        }
+    }
+
+    // refresh token 으로부터 jwt claim 정보 추출
+    public JwtClaimsDto getJwtClaimsFromRefreshToken(String token) {
+        try {
+
+<span class="nc" id="L70">            return getAuthInfoFromToken(token);</span>
+
+<span class="nc" id="L72">        } catch (Exception exception) {</span>
+<span class="nc" id="L73">            log.error(&quot;JWT Refresh Token is invalid during the '/reissue' process.&quot;);</span>
+<span class="nc" id="L74">            throw new JwtAuthenticationException(ErrorStatus._REISSUE_ERROR);</span>
+        }
+    }
+
+    // Jwt Token 에서 claim 정보를 파싱하여 반환하는 메서드
+    private JwtClaimsDto getAuthInfoFromToken(String token) {
+<span class="nc" id="L80">        Claims claims = Jwts.parser()</span>
+<span class="nc" id="L81">                .setSigningKey(jwtProperties.getSecret())</span>
+<span class="nc" id="L82">                .parseClaimsJws(token)</span>
+<span class="nc" id="L83">                .getBody();</span>
+
+<span class="nc" id="L85">        int id = claims.get(&quot;id&quot;, Integer.class);</span>
+<span class="nc" id="L86">        RoleType roleType = RoleType.valueOf(claims.get(&quot;roleType&quot;, String.class));</span>
+
+<span class="nc" id="L88">        return JwtClaimsDto.builder()</span>
+<span class="nc" id="L89">                .id(id)</span>
+<span class="nc" id="L90">                .roleType(roleType)</span>
+<span class="nc" id="L91">                .build();</span>
+    }
+
+    // 전화번호 로그인 및 admin 로그인 시 jwt 응답 생성 + redis refresh 저장
+    public JwtTokenResponseDto createServiceToken(JwtClaimsDto jwtClaimsDto) {
+<span class="nc" id="L96">        stringRedisUtil.deleteData(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto));</span>
+<span class="nc" id="L97">        String accessToken = createAccessToken(jwtClaimsDto);</span>
+<span class="nc" id="L98">        String refreshToken = createRefreshToken(jwtClaimsDto);</span>
+
+        // 서비스 토큰 생성
+<span class="nc" id="L101">        JwtTokenResponseDto jwtTokenResponseDto = JwtTokenResponseDto.builder()</span>
+<span class="nc" id="L102">                .accessToken(accessToken)</span>
+<span class="nc" id="L103">                .refreshToken(refreshToken)</span>
+<span class="nc" id="L104">                .expiredTime(LocalDateTime.now().plusSeconds(jwtProperties.getAccessExpiration() / 1000))</span>
+<span class="nc" id="L105">                .build();</span>
+
+        // redis refresh token 저장
+<span class="nc" id="L108">        stringRedisUtil.setDataExpire(stringRedisUtil.getRedisKeyForJwt(jwtClaimsDto),</span>
+<span class="nc" id="L109">                jwtTokenResponseDto.getRefreshToken(), jwtProperties.getRefreshExpiration());</span>
+
+<span class="nc" id="L111">        return jwtTokenResponseDto;</span>
+    }
+
+    // token 유효성 검증
+    public boolean validateToken(String token) {
+        try {
+<span class="nc" id="L117">            Jws&lt;Claims&gt; claimsJws = Jwts.parser()</span>
+<span class="nc" id="L118">                    .setSigningKey(jwtProperties.getSecret())</span>
+<span class="nc" id="L119">                    .parseClaimsJws(token);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            return !claimsJws.getBody().getExpiration().before(new Date());</span>
+<span class="nc" id="L121">        } catch (ExpiredJwtException exception) {</span>
+<span class="nc" id="L122">            log.warn(&quot;만료된 jwt 입니다.&quot;);</span>
+<span class="nc" id="L123">        } catch (UnsupportedJwtException exception) {</span>
+<span class="nc" id="L124">            log.warn(&quot;지원되지 않는 jwt 입니다.&quot;);</span>
+<span class="nc" id="L125">        } catch (IllegalArgumentException exception) {</span>
+<span class="nc" id="L126">            log.warn(&quot;token에 값이 없습니다.&quot;);</span>
+<span class="nc" id="L127">        } catch (SignatureException exception) {</span>
+<span class="nc" id="L128">            log.warn(&quot;signature에 오류가 존재합니다.&quot;);</span>
+<span class="nc" id="L129">        } catch (MalformedJwtException exception) {</span>
+<span class="nc" id="L130">            log.warn(&quot;jwt가 유효하지 않습니다.&quot;);</span>
+<span class="nc" id="L131">        }</span>
+<span class="nc" id="L132">        return false;</span>
+    }
+
+    // 실제 token 생성 로직
+    private String createToken(JwtClaimsDto jwtClaimsDto, Long tokenExpiration) {
+<span class="nc" id="L137">        Claims claims = Jwts.claims();</span>
+<span class="nc" id="L138">        claims.put(&quot;id&quot;, jwtClaimsDto.getId());</span>
+<span class="nc" id="L139">        claims.put(&quot;roleType&quot;, jwtClaimsDto.getRoleType().name());</span>
+<span class="nc" id="L140">        Date tokenExpiresIn = new Date(new Date().getTime() + tokenExpiration);</span>
+
+<span class="nc" id="L142">        return Jwts.builder()</span>
+<span class="nc" id="L143">                .setClaims(claims)</span>
+<span class="nc" id="L144">                .setIssuedAt(new Date())</span>
+<span class="nc" id="L145">                .setExpiration(tokenExpiresIn)</span>
+<span class="nc" id="L146">                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecret())</span>
+<span class="nc" id="L147">                .compact();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

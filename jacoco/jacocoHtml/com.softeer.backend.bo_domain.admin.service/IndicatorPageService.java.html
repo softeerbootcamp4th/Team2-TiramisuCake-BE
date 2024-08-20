@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IndicatorPageService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.bo_domain.admin.service</a> &gt; <span class="el_source">IndicatorPageService.java</span></div><h1>IndicatorPageService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.bo_domain.admin.service;
+
+import com.softeer.backend.bo_domain.admin.dto.indicator.EventIndicatorResponseDto;
+import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
+import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
+import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
+import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import kotlinx.serialization.Required;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class IndicatorPageService {
+
+    private final EventParticipationRepository eventParticipationRepository;
+    private final DrawSettingRepository drawSettingRepository;
+
+    public EventIndicatorResponseDto getEventIndicator() {
+
+<span class="nc" id="L24">        DrawSetting drawSetting = drawSettingRepository.findAll().get(0);</span>
+
+<span class="nc" id="L26">        List&lt;EventParticipation&gt; eventParticipationList = eventParticipationRepository.findAllByEventDateBetween(</span>
+<span class="nc" id="L27">                drawSetting.getStartDate(), drawSetting.getEndDate()</span>
+        );
+
+<span class="nc" id="L30">        return EventIndicatorResponseDto.of(eventParticipationList, drawSetting);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

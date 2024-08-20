@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Comment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.comment.domain</a> &gt; <span class="el_source">Comment.java</span></div><h1>Comment.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.comment.domain;
+
+
+import com.softeer.backend.fo_domain.comment.constant.CommentNickname;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Builder
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = &quot;comment&quot;)
+public class Comment {
+
+    @Id
+    @Column(name = &quot;comment_id&quot;)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = &quot;nickname&quot;, nullable = false)
+    private String nickname;
+
+    @Column(name = &quot;comment_type&quot;, nullable = false)
+    private Integer commentType;
+
+    @CreatedDate
+    @Column(name = &quot;upload_time&quot;, updatable = false)
+    private LocalDateTime uploadTime;
+
+    @Column(name = &quot;user_id&quot;, nullable = true)
+    private Integer userId;
+
+    @PrePersist
+    public void assignRandomNickname() {
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (userId != null) {</span>
+<span class="nc" id="L45">            this.nickname = CommentNickname.getMyRandomNickname(userId);</span>
+        } else {
+<span class="nc" id="L47">            this.nickname = CommentNickname.getRandomNickname();</span>
+        }
+<span class="nc" id="L49">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

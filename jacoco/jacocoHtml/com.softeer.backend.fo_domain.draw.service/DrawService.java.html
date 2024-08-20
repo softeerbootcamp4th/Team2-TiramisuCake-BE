@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.draw.service</a> &gt; <span class="el_source">DrawService.java</span></div><h1>DrawService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.draw.service;
+
+import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
+import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.exception.DrawException;
+import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
+import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
+import com.softeer.backend.fo_domain.draw.util.DrawUtil;
+import com.softeer.backend.fo_domain.share.domain.ShareInfo;
+import com.softeer.backend.fo_domain.share.exception.ShareInfoException;
+import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
+import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.util.DrawRedisUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class DrawService {
+    private final DrawParticipationInfoRepository drawParticipationInfoRepository;
+    private final ShareInfoRepository shareInfoRepository;
+    private final DrawRedisUtil drawRedisUtil;
+    private final DrawUtil drawUtil;
+    private final DrawResponseGenerateUtil drawResponseGenerateUtil;
+    private final DrawAttendanceCountUtil drawAttendanceCountUtil;
+    private final DrawSettingManager drawSettingManager;
+
+    /**
+     * 1. 연속 참여일수 조회
+     * 1-1. 만약 7일 연속 참여했다면 상품 정보 응답
+     * 1-2. 만약 7일 미만 참여라면 일반 정보 응답
+     */
+    public DrawMainResponseDto getDrawMainPageInfo(Integer userId) {
+        // 참여 정보 (연속참여일수) 조회
+<span class="fc" id="L38">        DrawParticipationInfo drawParticipationInfo = drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)</span>
+<span class="pc" id="L39">                .orElseThrow(() -&gt; new DrawException(ErrorStatus._NOT_FOUND));</span>
+
+        // 초대한 친구 수, 복권 기회 조회
+<span class="fc" id="L42">        ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)</span>
+<span class="pc" id="L43">                .orElseThrow(() -&gt; new ShareInfoException(ErrorStatus._NOT_FOUND));</span>
+
+<span class="fc" id="L45">        int drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);</span>
+<span class="fc" id="L46">        int invitedNum = shareInfo.getInvitedNum();</span>
+<span class="fc" id="L47">        int remainDrawCount = shareInfo.getRemainDrawCount();</span>
+
+<span class="fc" id="L49">        System.out.println(&quot;Draw Attendance = &quot; + drawAttendanceCount);</span>
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (drawAttendanceCount &gt;= 7) {</span>
+            // 7일 연속 출석자라면
+<span class="fc" id="L53">            return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount % 8);</span>
+        } else {
+            // 연속 출석자가 아니라면
+<span class="fc" id="L56">            return drawResponseGenerateUtil.generateMainNotAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount);</span>
+        }
+    }
+
+    /**
+     * 추첨 이벤트 당첨 로직 작성
+     *
+     * @param userId 사용자 아이디
+     * @return 추첨 결과에 따른 응답 반환
+     */
+    public DrawModalResponseDto participateDrawEvent(Integer userId) {
+        // 복권 기회 조회
+<span class="fc" id="L68">        ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)</span>
+<span class="pc" id="L69">                .orElseThrow(() -&gt; new ShareInfoException(ErrorStatus._NOT_FOUND));</span>
+
+        // 만약 남은 참여 기회가 0이라면
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (shareInfo.getRemainDrawCount() == 0) {</span>
+<span class="fc" id="L73">            return drawResponseGenerateUtil.generateDrawLoserResponse(userId);</span>
+        }
+
+<span class="fc" id="L76">        drawRedisUtil.increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가</span>
+<span class="fc" id="L77">        shareInfoRepository.decreaseRemainDrawCount(userId); // 횟수 1회 차감</span>
+
+        // 만약 당첨 목록에 존재한다면 이미 오늘은 한 번 당첨됐다는 뜻이므로 LoseModal 반환
+<span class="fc" id="L80">        int ranking = drawRedisUtil.getRankingIfWinner(userId); // 당첨 목록에 존재한다면 랭킹 반환</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (ranking != 0) {</span>
+<span class="fc" id="L82">            drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가</span>
+<span class="fc" id="L83">            return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환</span>
+        }
+
+        // 당첨자 수 조회
+<span class="fc" id="L87">        int first = drawSettingManager.getWinnerNum1(); // 1등 수</span>
+<span class="fc" id="L88">        int second = drawSettingManager.getWinnerNum2(); // 2등 수</span>
+<span class="fc" id="L89">        int third = drawSettingManager.getWinnerNum3(); // 3등 수</span>
+
+        // 당첨자 수 설정
+<span class="fc" id="L92">        drawUtil.setFirst(first);</span>
+<span class="fc" id="L93">        drawUtil.setSecond(second);</span>
+<span class="fc" id="L94">        drawUtil.setThird(third);</span>
+
+        // 추첨 로직 실행
+<span class="fc" id="L97">        drawUtil.performDraw();</span>
+
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (drawUtil.isDrawWin()) { // 당첨자일 경우</span>
+<span class="fc" id="L100">            ranking = drawUtil.getRanking();</span>
+            int winnerNum;
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            if (ranking == 1) {</span>
+<span class="fc" id="L103">                winnerNum = first;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            } else if (ranking == 2) {</span>
+<span class="fc" id="L105">                winnerNum = second;</span>
+            } else {
+<span class="fc" id="L107">                winnerNum = third;</span>
+            }
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            if (drawRedisUtil.isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가</span>
+                // 추첨 티켓이 다 팔리지 않았다면
+<span class="fc" id="L112">                drawParticipationInfoRepository.increaseWinCount(userId); // 당첨 횟수 증가</span>
+<span class="fc" id="L113">                return drawResponseGenerateUtil.generateDrawWinnerResponse(ranking); // WinModal 반환</span>
+            } else {
+                // 추첨 티켓이 다 팔렸다면 로직상 당첨자라도 실패 반환
+<span class="fc" id="L116">                drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가</span>
+<span class="fc" id="L117">                return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환</span>
+            }
+        } else { // 낙첨자일 경우
+<span class="fc" id="L120">            drawParticipationInfoRepository.increaseLoseCount(userId);  // 낙첨 횟수 증가</span>
+<span class="fc" id="L121">            return drawResponseGenerateUtil.generateDrawLoserResponse(userId); // LoseModal 반환</span>
+        }
+    }
+
+    /**
+     * 당첨 내역 조회하는 메서드
+     * 1. 당첨자라면 WinModal과 같은 당첨 내역 모달 응답
+     * 2. 낙첨자라면 LoseModal과 같은 공유 url 모달 응답
+     *
+     * @param userId 사용자 아이디
+     * @return 당첨 내역에 따른 응답
+     */
+    public DrawHistoryResponseDto getDrawHistory(Integer userId) {
+<span class="fc" id="L134">        int ranking = drawRedisUtil.getRankingIfWinner(userId);</span>
+
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (ranking != 0) {</span>
+            // 당첨자라면
+<span class="fc" id="L138">            return drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(ranking);</span>
+        }
+
+        // 당첨자가 아니라면
+<span class="fc" id="L142">        return drawResponseGenerateUtil.generateDrawHistoryLoserResponse(userId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

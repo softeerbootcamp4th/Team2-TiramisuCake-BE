@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebMvcConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.global.config.web</a> &gt; <span class="el_source">WebMvcConfig.java</span></div><h1>WebMvcConfig.java</h1><pre class="source lang-java linenums">package com.softeer.backend.global.config.web;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softeer.backend.fo_domain.draw.interceptor.DrawTimeCheckInterceptor;
+import com.softeer.backend.fo_domain.fcfs.interceptor.FcfsTimeCheckInterceptor;
+import com.softeer.backend.global.annotation.argumentresolver.AuthInfoArgumentResolver;
+import com.softeer.backend.global.config.properties.JwtProperties;
+import com.softeer.backend.global.filter.ExceptionHandlingFilter;
+import com.softeer.backend.global.filter.JwtAuthenticationFilter;
+import com.softeer.backend.global.filter.JwtAuthorizationFilter;
+import com.softeer.backend.global.util.JwtUtil;
+import com.softeer.backend.global.util.StringRedisUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+
+/**
+ * WebMvc 설정 클래스
+ */
+@Configuration
+@RequiredArgsConstructor
+public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final ObjectMapper objectMapper;
+    private final JwtUtil jwtUtil;
+    private final StringRedisUtil stringRedisUtil;
+    private final JwtProperties jwtProperties;
+
+    private final FcfsTimeCheckInterceptor fcfsTimeCheckInterceptor;
+    private final DrawTimeCheckInterceptor drawTimeCheckInterceptor;
+
+    /**
+     * AuthInfo 애노테이션에 대한 Argument Resolver 등록
+     *
+     * @param resolvers
+     */
+    public void addArgumentResolvers(List&lt;HandlerMethodArgumentResolver&gt; resolvers) {
+<span class="nc" id="L46">        resolvers.add(new AuthInfoArgumentResolver());</span>
+<span class="nc" id="L47">    }</span>
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+<span class="nc" id="L51">        registry.addInterceptor(fcfsTimeCheckInterceptor)</span>
+<span class="nc" id="L52">                .addPathPatterns(&quot;/fcfs&quot;);</span>
+
+<span class="nc" id="L54">        registry.addInterceptor(drawTimeCheckInterceptor)</span>
+<span class="nc" id="L55">                .addPathPatterns(&quot;/event/draw&quot;);</span>
+<span class="nc" id="L56">    }</span>
+
+    /**
+     * CORS 설정 메서드
+     *
+     * @param registry Cors 등록 객체
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+
+<span class="nc" id="L66">        registry.addMapping(&quot;/**&quot;)</span>
+<span class="nc" id="L67">                .allowedOrigins(&quot;https://softeer.site&quot;, &quot;http://localhost:5173&quot;, &quot;https://softeer.shop&quot;,</span>
+                        &quot;https://d3qmq1ffhp5il9.cloudfront.net&quot;) // 허용할 도메인 설정
+<span class="nc" id="L69">                .allowedMethods(&quot;OPTIONS&quot;, &quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;) // 허용할 HTTP 메서드 설정</span>
+<span class="nc" id="L70">                .allowedHeaders(&quot;Content-Type&quot;, &quot;Authorization&quot;, &quot;Authorization-Refresh&quot;) // 허용할 헤더 설정</span>
+<span class="nc" id="L71">                .exposedHeaders(&quot;Authorization&quot;, &quot;Authorization-Refresh&quot;) // 클라이언트에 노출할 헤더 설정</span>
+<span class="nc" id="L72">                .allowCredentials(true) // 자격 증명 허용</span>
+<span class="nc" id="L73">                .maxAge(3600); // preflight 요청의 캐시 시간 설정 (초 단위)</span>
+<span class="nc" id="L74">    }</span>
+
+    /**
+     * ExceptionHandlingFilter를 필터에 등록
+     */
+    @Bean
+    public FilterRegistrationBean&lt;ExceptionHandlingFilter&gt; exceptionHandleFilter() {
+<span class="nc" id="L81">        FilterRegistrationBean&lt;ExceptionHandlingFilter&gt; registrationBean = new FilterRegistrationBean&lt;&gt;();</span>
+<span class="nc" id="L82">        registrationBean.setFilter(new ExceptionHandlingFilter(objectMapper));</span>
+<span class="nc" id="L83">        registrationBean.addUrlPatterns(&quot;/*&quot;);</span>
+<span class="nc" id="L84">        registrationBean.setOrder(1);</span>
+<span class="nc" id="L85">        return registrationBean;</span>
+    }
+
+    /**
+     * JwtAuthenticationFilter를 필터에 등록
+     */
+    @Bean
+    public FilterRegistrationBean&lt;JwtAuthenticationFilter&gt; jwtAuthenticationFilter() {
+<span class="nc" id="L93">        FilterRegistrationBean&lt;JwtAuthenticationFilter&gt; registrationBean = new FilterRegistrationBean&lt;&gt;();</span>
+<span class="nc" id="L94">        registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil, stringRedisUtil, jwtProperties));</span>
+<span class="nc" id="L95">        registrationBean.addUrlPatterns(&quot;/*&quot;);</span>
+<span class="nc" id="L96">        registrationBean.setOrder(2);</span>
+<span class="nc" id="L97">        return registrationBean;</span>
+    }
+
+    /**
+     * JwtAuthorizationFilter를 필터에 등록
+     */
+    @Bean
+    public FilterRegistrationBean&lt;JwtAuthorizationFilter&gt; jwtAuthorizationFilter() {
+<span class="nc" id="L105">        FilterRegistrationBean&lt;JwtAuthorizationFilter&gt; registrationBean = new FilterRegistrationBean&lt;&gt;();</span>
+<span class="nc" id="L106">        registrationBean.setFilter(new JwtAuthorizationFilter());</span>
+<span class="nc" id="L107">        registrationBean.addUrlPatterns(&quot;/admin/*&quot;);</span>
+<span class="nc" id="L108">        registrationBean.setOrder(3);</span>
+<span class="nc" id="L109">        return registrationBean;</span>
+    }
+
+    @Bean
+    public FilterRegistrationBean&lt;ShallowEtagHeaderFilter&gt; shallowEtagHeaderFilter() {
+<span class="nc" id="L114">        FilterRegistrationBean&lt;ShallowEtagHeaderFilter&gt; filterRegistrationBean</span>
+                = new FilterRegistrationBean&lt;&gt;(new ShallowEtagHeaderFilter());
+<span class="nc" id="L116">        filterRegistrationBean.addUrlPatterns(&quot;/main/event/static&quot;, &quot;/main/car&quot;);</span>
+<span class="nc" id="L117">        return filterRegistrationBean;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

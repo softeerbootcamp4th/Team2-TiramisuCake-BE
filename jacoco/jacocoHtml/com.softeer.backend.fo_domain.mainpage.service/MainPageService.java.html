@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainPageService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">backend</a> &gt; <a href="index.source.html" class="el_package">com.softeer.backend.fo_domain.mainpage.service</a> &gt; <span class="el_source">MainPageService.java</span></div><h1>MainPageService.java</h1><pre class="source lang-java linenums">package com.softeer.backend.fo_domain.mainpage.service;
+
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
+import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
+import com.softeer.backend.fo_domain.mainpage.dto.MainPageCarResponseDto;
+import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventInfoResponseDto;
+import com.softeer.backend.fo_domain.mainpage.dto.MainPageEventStaticResponseDto;
+import com.softeer.backend.global.common.constant.RedisKeyPrefix;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.constant.StaticTextName;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
+import com.softeer.backend.global.util.EventLockRedisUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.DecimalFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+<span class="nc" id="L33">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class MainPageService {
+    private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy.MM.dd&quot;);
+    private final DateTimeFormatter fcfsTimeFormatter = DateTimeFormatter.ofPattern(&quot;a h&quot;, Locale.KOREAN);
+    private final DecimalFormat decimalFormat = new DecimalFormat(&quot;#,###&quot;);
+
+    private final EventLockRedisUtil eventLockRedisUtil;
+    private final FcfsSettingManager fcfsSettingManager;
+    private final DrawSettingManager drawSettingManager;
+    private final QuizManager quizManager;
+    private final DrawRepository drawRepository;
+    private final StaticResourceUtil staticResourceUtil;
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = &quot;staticResources&quot;, key = &quot;'event'&quot;)
+    public MainPageEventStaticResponseDto getEventPageStatic(){
+
+<span class="nc" id="L52">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+<span class="nc" id="L53">        Map&lt;String, String&gt; s3ContentMap = staticResourceUtil.getS3ContentMap();</span>
+
+<span class="nc" id="L55">        MainPageEventStaticResponseDto.EventInfo fcfsInfo = MainPageEventStaticResponseDto.EventInfo.builder()</span>
+<span class="nc" id="L56">                .title(textContentMap.get(StaticTextName.FCFS_TITLE.name()))</span>
+<span class="nc" id="L57">                .content(textContentMap.get(StaticTextName.FCFS_CONTENT.name()))</span>
+<span class="nc" id="L58">                .rewardImage1(s3ContentMap.get(S3FileName.FCFS_REWARD_IMAGE_1.name()))</span>
+<span class="nc" id="L59">                .rewardImage2(s3ContentMap.get(S3FileName.FCFS_REWARD_IMAGE_2.name()))</span>
+<span class="nc" id="L60">                .build();</span>
+
+<span class="nc" id="L62">        MainPageEventStaticResponseDto.EventInfo drawInfo = MainPageEventStaticResponseDto.EventInfo.builder()</span>
+<span class="nc" id="L63">                .title(textContentMap.get(StaticTextName.DRAW_TITLE.name()))</span>
+<span class="nc" id="L64">                .content(textContentMap.get(StaticTextName.DRAW_CONTENT.name()))</span>
+<span class="nc" id="L65">                .rewardImage1(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_1.name()))</span>
+<span class="nc" id="L66">                .rewardImage2(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_2_3.name()))</span>
+<span class="nc" id="L67">                .build();</span>
+
+<span class="nc" id="L69">        return MainPageEventStaticResponseDto.builder()</span>
+<span class="nc" id="L70">                .eventTitle(textContentMap.get(StaticTextName.EVENT_TITLE.name()))</span>
+<span class="nc" id="L71">                .eventDescription(textContentMap.get(StaticTextName.EVENT_DESCRIPTION.name()))</span>
+<span class="nc" id="L72">                .eventInfoList(Arrays.asList(fcfsInfo, drawInfo))</span>
+<span class="nc" id="L73">                .build();</span>
+
+    }
+
+    @Transactional(readOnly = true)
+    public MainPageEventInfoResponseDto getEventPageInfo(){
+
+<span class="nc" id="L80">        setTotalVisitorsCount();</span>
+
+<span class="nc" id="L82">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+
+<span class="nc" id="L84">        FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);</span>
+<span class="nc" id="L85">        FcfsSettingDto secondFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(2);</span>
+
+<span class="nc" id="L87">        int totalDrawWinner = drawSettingManager.getWinnerNum1()</span>
+<span class="nc" id="L88">                + drawSettingManager.getWinnerNum2() + drawSettingManager.getWinnerNum3();</span>
+
+<span class="nc" id="L90">        int remainDrawCount = totalDrawWinner - (int)drawRepository.count();</span>
+
+<span class="nc" id="L92">        return MainPageEventInfoResponseDto.builder()</span>
+<span class="nc" id="L93">                .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))</span>
+<span class="nc" id="L94">                .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))</span>
+<span class="nc" id="L95">                .fcfsInfo(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_INFO.name()),</span>
+<span class="nc" id="L96">                        staticResourceUtil.getKoreanDayOfWeek(firstFcfsSetting.getStartTime().getDayOfWeek()),</span>
+<span class="nc" id="L97">                        staticResourceUtil.getKoreanDayOfWeek(secondFcfsSetting.getStartTime().getDayOfWeek()),</span>
+<span class="nc" id="L98">                        firstFcfsSetting.getStartTime().format(fcfsTimeFormatter),</span>
+<span class="nc" id="L99">                        firstFcfsSetting.getWinnerNum()))</span>
+<span class="nc" id="L100">                .totalDrawWinner(staticResourceUtil.format(</span>
+<span class="nc" id="L101">                        textContentMap.get(StaticTextName.TOTAL_DRAW_WINNER.name()), decimalFormat.format(totalDrawWinner)))</span>
+<span class="nc" id="L102">                .remainDrawCount(staticResourceUtil.format(</span>
+<span class="nc" id="L103">                        textContentMap.get(StaticTextName.REMAIN_DRAW_COUNT.name()), decimalFormat.format(remainDrawCount)))</span>
+<span class="nc" id="L104">                .fcfsHint(quizManager.getHint())</span>
+<span class="nc" id="L105">                .fcfsStartTime(fcfsSettingManager.getNextFcfsTime(LocalDateTime.now()))</span>
+<span class="nc" id="L106">                .build();</span>
+    }
+
+    // 이벤트 기간이면 redis에 사이트 방문자 수 +1 하기
+    public void setTotalVisitorsCount(){
+
+<span class="nc" id="L112">        LocalDate now = LocalDate.now();</span>
+
+<span class="nc bnc" id="L114" title="All 4 branches missed.">        if (!now.isBefore(drawSettingManager.getStartDate()) &amp;&amp; !now.isAfter(drawSettingManager.getEndDate())) {</span>
+<span class="nc" id="L115">            eventLockRedisUtil.incrementData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());</span>
+        }
+
+<span class="nc" id="L118">    }</span>
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = &quot;staticResources&quot;, key = &quot;'car'&quot;)
+    public MainPageCarResponseDto getCarPage() {
+<span class="nc" id="L123">        Map&lt;String, String&gt; textContentMap = staticResourceUtil.getTextContentMap();</span>
+<span class="nc" id="L124">        Map&lt;String, String&gt; s3ContentMap = staticResourceUtil.getS3ContentMap();</span>
+
+<span class="nc" id="L126">        List&lt;MainPageCarResponseDto.CarInfo&gt; carInfoList = List.of(</span>
+<span class="nc" id="L127">                createCarInfo(1,</span>
+                        StaticTextName.MAIN_TITLE,
+                        StaticTextName.MAIN_SUBTITLE,
+                        S3FileName.IONIQ_VIDEO,
+                        S3FileName.MAIN_BACKGROUND_IMAGE,
+                        textContentMap,
+                        s3ContentMap),
+<span class="nc" id="L134">                createCarInfoWithDetails(2,</span>
+                        StaticTextName.INTERIOR_TITLE,
+                        StaticTextName.INTERIOR_SUBTITLE,
+                        StaticTextName.INTERIOR_IMAGE_TITLE,
+                        StaticTextName.INTERIOR_IMAGE_CONTENT,
+                        S3FileName.INTERIOR_THUMBNAIL_IMAGE,
+                        S3FileName.INTERIOR_BACKGROUND_IMAGE,
+<span class="nc" id="L141">                        List.of(</span>
+<span class="nc" id="L142">                                createCarDetailInfo(1,</span>
+                                        StaticTextName.INTERIOR_OPENNESS_TITLE,
+                                        StaticTextName.INTERIOR_OPENNESS_SUBTITLE,
+                                        StaticTextName.INTERIOR_OPENNESS_CONTENT,
+                                        S3FileName.INTERIOR_OPENNESS_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap),
+<span class="nc" id="L149">                                createCarDetailInfo(2,</span>
+                                        StaticTextName.INTERIOR_WELLNESS_TITLE,
+                                        StaticTextName.INTERIOR_WELLNESS_SUBTITLE,
+                                        StaticTextName.INTERIOR_WELLNESS_CONTENT,
+                                        S3FileName.INTERIOR_WELLNESS_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap)
+                        ),
+                        textContentMap,
+                        s3ContentMap
+                ),
+<span class="nc" id="L160">                createCarInfoWithDetails(3,</span>
+                        StaticTextName.PERFORMANCE_TITLE,
+                        StaticTextName.PERFORMANCE_SUBTITLE,
+                        StaticTextName.PERFORMANCE_IMAGE_TITLE,
+                        StaticTextName.PERFORMANCE_IMAGE_CONTENT,
+                        S3FileName.PERFORMANCE_THUMBNAIL_IMAGE,
+                        S3FileName.PERFORMANCE_BACKGROUND_IMAGE,
+<span class="nc" id="L167">                        List.of(</span>
+<span class="nc" id="L168">                                createCarDetailInfo(1,</span>
+                                        StaticTextName.PERFORMANCE_BRAKING_TITLE,
+                                        StaticTextName.PERFORMANCE_BRAKING_SUBTITLE,
+                                        StaticTextName.PERFORMANCE_BRAKING_CONTENT,
+                                        S3FileName.PERFORMANCE_BRAKING_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap),
+<span class="nc" id="L175">                                createCarDetailInfo(2,</span>
+                                        StaticTextName.PERFORMANCE_DRIVING_TITLE,
+                                        StaticTextName.PERFORMANCE_DRIVING_SUBTITLE,
+                                        StaticTextName.PERFORMANCE_DRIVING_CONTENT,
+                                        S3FileName.PERFORMANCE_DRIVING_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap)
+                        ),
+                        textContentMap,
+                        s3ContentMap
+                ),
+<span class="nc" id="L186">                createCarInfoWithDetails(4, StaticTextName.CHARGING_TITLE,</span>
+                        StaticTextName.CHARGING_SUBTITLE,
+                        StaticTextName.CHARGING_IMAGE_TITLE,
+                        StaticTextName.CHARGING_IMAGE_CONTENT,
+                        S3FileName.CHARGING_THUMBNAIL_IMAGE,
+                        S3FileName.CHARGING_BACKGROUND_IMAGE,
+<span class="nc" id="L192">                        List.of(</span>
+<span class="nc" id="L193">                                createCarDetailInfo(1,</span>
+                                        StaticTextName.CHARGING_FAST_TITLE,
+                                        StaticTextName.CHARGING_FAST_SUBTITLE,
+                                        StaticTextName.CHARGING_FAST_CONTENT,
+                                        S3FileName.CHARGING_FAST_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap),
+<span class="nc" id="L200">                                createCarDetailInfo(2,</span>
+                                        StaticTextName.CHARGING_V2L_TITLE,
+                                        StaticTextName.CHARGING_V2L_SUBTITLE,
+                                        StaticTextName.CHARGING_V2L_CONTENT,
+                                        S3FileName.CHARGING_V2L_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap)
+                        ),
+                        textContentMap,
+                        s3ContentMap
+                ),
+<span class="nc" id="L211">                createCarInfoWithDetails(5,</span>
+                        StaticTextName.SAFE_TITLE,
+                        StaticTextName.SAFE_SUBTITLE,
+                        StaticTextName.SAFE_IMAGE_TITLE,
+                        StaticTextName.SAFE_IMAGE_CONTENT,
+                        S3FileName.SAFE_THUMBNAIL_IMAGE,
+                        S3FileName.SAFE_BACKGROUND_IMAGE,
+<span class="nc" id="L218">                        List.of(</span>
+<span class="nc" id="L219">                                createCarDetailInfo(1,</span>
+                                        StaticTextName.SAFE_DRIVING_TITLE,
+                                        StaticTextName.SAFE_DRIVING_SUBTITLE,
+                                        StaticTextName.SAFE_DRIVING_CONTENT,
+                                        S3FileName.SAFE_DRIVING_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap),
+<span class="nc" id="L226">                                createCarDetailInfo(2,</span>
+                                        StaticTextName.SAFE_ADVANCED_TITLE,
+                                        StaticTextName.SAFE_ADVANCED_SUBTITLE,
+                                        StaticTextName.SAFE_ADVANCED_CONTENT,
+                                        S3FileName.SAFE_ADVANCED_IMAGE,
+                                        textContentMap,
+                                        s3ContentMap)
+                        ),
+                        textContentMap,
+                        s3ContentMap
+                )
+        );
+
+<span class="nc" id="L239">        return MainPageCarResponseDto.builder()</span>
+<span class="nc" id="L240">                .carInfoList(carInfoList)</span>
+<span class="nc" id="L241">                .build();</span>
+    }
+
+    private MainPageCarResponseDto.CarInfo createCarInfo(int id,
+                                                         StaticTextName titleKey,
+                                                         StaticTextName subTitleKey,
+                                                         S3FileName imgUrlKey,
+                                                         S3FileName backgroundImgUrlKey,
+                                                         Map&lt;String, String&gt; textContentMap,
+                                                         Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L251">        return MainPageCarResponseDto.CarInfo.builder()</span>
+<span class="nc" id="L252">                .id(id)</span>
+<span class="nc" id="L253">                .title(textContentMap.get(titleKey.name()))</span>
+<span class="nc" id="L254">                .subTitle(textContentMap.get(subTitleKey.name()))</span>
+<span class="nc" id="L255">                .imgUrl(s3ContentMap.get(imgUrlKey.name()))</span>
+<span class="nc" id="L256">                .backgroundImgUrl(s3ContentMap.get(backgroundImgUrlKey.name()))</span>
+<span class="nc" id="L257">                .build();</span>
+    }
+
+    private MainPageCarResponseDto.CarDetailInfo createCarDetailInfo(int id,
+                                                                     StaticTextName titleKey,
+                                                                     StaticTextName subTitleKey,
+                                                                     StaticTextName contentKey,
+                                                                     S3FileName imgUrlKey,
+                                                                     Map&lt;String, String&gt; textContentMap,
+                                                                     Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L267">        return MainPageCarResponseDto.CarDetailInfo.builder()</span>
+<span class="nc" id="L268">                .id(id)</span>
+<span class="nc" id="L269">                .title(textContentMap.get(titleKey.name()))</span>
+<span class="nc" id="L270">                .subTitle(textContentMap.get(subTitleKey.name()))</span>
+<span class="nc" id="L271">                .content(textContentMap.get(contentKey.name()))</span>
+<span class="nc" id="L272">                .imgUrl(s3ContentMap.get(imgUrlKey.name()))</span>
+<span class="nc" id="L273">                .build();</span>
+    }
+
+    private MainPageCarResponseDto.CarInfo createCarInfoWithDetails(int id,
+                                                                    StaticTextName titleKey,
+                                                                    StaticTextName subTitleKey,
+                                                                    StaticTextName imgTitleKey,
+                                                                    StaticTextName imgContentKey,
+                                                                    S3FileName imgUrlKey,
+                                                                    S3FileName backgroundImgUrlKey,
+                                                                    List&lt;MainPageCarResponseDto.CarDetailInfo&gt; carDetailInfoList,
+                                                                    Map&lt;String, String&gt; textContentMap,
+                                                                    Map&lt;String, String&gt; s3ContentMap) {
+<span class="nc" id="L286">        return MainPageCarResponseDto.CarInfo.builder()</span>
+<span class="nc" id="L287">                .id(id)</span>
+<span class="nc" id="L288">                .title(textContentMap.get(titleKey.name()))</span>
+<span class="nc" id="L289">                .subTitle(textContentMap.get(subTitleKey.name()))</span>
+<span class="nc" id="L290">                .imgTitle(textContentMap.get(imgTitleKey.name()))</span>
+<span class="nc" id="L291">                .imgContent(textContentMap.get(imgContentKey.name()))</span>
+<span class="nc" id="L292">                .imgUrl(s3ContentMap.get(imgUrlKey.name()))</span>
+<span class="nc" id="L293">                .backgroundImgUrl(s3ContentMap.get(backgroundImgUrlKey.name()))</span>
+<span class="nc" id="L294">                .carDetailInfoList(carDetailInfoList)</span>
+<span class="nc" id="L295">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

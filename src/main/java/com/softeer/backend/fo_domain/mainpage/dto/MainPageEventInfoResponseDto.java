@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.mainpage.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,9 @@ public class MainPageEventInfoResponseDto {
 
     private String fcfsHint;
 
+    @JsonProperty("isFcfsAvailable")
+    private boolean isFcfsAvailable;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime fcfsStartTime;
+    private LocalDateTime nextFcfsStartTime;
 }

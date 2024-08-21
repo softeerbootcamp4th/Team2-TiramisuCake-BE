@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.draw.dto.result;
+package com.softeer.backend.fo_domain.draw.dto.history;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

@@ -2,7 +2,7 @@ package com.softeer.backend.fo_domain.draw.controller;
 
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.service.DrawService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;

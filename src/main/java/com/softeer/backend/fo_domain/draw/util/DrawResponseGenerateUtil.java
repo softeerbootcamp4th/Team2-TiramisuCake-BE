@@ -4,8 +4,8 @@ import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawWinModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryLoserResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryWinnerResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryLoserResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;

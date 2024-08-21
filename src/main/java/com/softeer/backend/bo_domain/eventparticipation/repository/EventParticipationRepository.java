@@ -17,7 +17,7 @@ public interface EventParticipationRepository extends JpaRepository<EventPartici
     /**
      * 시작날짜, 종료날짜에 해당하는 EventParticipation 엔티티 조회
      */
-    @Query("SELECT e FROM EventParticipation e WHERE e.eventDate BETWEEN :startDate AND :endDate")
+    @Query("SELECT e FROM EventParticipation e WHERE e.eventDate BETWEEN :startDate AND :endDate ORDER BY e.eventDate ASC")
     List<EventParticipation> findAllByEventDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
 }

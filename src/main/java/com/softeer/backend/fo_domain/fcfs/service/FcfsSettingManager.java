@@ -162,6 +162,19 @@ public class FcfsSettingManager {
         return null;
     }
 
+    /**
+     * 현재 선착순 이벤트가 진행중이라면 현재 이벤트의 시작시간을, 진행중이 아니라면 다음 이벤트 시작시간을 반환하는 메서드
+     */
+    public LocalDateTime getNowOrNextFcfsTime(LocalDateTime now) {
+
+        Integer round = getFcfsRound(now);
+        if(round != null){
+            return fcfsSettingList.get(round-1).getStartTime();
+        }
+
+        return getNextFcfsTime(now);
+    }
+
     public Integer getFcfsRoundForHistory(LocalDate now) {
 
         for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {

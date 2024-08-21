@@ -6,12 +6,15 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import java.io.IOException;
 
+/**
+ * 'xx.xx%' 형식으로 퍼센트 값을 변환하는 Serializer 클래스
+ */
 public class PercentageSerializer extends JsonSerializer<Double> {
 
     @Override
     public void serialize(Double value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value != null) {
-            // 백분율로 변환하고 % 기호를 붙입니다.
+
             String formatted = String.format("%.2f%%", value * 100);
             gen.writeString(formatted);
         }

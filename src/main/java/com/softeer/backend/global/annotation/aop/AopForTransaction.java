@@ -13,10 +13,6 @@ public class AopForTransaction {
 
     /**
      * 파라미터로 넘어온 메서드를 새로운 트랜잭션에서 실행하는 메서드
-     *
-     * @param joinPoint
-     * @return 메서드의 반환값
-     * @throws Throwable
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Object proceed(final ProceedingJoinPoint joinPoint) throws Throwable {

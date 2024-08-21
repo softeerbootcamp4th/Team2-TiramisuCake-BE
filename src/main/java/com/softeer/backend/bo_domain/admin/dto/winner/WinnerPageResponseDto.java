@@ -13,6 +13,9 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 당첨 관리 페이지 정보 응답 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder

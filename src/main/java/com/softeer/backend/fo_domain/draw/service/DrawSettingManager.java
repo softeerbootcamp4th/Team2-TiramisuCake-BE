@@ -17,6 +17,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * 추첨 이벤트 설정을 관리하기 위한 클래스
+ */
 @Getter
 @Component
 @RequiredArgsConstructor
@@ -39,6 +42,9 @@ public class DrawSettingManager {
     // @PostConstruct로 생성됐을 시 세팅정보 가져오기
     // 스케줄러로 01:00:00에 redis 임시 목록 삭제하기
 
+    /**
+     * 서버가 실행되고 인스턴스가 만들어진 직후 DB로부터 해당 설정을 불러와 저장하는 메서드
+     */
     @PostConstruct
     public void initializeDrawSettingManager() {
         DrawSetting drawSetting = drawSettingRepository.findById(1)
@@ -53,6 +59,9 @@ public class DrawSettingManager {
         winnerNum3 = drawSetting.getWinnerNum3();
     }
 
+    /**
+     * 추첨이벤트 정보를 설정하는 메서드
+     */
     public void setDrawSetting(DrawSetting drawSetting) {
         this.startDate = drawSetting.getStartDate();
         this.endDate = drawSetting.getEndDate();

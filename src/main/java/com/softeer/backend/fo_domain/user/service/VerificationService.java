@@ -9,6 +9,7 @@ import com.softeer.backend.fo_domain.user.properties.SmsProperties;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.util.RandomCodeUtil;
 import com.softeer.backend.global.util.StringRedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -19,24 +20,21 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * 휴대폰 인증 기능을 수행하는 클래스
+ */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class VerificationService {
     private final DefaultMessageService messageService;
     private final StringRedisUtil stringRedisUtil;
-    private final SmsProperties smsProperties;
     private final RandomCodeUtil randomCodeUtil;
-
-    public VerificationService(SmsProperties smsProperties, StringRedisUtil stringRedisUtil,
-                               RandomCodeUtil randomCodeUtil) {
-        this.messageService = NurigoApp.INSTANCE.initialize(
-                smsProperties.getKey(), smsProperties.getSecret(), smsProperties.getUrl());
-        this.smsProperties = smsProperties;
-        this.stringRedisUtil = stringRedisUtil;
-        this.randomCodeUtil = randomCodeUtil;
-    }
+    private final SmsProperties smsProperties;
 
     /**
+     * 인증 코드를 발급하는 메서드
+     * <p>
      * 1. CoolSms를 사용하여 인증코드를 발급하고 인증 제한시간을 응답에 담아 반환한다.
      * 2. 인증 코드 발급 제한 횟수를 초과하면 내일 다시 인증하라는 응답을 전송한다.
      */
@@ -80,6 +78,12 @@ public class VerificationService {
                 .build();
     }
 
+    /**
+     * 인증 코드를 발급하는 메서드
+     * <p>
+     * 1. CoolSms를 사용하여 인증코드를 발급하고 인증 제한시간을 응답에 담아 반환한다.
+     * 2. 인증 코드 발급 제한 횟수를 초과하면 내일 다시 인증하라는 응답을 전송한다.
+     */
     public VerificationCodeTestResponseDto sendVerificationCodeTest(String phoneNumber) {
 
         // 인증코드 발급이 처음이면 redis에 발급 횟수를 저장(유효 기간: 밤 12시 전까지)
@@ -115,6 +119,8 @@ public class VerificationService {
 
 
     /**
+     * 인증 코드가 올바른지 검증하는 메서드
+     * <p>
      * 1. 인증 코드를 검증하여 Redis에 있는 인증코도와 같은지를 검사한다.
      * 2. 제한시간이 지났거나 인증코드 불일치, 혹은 인증 제한 횟수를 초과한 경우 예외를 던진다.
      */

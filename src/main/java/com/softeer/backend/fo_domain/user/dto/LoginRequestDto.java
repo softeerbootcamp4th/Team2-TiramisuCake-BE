@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 로그인 요청 DTO 클래스
+ */
 @Getter
 @Setter
 @Builder

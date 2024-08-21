@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * 공유 url 정보 엔티티를 관리하기 위한 레포지토리 클래스
+ */
 @Repository
 public interface ShareUrlInfoRepository extends JpaRepository<ShareUrlInfo, Integer> {
     @Query("SELECT s.shareUrl FROM ShareUrlInfo s WHERE s.userId = :userId")

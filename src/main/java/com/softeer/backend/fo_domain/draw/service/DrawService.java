@@ -17,6 +17,9 @@ import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * 추첨 참여 로직을 처리하기 위한 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class DrawService {
@@ -30,8 +33,8 @@ public class DrawService {
 
     /**
      * 1. 연속 참여일수 조회
-     * 1-1. 만약 7일 연속 참여했다면 상품 정보 응답
-     * 1-2. 만약 7일 미만 참여라면 일반 정보 응답
+     *  1-1. 만약 7일 연속 참여했다면 상품 정보 응답
+     *  1-2. 만약 7일 미만 참여라면 일반 정보 응답
      */
     public DrawMainResponseDto getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
@@ -58,10 +61,19 @@ public class DrawService {
     }
 
     /**
-     * 추첨 이벤트 당첨 로직 작성
+     * 추첨 이벤트 참여를 위한 메서드
      *
-     * @param userId 사용자 아이디
-     * @return 추첨 결과에 따른 응답 반환
+     * 1. 남은 참여 기회가 0이라면 실패 응답 반환하고 종료
+     * 2. 추첨 이벤트 참여자 수 증가
+     * 3. 해당 사용자의 추첨 이벤트 참여 기회 1회 차감
+     * 4. 오늘 이미 당첨된 사용자인지 확인
+     *  4-1. 이미 당첨된 사용자라면 사용자의 낙첨 횟수 1회 증가, 낙첨 응답 반환
+     * 5. 추첨 이벤트 설정으로부터 각 등수의 당첨자 수 조회
+     * 6. 추첨 로직 실행
+     *  6-1. 당첨자일 경우
+     *   6-1-1. 레디스에 해당 등수의 자리가 남았을 경우: 레디스에 사용자 넣기, 해당 사용자의 당첨 횟수 증가, 당첨 응답 반환
+     *   6-1-2. 레디스에 해당 등수의 자리가 없을 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
+     *  6-2. 낙첨자일 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
      */
     public DrawModalResponseDto participateDrawEvent(Integer userId) {
         // 복권 기회 조회
@@ -108,7 +120,6 @@ public class DrawService {
             }
 
             if (drawRedisUtil.isWinner(userId, ranking, winnerNum)) { // 레디스에 추첨 티켓이 남았다면, 레디스 당첨 목록에 추가
-                // 추첨 티켓이 다 팔리지 않았다면
                 drawParticipationInfoRepository.increaseWinCount(userId); // 당첨 횟수 증가
                 return drawResponseGenerateUtil.generateDrawWinnerResponse(ranking); // WinModal 반환
             } else {
@@ -124,11 +135,9 @@ public class DrawService {
 
     /**
      * 당첨 내역 조회하는 메서드
-     * 1. 당첨자라면 WinModal과 같은 당첨 내역 모달 응답
-     * 2. 낙첨자라면 LoseModal과 같은 공유 url 모달 응답
      *
-     * @param userId 사용자 아이디
-     * @return 당첨 내역에 따른 응답
+     * 1. 당첨자라면 WinModal과 같은 당첨 내역 응답
+     * 2. 낙첨자라면 LoseModal과 같은 공유 url 응답
      */
     public DrawHistoryResponseDto getDrawHistory(Integer userId) {
         int ranking = drawRedisUtil.getRankingIfWinner(userId);

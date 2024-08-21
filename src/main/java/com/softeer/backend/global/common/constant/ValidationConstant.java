@@ -2,6 +2,9 @@ package com.softeer.backend.global.common.constant;
 
 import lombok.Getter;
 
+/**
+ * 검증 로직에서 사용되는 상수를 관리하는 클래스
+ */
 public class ValidationConstant {
     public static final String PHONE_NUMBER_REGEX = "^01[016789]\\d{8}$";
     public static final String PHONE_NUMBER_MSG = "잘못된 전화번호 형식입니다.";

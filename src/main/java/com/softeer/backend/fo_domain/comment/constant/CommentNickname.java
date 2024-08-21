@@ -27,14 +27,18 @@ public enum CommentNickname {
         this.nickname = nickname;
     }
 
-    // 인증 하지 않은 유저의 닉네임 생성 메서드
+    /**
+     * 인증 하지 않은 유저의 닉네임 생성 메서드
+     */
     public static String getRandomNickname() {
         CommentNickname[] nicknames = values();
         int index = (int) (Math.random() * nicknames.length);
         return NICKNAME_PREFIX + nicknames[index].getNickname();
     }
 
-    // 인증한 유저의 닉네임 생성 메서드
+    /**
+     * 인증한 유저의 닉네임 생성 메서드
+     */
     public static String getMyRandomNickname(int userId) {
         CommentNickname[] nicknames = values();
         int index = userId % nicknames.length;

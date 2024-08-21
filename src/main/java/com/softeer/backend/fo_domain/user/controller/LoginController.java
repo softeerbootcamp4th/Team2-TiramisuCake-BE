@@ -8,12 +8,18 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 로그인 요청을 처리하는 컨트롤러 클래스
+ */
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
 
     private final LoginService loginService;
 
+    /**
+     * 로그인 요청을 처리하는 메서드
+     */
     @PostMapping("/login")
     ResponseDto<JwtTokenResponseDto> handleLogin(@Valid @RequestBody LoginRequestDto loginRequestDto,
                                                  @RequestHeader(value = "X-Share-Code", required = false) String shareCode) {
@@ -21,5 +27,4 @@ public class LoginController {
 
         return ResponseDto.onSuccess(jwtTokenResponseDto);
     }
-
 }

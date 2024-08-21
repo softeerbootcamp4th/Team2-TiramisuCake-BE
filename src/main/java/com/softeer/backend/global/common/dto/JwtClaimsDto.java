@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * JWT의 claim안에 있는 정보
+ * JWT의 claim안에 있는 정보를 저장하는 Dto 클래스
  */
 @Getter
 @Builder

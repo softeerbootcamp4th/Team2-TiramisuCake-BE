@@ -9,6 +9,8 @@ import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryWinnerResponseD
 import com.softeer.backend.fo_domain.share.exception.ShareUrlInfoException;
 import com.softeer.backend.fo_domain.share.repository.ShareUrlInfoRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
+import com.softeer.backend.global.staticresources.constant.S3FileName;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,13 +22,14 @@ public class DrawResponseGenerateUtil {
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final DrawUtil drawUtil;
     private final DrawModalGenerateUtil drawModalGenerateUtil;
+    private final StaticResourceUtil staticResourceUtil;
 
 
     /**
      * 7일 연속 출석 시 상품 정보 모달 만들어서 반환하는 메서드
      *
-     * @param invitedNum             초대한 사람 수
-     * @param remainDrawCount        남은 추첨 기회
+     * @param invitedNum          초대한 사람 수
+     * @param remainDrawCount     남은 추첨 기회
      * @param drawAttendanceCount 연속 출석 일수
      * @return 7일 연속 출석 상품 모달
      */
@@ -42,8 +45,8 @@ public class DrawResponseGenerateUtil {
     /**
      * 7일 미만 출석 시 모달 만들어서 반환하는 메서드
      *
-     * @param invitedNum             초대한 사람 수
-     * @param remainDrawCount        남은 추첨 기회
+     * @param invitedNum          초대한 사람 수
+     * @param remainDrawCount     남은 추첨 기회
      * @param drawAttendanceCount 연속 출석 일수
      * @return 7일 미만 출석 상품 모달
      */
@@ -84,6 +87,7 @@ public class DrawResponseGenerateUtil {
 
     /**
      * 당첨내역이 있는 경우 당첨 내역 응답 만들어서 반환
+     *
      * @param ranking 등수
      * @return 당첨 내역 응답
      */
@@ -96,6 +100,7 @@ public class DrawResponseGenerateUtil {
 
     /**
      * 당첨내역이 없는 경우 낙첨 응답 만들어서 반환
+     *
      * @param userId 사용자 아이디
      * @return 낙첨 내역 응답
      */
@@ -115,5 +120,20 @@ public class DrawResponseGenerateUtil {
     private String getShareUrl(Integer userId) {
         return BASE_URL + shareUrlInfoRepository.findShareUrlByUserId(userId)
                 .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+    }
+
+    /**
+     * ranking에 따른 s3 이미지 url 반환
+     */
+    public String getImageUrl(int ranking) {
+        if (ranking == 1) {
+            return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_1.name());
+        }
+        if (ranking == 2) {
+            return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_2.name());
+        }
+        if (ranking == 3) {
+            return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_3.name());
+        }
     }
 }

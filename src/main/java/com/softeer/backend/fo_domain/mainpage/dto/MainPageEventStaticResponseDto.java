@@ -28,6 +28,12 @@ public class MainPageEventStaticResponseDto {
 
         private String content;
 
+        private String rewardName1;
+
+        private String rewardName2;
+
+        private String rewardName3;
+
         private String rewardImage1;
 
         private String rewardImage2;

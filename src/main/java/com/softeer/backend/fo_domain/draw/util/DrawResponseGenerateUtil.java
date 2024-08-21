@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.draw.util;
 
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
@@ -13,6 +14,8 @@ import com.softeer.backend.global.staticresources.constant.S3FileName;
 import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -88,13 +91,13 @@ public class DrawResponseGenerateUtil {
     /**
      * 당첨내역이 있는 경우 당첨 내역 응답 만들어서 반환
      *
-     * @param ranking 등수
+     * @param drawHistoryList 당첨 내역 리스트
      * @return 당첨 내역 응답
      */
-    public DrawHistoryWinnerResponseDto generateDrawHistoryWinnerResponse(int ranking) {
+    public DrawHistoryWinnerResponseDto generateDrawHistoryWinnerResponse(List<DrawHistoryDto> drawHistoryList) {
         return DrawHistoryWinnerResponseDto.builder()
                 .isDrawWin(true)
-                .winModal(drawModalGenerateUtil.generateWinModal(ranking))
+                .historyList(drawHistoryList)
                 .build();
     }
 
@@ -128,11 +131,9 @@ public class DrawResponseGenerateUtil {
     public String getImageUrl(int ranking) {
         if (ranking == 1) {
             return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_1.name());
-        }
-        if (ranking == 2) {
+        } else if (ranking == 2) {
             return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_2.name());
-        }
-        if (ranking == 3) {
+        } else {
             return staticResourceUtil.getS3ContentMap().get(S3FileName.DRAW_REWARD_IMAGE_3.name());
         }
     }

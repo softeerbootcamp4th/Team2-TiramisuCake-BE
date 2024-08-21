@@ -10,6 +10,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 추첨 이벤트 시간값 수정 요청 시, 시간값을 검사하는 애노테이션
+ */
 @Constraint(validatedBy = DrawTimeRangeValidator.class)
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

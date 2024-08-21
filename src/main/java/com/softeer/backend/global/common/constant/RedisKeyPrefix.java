@@ -2,6 +2,9 @@ package com.softeer.backend.global.common.constant;
 
 import lombok.Getter;
 
+/**
+ * redis의 key로 사용되는 상수
+ */
 @Getter
 public enum RedisKeyPrefix {
     // 선착순

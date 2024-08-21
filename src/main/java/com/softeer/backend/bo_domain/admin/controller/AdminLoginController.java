@@ -14,13 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 어드민 계정 로그인 및 로그아웃을 관리하는 컨트롤러 클래스
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminLoginController {
-
     private final AdminLoginService adminLoginService;
 
+    /**
+     * 어드민 계정 로그인을 처리하는 메서드
+     */
     @PostMapping("/login")
     ResponseDto<JwtTokenResponseDto> handleLogin(@Valid @RequestBody AdminLoginRequestDto adminLoginRequestDto) {
         JwtTokenResponseDto jwtTokenResponseDto = adminLoginService.handleLogin(adminLoginRequestDto);
@@ -28,6 +33,9 @@ public class AdminLoginController {
         return ResponseDto.onSuccess(jwtTokenResponseDto);
     }
 
+    /**
+     * 어드민 계정 로그아웃을 처리하는 메서드
+     */
     @PostMapping("/logout")
     ResponseDto<Void> handleLogout(@Parameter(hidden = true) @AuthInfo Integer adminId) {
         adminLoginService.handleLogout(adminId);
@@ -35,6 +43,9 @@ public class AdminLoginController {
         return ResponseDto.onSuccess();
     }
 
+    /**
+     * 어드민 계정 회원가입을 처리하는 메서드
+     */
     @PostMapping("/signup")
     ResponseDto<Void> handleSignUp(@Valid @RequestBody AdminSignUpRequestDto adminSignUpRequestDto) {
 
@@ -42,6 +53,4 @@ public class AdminLoginController {
 
         return ResponseDto.onSuccess();
     }
-
-
 }

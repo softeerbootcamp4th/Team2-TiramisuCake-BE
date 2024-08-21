@@ -6,8 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * 선착순 설정 정보 entity repository 클래스
+ */
 @Repository
 public interface FcfsSettingRepository extends JpaRepository<FcfsSetting, Integer> {
-
-
 }

@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 로컬 캐싱을 위한 환경 구성 클래스
+ */
 @Slf4j
 @Configuration
 @EnableCaching

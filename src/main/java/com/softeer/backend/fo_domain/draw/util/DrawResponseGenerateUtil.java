@@ -15,11 +15,13 @@ import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
+/**
+ * 추첨 이벤트 결과 응답을 생성하는 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class DrawResponseGenerateUtil {
+    // 공유 url의 기본 url
     public static final String BASE_URL = "https://softeer.site/share/";
 
     private final ShareUrlInfoRepository shareUrlInfoRepository;
@@ -76,8 +78,9 @@ public class DrawResponseGenerateUtil {
     }
 
     /**
-     * 당첨자 응답 만들어서 반환
+     * 등수에 따른 당첨자 응답 만들어서 반환
      *
+     * @param ranking 등수
      * @return 당첨자 응답
      */
     public DrawWinModalResponseDto generateDrawWinnerResponse(int ranking) {

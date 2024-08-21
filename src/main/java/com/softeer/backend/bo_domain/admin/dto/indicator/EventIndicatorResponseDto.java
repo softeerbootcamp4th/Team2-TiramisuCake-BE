@@ -4,15 +4,16 @@ package com.softeer.backend.bo_domain.admin.dto.indicator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.softeer.backend.bo_domain.admin.serializer.PercentageSerializer;
-import com.softeer.backend.bo_domain.admin.serializer.PhoneNumberSerializer;
 import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
-import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * 이벤트 지표 조회 응답 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder

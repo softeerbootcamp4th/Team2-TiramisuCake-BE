@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 공유 정보 엔티티 클래스
+ */
 @Getter
 @Entity
 @NoArgsConstructor

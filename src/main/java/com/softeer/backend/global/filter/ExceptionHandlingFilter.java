@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeer.backend.global.common.code.BaseErrorCode;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.exception.JwtAuthenticationException;
+import com.softeer.backend.global.common.exception.JwtAuthorizationException;
 import com.softeer.backend.global.common.response.ResponseDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +37,15 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
             setErrorResponse(response, jwtAuthenticationException.getCode());
 
-            // 나머지 예외 처리
-        } catch (Exception e) {
+        // Jwt 인가 예외 처리
+        } catch(JwtAuthorizationException jwtAuthorizationException) {
+
+            log.error("JwtAuthorizationException occurs in ExceptionHandlingFilter",
+                    jwtAuthorizationException);
+            setErrorResponse(response, jwtAuthorizationException.getCode());
+        }
+        // 나머지 예외 처리
+        catch (Exception e) {
 
             log.error("Exception occurs in ExceptionHandlingFilter", e);
 
@@ -45,7 +53,9 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
         }
     }
 
-    // 인증 예외 처리 메서드
+    /**
+     * 예외 응답을 생성하는 메서드
+     */
     private void setErrorResponse(HttpServletResponse response,
                                   BaseErrorCode errorCode) {
 

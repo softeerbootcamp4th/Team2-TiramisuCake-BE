@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * 추첨 이벤트와 관련된 로직을 수행하는 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class DrawUtil {
@@ -35,7 +38,7 @@ public class DrawUtil {
 
     /**
      * 추첨 로직 실행
-     * 만약 1, 2, 3등 중 하나에 당첨되었다면 등수와 이미지 방향이 결정됨.
+     * 만약 1, 2, 3등 중 하나에 당첨되었다면 등수와 이미지 방향이 결정됨
      */
     public void performDraw() {
         Random random = new Random();
@@ -54,7 +57,8 @@ public class DrawUtil {
     }
 
     /**
-     * @return 당첨자를 위한 방향 이미지 List 반환
+     * 당첨자를 위한 방향 이미지 List 반환
+     * 세 개의 이미지가 모두 같은 방향이어야 함
      */
     public List<String> generateWinImages() {
         Random random = new Random();
@@ -71,7 +75,9 @@ public class DrawUtil {
     }
 
     /**
-     * @return 낙첨자를 위한 랜덤 방향 이미지 List 반환
+     * 낙첨자를 위한 랜덤 방향 이미지 List 반환
+     * 세 개의 이미지 중 적어도 하나는 다른 방향이어야 함
+     * do-while문을 이용해 방향이 방향 생성
      */
     public List<String> generateLoseImages() {
         DrawUtil drawUtil = drawUtilProvider.getObject();
@@ -93,8 +99,8 @@ public class DrawUtil {
     }
 
     /**
-     * @param direction 방향을 나타냄. 0, 1, 2, 3이 각각 위, 오른쪽, 밑, 왼쪽
-     * @return 방향에 따른 이미지 url을 반환
+     * 방향에 따른 이미지 url list를 반환하는 메서드
+     * direction은 방향을 나타냄. 0, 1, 2, 3이 각각 위, 오른쪽, 밑, 왼쪽
      */
     @Cacheable(value = "staticResources", key = "'drawImage_' + #direction")
     public String getImageUrl(int direction) {

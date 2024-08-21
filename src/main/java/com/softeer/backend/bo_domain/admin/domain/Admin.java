@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 어드민 계정 정보 엔티티 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

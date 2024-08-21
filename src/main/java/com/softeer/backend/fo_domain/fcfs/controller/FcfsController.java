@@ -10,28 +10,23 @@ import com.softeer.backend.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
+/**
+ * 선착순 이벤트 요청을 처리하는 컨트롤러 클래스
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/fcfs")
-@Tag(name = "Fcfs Controller", description = "선착순 API")
 public class FcfsController {
     private final FcfsService fcfsService;
 
+    /**
+     * 선착순 페이지 정보를 반환하는 메서드
+     */
     @GetMapping
     public ResponseDto<FcfsPageResponseDto> getFcfsPage(@Parameter(hidden = true) HttpServletRequest request) {
 
@@ -42,6 +37,9 @@ public class FcfsController {
         return ResponseDto.onSuccess(fcfsPageResponseDto);
     }
 
+    /**
+     * 선착순 튜토리얼 페이지 정보를 반환하는 메서드
+     */
     @GetMapping("/tutorial")
     public ResponseDto<FcfsPageResponseDto> getFcfsTutorialPage() {
 
@@ -50,6 +48,9 @@ public class FcfsController {
         return ResponseDto.onSuccess(fcfsPageResponseDto);
     }
 
+    /**
+     * 선착순 등록을 처리하는 메서드
+     */
     @PostMapping
     public ResponseDto<FcfsResultResponseDto> handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
                                      @Parameter(hidden = true) @AuthInfo Integer userId,

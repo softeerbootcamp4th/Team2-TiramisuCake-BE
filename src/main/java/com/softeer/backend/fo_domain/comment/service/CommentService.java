@@ -11,10 +11,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+/**
+ * 기대평 요청을 처리하는 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -41,12 +42,13 @@ public class CommentService {
 
     /**
      * 기대평을 저장하는 메서드
+     * <p>
+     * 1-1.로그인 한 유저가 기대평을 등록했다면 User entity의 id값을 기반으로 닉네임을 설정한다.
+     * 1-2.로그인 하지 않았다면, 랜덤으로 닉네임을 설정한다.
      */
     @Transactional
     public void saveComment(Integer userId, int commentType) {
 
-        // 로그인 한 유저가 기대평을 등록했다면 User entity의 id값을 기반으로 닉네임을 설정한다.
-        // 로그인 하지 않았다면, 랜덤으로 닉네임을 설정한다.
         String randomNickname = (userId != null ?
                 CommentNickname.getMyRandomNickname(userId) : CommentNickname.getRandomNickname());
 

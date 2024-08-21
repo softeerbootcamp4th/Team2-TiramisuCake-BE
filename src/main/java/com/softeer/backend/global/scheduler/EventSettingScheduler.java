@@ -13,11 +13,13 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
+/**
+ * 이벤트 설정 정보를 스케줄러로 DB에서 받아오는 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class EventSettingScheduler {
@@ -34,13 +36,15 @@ public class EventSettingScheduler {
     @PostConstruct
     public void init() {
         scheduleTask();
-
     }
 
     public void scheduleTask() {
         scheduledFuture = taskScheduler.schedule(this::updateEventSetting, new CronTrigger("0 0 1 * * *"));
     }
 
+    /**
+     * 이벤트 설정 정보 업데이트하는 메서드
+     */
     @Transactional(readOnly = true)
     protected void updateEventSetting() {
         LocalDateTime now = LocalDateTime.now();
@@ -54,5 +58,4 @@ public class EventSettingScheduler {
             drawSettingManager.setDrawSetting(drawSetting);
         }
     }
-
 }

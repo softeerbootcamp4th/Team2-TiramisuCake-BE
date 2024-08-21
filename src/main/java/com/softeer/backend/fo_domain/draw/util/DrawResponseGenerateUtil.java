@@ -15,6 +15,8 @@ import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 추첨 이벤트 결과 응답을 생성하는 클래스
  */

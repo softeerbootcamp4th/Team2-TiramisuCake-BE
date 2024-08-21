@@ -4,6 +4,9 @@ import com.softeer.backend.global.common.constant.ValidationConstant;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+/**
+ * 사용자 인증 코드 확인 요청 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder

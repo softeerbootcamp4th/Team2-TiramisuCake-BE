@@ -31,12 +31,12 @@ public class StringRedisUtil {
         getStringStringValueOperations().set(key, value);
     }
 
-    /* key 에 해당하는 데이터 삭제하는 메서드 */
+    // key 에 해당하는 데이터 삭제하는 메서드
     public void deleteData(String key) {
         this.stringRedisTemplate.delete(key);
     }
 
-    /* key 에 해당하는 데이터 만료기간 설정 메서드 */
+    // key 에 해당하는 데이터 만료기간 설정 메서드
     public void setDataExpire(String key, String value, long duration) {
         Duration expireDuration = Duration.ofSeconds(duration);
         getStringStringValueOperations().set(key, value, expireDuration);
@@ -60,6 +60,7 @@ public class StringRedisUtil {
         setDataExpire(key, value, secondsUntilExpiry);
     }
 
+    // 데이터의 값을 1만큼 증가시키는 메서드
     public long incrementData(String key) {
         ValueOperations<String, String> valueOperations = getStringStringValueOperations();
         return valueOperations.increment(key, 1); // 증가된 값을 반환
@@ -69,12 +70,7 @@ public class StringRedisUtil {
         return this.stringRedisTemplate.opsForValue();
     }
 
-    /**
-     * Refresh Token을 redis에 저장할 때, 접두사를 붙여서 redis key를 반환하는 메서드
-     *
-     * @param jwtClaimsDto JWT의 claim 정보
-     * @return 일반 유저는 "USER_{id값}", 어드민 유저는 "ADMIN_{id값}"
-     */
+    // Refresh Token을 redis에 저장할 때, 접두사를 붙여서 redis key를 반환하는 메서드
     public String getRedisKeyForJwt(JwtClaimsDto jwtClaimsDto) {
 
         String id = String.valueOf(jwtClaimsDto.getId());

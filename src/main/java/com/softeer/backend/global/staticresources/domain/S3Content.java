@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * S3에 저장된 url을 관리하는 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

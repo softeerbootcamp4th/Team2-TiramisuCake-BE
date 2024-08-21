@@ -7,6 +7,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * 추첨 이벤트 시간 수정 요청 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder

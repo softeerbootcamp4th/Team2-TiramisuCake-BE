@@ -2,6 +2,9 @@ package com.softeer.backend.fo_domain.user.constatnt;
 
 import lombok.Getter;
 
+/**
+ * 전화번호 인증에서 사용되는 redis key의 prefix를 관리하는 enum 클래스
+ */
 @Getter
 public enum RedisVerificationPrefix {
     VERIFICATION_CODE("VERIFICATION_CODE:"), // 인증코드의 Redis key prefix

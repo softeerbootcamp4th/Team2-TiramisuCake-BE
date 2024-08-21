@@ -109,6 +109,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return registrationBean;
     }
 
+    /**
+     * etag를 생성 및 관리해주는 필터 등록
+     */
     @Bean
     public FilterRegistrationBean<ShallowEtagHeaderFilter> shallowEtagHeaderFilter() {
         FilterRegistrationBean<ShallowEtagHeaderFilter> filterRegistrationBean

@@ -23,20 +23,25 @@ public class ScrollPaginationUtil<T> {
         return new ScrollPaginationUtil<>(itemsWithNextCursor, size);
     }
 
-    // 마지막 스크롤인지를 확인하는 메서드
+    /**
+     * 마지막 스크롤인지를 확인하는 메서드
+     */
     public boolean isLastScroll() {
         return this.itemsWithNextCursor.size() <= countPerScroll;
     }
 
-    // 마지막 스크롤일 경우, 그대로 데이터를 반환한다.
-    // 마지막 스크롤이 아닌 경우, 마지막 데이터를 제외하고 반환한다.
+    /**
+     * 스크롤한 데이터를 반환하는 메서드
+     * <p>
+     * 1-1. 마지막 스크롤일 경우, 그대로 데이터를 반환한다.
+     * 1-2. 마지막 스크롤이 아닌 경우, 마지막 데이터를 제외하고 반환한다.
+     */
     public List<T> getCurrentScrollItems() {
         List<T> itemsList;
 
         if (isLastScroll()) {
             itemsList = new ArrayList<>(this.itemsWithNextCursor);
-        }
-        else{
+        } else {
             itemsList = new ArrayList<>(itemsWithNextCursor.subList(0, countPerScroll));
         }
         Collections.reverse(itemsList);
@@ -44,9 +49,11 @@ public class ScrollPaginationUtil<T> {
         return itemsList;
     }
 
-    // 다음 커서 값을 갖고 있는 데이터를 반환하는 메서드
+    /**
+     * 다음 커서 값을 갖고 있는 데이터를 반환하는 메서드
+     */
     public T getNextCursor() {
-        return itemsWithNextCursor.get(countPerScroll-1);
+        return itemsWithNextCursor.get(countPerScroll - 1);
     }
 
 }

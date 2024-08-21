@@ -46,3 +46,6 @@ out/
 
 application.yml
 build.gradle
+
+/jacoco/**
+/jacoco/

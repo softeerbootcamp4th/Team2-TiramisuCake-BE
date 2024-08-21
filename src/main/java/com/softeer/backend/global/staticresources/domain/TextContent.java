@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 화면을 구성하는 정적 텍스트 정보를 관리하는 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

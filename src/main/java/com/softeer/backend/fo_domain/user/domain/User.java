@@ -3,6 +3,9 @@ package com.softeer.backend.fo_domain.user.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * 사용자 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

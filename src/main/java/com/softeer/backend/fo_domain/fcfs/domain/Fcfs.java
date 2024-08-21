@@ -11,6 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * 선착순 당첨 정보를 관리하는 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

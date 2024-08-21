@@ -11,10 +11,6 @@ import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.constant.S3FileName;
 import com.softeer.backend.global.staticresources.constant.StaticTextName;
-import com.softeer.backend.global.staticresources.domain.S3Content;
-import com.softeer.backend.global.staticresources.domain.TextContent;
-import com.softeer.backend.global.staticresources.repository.S3ContentRepository;
-import com.softeer.backend.global.staticresources.repository.TextContentRepository;
 import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import com.softeer.backend.global.util.FcfsRedisUtil;
 import com.softeer.backend.global.util.RandomCodeUtil;
@@ -26,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -45,7 +40,9 @@ public class FcfsService {
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
 
-
+    /**
+     * 선착순 페이지에 필요한 정보를 반환하는 메서드
+     */
     public FcfsPageResponseDto getFcfsPage(int round) {
 
         QuizDto quiz = quizManager.getQuiz(round);
@@ -61,6 +58,9 @@ public class FcfsService {
                 .build();
     }
 
+    /**
+     * 선착순 튜토리얼 페이지에 필요한 정보를 반환하는 메서드
+     */
     public FcfsPageResponseDto getFcfsTutorialPage() {
 
         QuizDto tutorialQuiz = quizManager.getTutorialQuiz();
@@ -77,26 +77,44 @@ public class FcfsService {
     }
 
     /**
-     * 1. 선착순 당첨자가 아직 다 결정되지 않았으면, 선착순 당첨 응답 생성 및 반환
-     * 2. 선착순 당첨자가 다 결정됐다면, Redisson lock을 사용하지 않고 Redis에 저장된 선착순 이벤트 참여자 수를 1명씩 더한다.
+     * 선착순 등록을 처리하고 결과 모달 정보를 반환하는 메서드
+     * <p>
+     * 1. 선착순 등록 요청 dto에서 전달된 퀴즈 정답이 유효한지 확인한다.
+     * 1-1. 유효하지 않다면 예외가 발생한다.
+     * 2. 선착순 설정 매니저 클래스의 fcfsClosed 변수값을 확인한다.(선착순 당첨자가 다 나왔는지 여부를 의미)
+     * 2-1. 값이 true라면 선착순 이벤트 참여자 수에 1을 더하고 실패 모달 정보를 반환한다.
+     * 2-2. 값이 false라면 선착순 등록을 처리하는 메서드를 호출한다.
      */
     public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
 
-        if(!fcfsRequestDto.getAnswer().equals(quizManager.getQuiz(round).getAnswerWord())) {
+        // 퀴즈 정답이 유효한지 확인하고 유효하지 않다면 예외 발생
+        if (!fcfsRequestDto.getAnswer().equals(quizManager.getQuiz(round).getAnswerWord())) {
             log.error("fcfs quiz answer is not match, correct answer: {}, wrong anwer: {}",
                     quizManager.getQuiz(round).getAnswerWord(), fcfsRequestDto.getAnswer());
             throw new FcfsException(ErrorStatus._BAD_REQUEST);
         }
 
-        if (fcfsSettingManager.isFcfsClosed()){
+        // 선착순 당첨자가 다 나왔다면 선착순 이벤트 참여자 수에 1을 더하는 메서드를 호출하고 실패 모달 정보를 반환
+        if (fcfsSettingManager.isFcfsClosed()) {
             countFcfsParticipant(round);
 
             return getFcfsResult(false, null);
         }
+
+        // 선착순 등록을 처리하는 메서드 호출
         FcfsService fcfsService = fcfsServiceProvider.getObject();
         return fcfsService.saveFcfsWinners(userId, round);
     }
 
+    /**
+     * 선착순 등록을 처리하는 메서드
+     * <p>
+     * 1. 선착순 당첨자 수가 남아있고 이미 선착순 이벤트에 당첨됐는지를 확인한다.
+     * 1-1. 당첨자가 모두 나왔거나 이미 선착순 이벤트에 당첨됐었다면, 선착순 실패 모달 정보를 반환한다.
+     * 2. redis에 선착순 등록 요청한 유저의 userId, 이벤트 코드를 저장하고 선착순 참가자 수에 1을 더한다.
+     * 3. 해당 유저를 마지막으로 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClose 변수값을 true로 설정한다.
+     * 4. 선착순 성공 모달 정보를 반환한다.
+     */
     @EventLock(key = "FCFS_#{#round}")
     public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
 
@@ -108,11 +126,13 @@ public class FcfsService {
             // redis에 userId 등록
             fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId);
 
-            // redis에 code 등록
+            // 중복되지 않는 code를 생성
             String code = makeFcfsCode(round);
             while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {
                 code = makeFcfsCode(round);
             }
+
+            // redis에 선착순 code 등록
             fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
 
             // redis에 code-userId 형태로 등록(hash)
@@ -133,15 +153,26 @@ public class FcfsService {
 
     }
 
-    private String makeFcfsCode(int round){
-        return (char)('A'+round-1) + randomCodeUtil.generateRandomCode(5);
+    /**
+     * 선착순 이벤트 코드를 반환하는 메서드
+     *
+     * round값에 따라 코드의 앞부분을 특정 문자로 고정한다.
+     */
+    private String makeFcfsCode(int round) {
+        return (char) ('A' + round - 1) + randomCodeUtil.generateRandomCode(5);
     }
 
+    /**
+     * redis에 저장된 선착순 이벤트 참여자 수를 1만큼 늘리는 메서드
+     */
     private void countFcfsParticipant(int round) {
         fcfsRedisUtil.incrementValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
     }
 
-    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode){
+    /**
+     * 선착순 결과 모달 응답 Dto를 만들어서 반환하는 메서드
+     */
+    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode) {
 
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
         Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
@@ -150,7 +181,7 @@ public class FcfsService {
 
         FcfsService fcfsService = fcfsServiceProvider.getObject();
 
-        if(fcfsWin){
+        if (fcfsWin) {
             FcfsSuccessResult fcfsSuccessResult = fcfsService.getFcfsSuccessResult(
                     textContentMap, s3ContentMap, firstFcfsSetting
             );
@@ -170,9 +201,12 @@ public class FcfsService {
                 .build();
     }
 
+    /**
+     * 선착순 당첨 모달 정보 중, 정적 정보를 반환하는 메서드
+     */
     @Cacheable(value = "staticResources", key = "'fcfsSuccess'")
     public FcfsSuccessResult getFcfsSuccessResult(Map<String, String> textContentMap, Map<String, String> s3ContentMap,
-                                                  FcfsSettingDto firstFcfsSetting){
+                                                  FcfsSettingDto firstFcfsSetting) {
 
         return FcfsSuccessResult.builder()
                 .title(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_WINNER_TITLE.name()),
@@ -188,8 +222,11 @@ public class FcfsService {
                 .build();
     }
 
+    /**
+     * 선착순 실패 모달 정보 중, 정적 정보를 반환하는 메서드
+     */
     @Cacheable(value = "staticResources", key = "'fcfsFail'")
-    public FcfsFailResult getFcfsFailResult(Map<String, String> textContentMap){
+    public FcfsFailResult getFcfsFailResult(Map<String, String> textContentMap) {
 
         return FcfsFailResult.builder()
                 .title(textContentMap.get(StaticTextName.FCFS_LOSER_TITLE.name()))

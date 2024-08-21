@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * 당첨 모달 생성하는 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class DrawModalGenerateUtil {
@@ -17,7 +20,7 @@ public class DrawModalGenerateUtil {
     private final StaticResourceUtil staticResourceUtil;
 
     /**
-     * @return 등수에 따른 WinModal을 반환
+     * 등수에 따른 WinModal을 반환
      */
     @Cacheable(value = "staticResources", key = "'draw_modal_' + #ranking")
     public WinModal generateWinModal(int ranking) {
@@ -37,7 +40,7 @@ public class DrawModalGenerateUtil {
     }
 
     /**
-     * @return 1등 WinModal 반환
+     * 1등 WinModal 반환
      */
 
     private WinModal generateFirstWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
@@ -50,7 +53,7 @@ public class DrawModalGenerateUtil {
     }
 
     /**
-     * @return 2등 WinModal 반환
+     * 2등 WinModal 반환
      */
     private WinModal generateSecondWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
@@ -62,7 +65,7 @@ public class DrawModalGenerateUtil {
     }
 
     /**
-     * @return 3등 WinModal 반환
+     * 3등 WinModal 반환
      */
     private WinModal generateThirdWinModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()
@@ -74,9 +77,7 @@ public class DrawModalGenerateUtil {
     }
 
     /**
-     * 7일 연속 출석자 상품 정보 반환 메서드
-     *
-     * @return FullAttendModal 반환
+     * 7일 연속 출석자 상품 정보 반환
      */
     public WinModal generateFullAttendModal(Map<String, String> textContentMap, Map<String, String> s3ContentMap) {
         return WinModal.builder()

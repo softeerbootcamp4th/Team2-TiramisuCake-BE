@@ -11,6 +11,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 추첨 당첨 정보 저장하는 엔티티 클래스
+ */
 @Getter
 @Entity
 @NoArgsConstructor

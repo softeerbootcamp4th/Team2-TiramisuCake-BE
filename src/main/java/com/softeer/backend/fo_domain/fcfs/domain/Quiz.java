@@ -11,6 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * 선착순 퀴즈 entity
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

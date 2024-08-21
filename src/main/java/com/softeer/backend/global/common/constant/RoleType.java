@@ -18,5 +18,4 @@ public enum RoleType {
     RoleType(String redisKeyPrefix) {
         this.redisKeyPrefix = redisKeyPrefix;
     }
-
 }

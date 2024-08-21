@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+/**
+ * 이벤트 참가자 수를 관리하는 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

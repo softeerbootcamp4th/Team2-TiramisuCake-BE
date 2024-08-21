@@ -10,6 +10,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+/**
+ * 인증에 성공한 유저의 id값을 반환해주는 Argument Resolver 클래스
+ */
 public class AuthInfoArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override

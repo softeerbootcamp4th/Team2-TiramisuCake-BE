@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 추첨 이벤트 페이지 응답 DTO 클래스
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor

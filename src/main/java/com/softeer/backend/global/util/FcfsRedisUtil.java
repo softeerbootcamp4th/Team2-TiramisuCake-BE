@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 선착순 이벤트에 사용되는 redis util 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class FcfsRedisUtil {

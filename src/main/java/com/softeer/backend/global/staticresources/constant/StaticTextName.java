@@ -2,6 +2,9 @@ package com.softeer.backend.global.staticresources.constant;
 
 import lombok.Getter;
 
+/**
+ * DB에 저장된 정적 텍스트 데이터의 이름을 관리하는 enum 클래스
+ */
 public enum StaticTextName {
     EVENT_TITLE,
     EVENT_DESCRIPTION,
@@ -14,6 +17,11 @@ public enum StaticTextName {
     REMAIN_DRAW_COUNT,
     DRAW_TITLE,
     DRAW_CONTENT,
+    DRAW_REWARD_NAME_1,
+    DRAW_REWARD_NAME_2,
+    DRAW_REWARD_NAME_3,
+    FCFS_REWARD_NAME_1,
+    FCFS_REWARD_NAME_2,
 
     MAIN_TITLE,
     MAIN_SUBTITLE,

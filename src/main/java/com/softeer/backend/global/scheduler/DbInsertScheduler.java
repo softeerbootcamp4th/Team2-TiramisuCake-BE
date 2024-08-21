@@ -25,11 +25,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
+/**
+ * 정해진 시간에 데이터베이스에 값을 insert하는 클래스
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -59,25 +61,36 @@ public class DbInsertScheduler {
         scheduledFuture = taskScheduler.schedule(this::insertData, new CronTrigger("0 0 2 * * *"));
     }
 
+    /**
+     * 선착순 당첨자, 추첨 당첨자, 총 방문자 수, 선착순 참여자 수, 추첨 참여자 수를 데이터베이스에 저장하는 메서드
+     */
     @Transactional
     protected void insertData() {
         LocalDate now = LocalDate.now();
+        // 이벤트 기간이 아니라면 메서드 수행 x
         if (now.isBefore(drawSettingManager.getStartDate().plusDays(1)))
             return;
 
+        // 이벤트 기간이 끝났다면 스케줄러 동작을 종료시킴
         if (now.isAfter(drawSettingManager.getEndDate().plusDays(1)))
             stopScheduler();
 
+        // 총 방문자 수
         int totalVisitorsCount = eventLockRedisUtil.getData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());
         eventLockRedisUtil.deleteData(RedisKeyPrefix.TOTAL_VISITORS_COUNT_PREFIX.getPrefix());
 
+        // 선착순 이벤트 참여자 수
         int fcfsParticipantCount = 0;
 
+        // 현재 추첨 이벤트의 라운드 받아오기
         if (fcfsSettingManager.getRoundForScheduler(now) != -1) {
+            // fcfsClosed 변수 초기화
             fcfsSettingManager.setFcfsClosed(false);
 
+            // 현재 추첨 이벤트의 라운드 받아오기
             int round = fcfsSettingManager.getRoundForScheduler(now);
 
+            // 레디스에서 사용자와 코드 조회
             Map<String, Integer> participantIds = fcfsRedisUtil.getHashEntries(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
             participantIds.forEach((code, userId) -> {
                 User user = userRepository.findById(userId)
@@ -91,11 +104,15 @@ public class DbInsertScheduler {
                         .round(round)
                         .code(code)
                         .build();
+
+                // 코드와 사용자 저장
                 fcfsRepository.save(fcfs);
             });
 
+            // 선착순 참여자 수 가져오기
             fcfsParticipantCount += fcfsRedisUtil.getValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
 
+            // 레디스에서 값들을 삭제
             fcfsRedisUtil.clearValue(RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round);
             fcfsRedisUtil.clearIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);
             fcfsRedisUtil.clearStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round);
@@ -135,6 +152,7 @@ public class DbInsertScheduler {
             drawRedisUtil.deleteAllSetData(drawWinnerKey);
         }
 
+        // 총 방문자 수, 선착순 참여자 수, 추첨 참여자 수 DB에 insert
         eventParticipationRepository.save(EventParticipation.builder()
                 .visitorCount(totalVisitorsCount)
                 .fcfsParticipantCount(fcfsParticipantCount)

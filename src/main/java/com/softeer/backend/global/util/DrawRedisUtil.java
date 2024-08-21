@@ -55,6 +55,13 @@ public class DrawRedisUtil {
         return 0;
     }
 
+    /**
+     * 해당 등수의 자리가 남아있는지 판단하는 메서드
+     *
+     * 1. redis에서 해당 등수의 자리가 남아있는지 판단한다.
+     *  1-1. 자리가 남아있다면 사용자를 당첨자 리스트에 저장하고 true 반환
+     *  1-2. 자리가 없다면 false 반환
+     */
     @EventLock(key = "DRAW_WINNER")
     public boolean isWinner(Integer userId, int ranking, int winnerNum) {
         String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
@@ -71,17 +78,23 @@ public class DrawRedisUtil {
         }
     }
 
-    // 추첨 참여자수 증가
+    /**
+     * 추첨 참여자 수 증가
+     */
     public void increaseDrawParticipationCount() {
         integerRedisTemplate.opsForValue().increment(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
-    // 추첨 참여인원수 조회
+    /**
+     * 추첨 참여인원수 조회
+     */
     public Integer getDrawParticipantCount() {
         return integerRedisTemplate.opsForValue().get(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }
 
-    // 추첨 참여인원수 삭제
+    /**
+     * 추첨 참여인원수 삭제
+     */
     public void deleteDrawParticipantCount() {
         integerRedisTemplate.delete(RedisKeyPrefix.DRAW_PARTICIPANT_COUNT_PREFIX.getPrefix());
     }

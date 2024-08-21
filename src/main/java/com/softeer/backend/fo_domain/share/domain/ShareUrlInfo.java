@@ -3,6 +3,9 @@ package com.softeer.backend.fo_domain.share.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * 공유 url 정보 엔티티 클래스
+ */
 @Entity
 @Getter
 @Builder

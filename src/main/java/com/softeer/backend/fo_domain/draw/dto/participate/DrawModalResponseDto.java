@@ -5,6 +5,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+/**
+ * 추첨 이벤트 참여 응답 DTO 클래스
+ */
 @Data
 @SuperBuilder
 public class DrawModalResponseDto {

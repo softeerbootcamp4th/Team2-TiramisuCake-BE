@@ -1,12 +1,14 @@
 package com.softeer.backend.fo_domain.fcfs.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+/**
+ * 선착순 설정 정보 Dto 클래스
+ */
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @Setter

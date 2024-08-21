@@ -1,5 +1,8 @@
 package com.softeer.backend.global.staticresources.constant;
 
+/**
+ * DB에 저장된 S3 url의 파일 이름을 관리하는 enum 클래스
+ */
 public enum S3FileName {
     CHARGING_BACKGROUND_IMAGE,
     CHARGING_FAST_IMAGE,

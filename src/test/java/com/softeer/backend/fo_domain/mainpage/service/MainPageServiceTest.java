@@ -137,7 +137,7 @@ public class MainPageServiceTest {
         assertThat(response.getStartDate()).isEqualTo("2024.08.01");
         assertThat(response.getEndDate()).isEqualTo("2024.08.31");
         assertThat(response.getFcfsHint()).isEqualTo("퀴즈 힌트");
-        assertThat(response.getFcfsStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 22, 11, 0));
+        assertThat(response.getNextFcfsStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 22, 11, 0));
     }
 
     @Test

@@ -79,11 +79,14 @@ public class LoginService {
             // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
             if (shareCode != null) {
                 // 공유한 사람의 아이디
-                Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareCode)
-                        .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
+                if (shareUrlInfoRepository.existsByShareUrl(shareCode)) {
+                    // 공유한 사용자의 userId 조회
+                    Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareCode)
+                            .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
 
-                // 공유한 사람 추첨 기회 추가
-                shareInfoRepository.increaseInvitedNumAndRemainDrawCount(shareUserId);
+                    // 공유한 사람 추첨 기회 추가
+                    shareInfoRepository.increaseInvitedNumAndRemainDrawCount(shareUserId);
+                }
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우

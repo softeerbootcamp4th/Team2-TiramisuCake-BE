@@ -107,7 +107,7 @@ public class LoginService {
         ShareInfo shareInfo = ShareInfo.builder()
                 .userId(userId)
                 .invitedNum(0)
-                .remainDrawCount(1)
+                .remainDrawCount(1000)
                 .build();
 
         shareInfoRepository.save(shareInfo);

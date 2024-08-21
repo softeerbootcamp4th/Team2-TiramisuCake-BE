@@ -42,11 +42,14 @@ class ShareUrlInfoServiceTest {
     @Test
     @DisplayName("로그인한 사용자, 유효한 userId와 shareCode가 존재하는 경우")
     void testGetShortenShareUrl_forLoggedInUser_validShareCode() {
+        // given
         when(shareUrlInfoRepository.findShareUrlByUserId(VALID_USER_ID))
                 .thenReturn(Optional.of(VALID_SHARE_CODE));
 
+        // when
         ShareUrlInfoResponseDto response = shareUrlInfoService.getShortenShareUrl(VALID_USER_ID);
 
+        // then
         assertThat(response).isNotNull();
         assertThat(response.getShareUrl()).isEqualTo(BASE_URL + VALID_SHARE_CODE);
     }
@@ -54,9 +57,11 @@ class ShareUrlInfoServiceTest {
     @Test
     @DisplayName("로그인한 사용자, 유효한 userId에 해당하는 shareCode가 없는 경우")
     void testGetShortenShareUrl_forLoggedInUser_shareCodeNotFound() {
+        // when
         when(shareUrlInfoRepository.findShareUrlByUserId(VALID_USER_ID))
                 .thenReturn(Optional.empty());
 
+        // then
         assertThatThrownBy(() -> shareUrlInfoService.getShortenShareUrl(VALID_USER_ID))
                 .isInstanceOf(ShareInfoException.class);
     }

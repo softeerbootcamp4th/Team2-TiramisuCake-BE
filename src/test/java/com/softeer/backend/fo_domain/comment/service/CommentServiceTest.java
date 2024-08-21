@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,14 +52,14 @@ class CommentServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getComments()).hasSize(2);
 
-        // Verify properties of the first comment response
+        // 첫 번째 기대평
         CommentsResponseDto.CommentResponse firstCommentResponse = response.getComments().get(0);
         assertThat(firstCommentResponse).isNotNull();
         assertThat(firstCommentResponse.getIsMine()).isFalse();
         assertThat(firstCommentResponse.getNickName()).isEqualTo("user2");
         assertThat(firstCommentResponse.getCommentType()).isEqualTo(1);
 
-        // Verify properties of the second comment response
+        // 두 번째 기대평
         CommentsResponseDto.CommentResponse secondCommentResponse = response.getComments().get(1);
         assertThat(secondCommentResponse).isNotNull();
         assertThat(secondCommentResponse.getIsMine()).isTrue();

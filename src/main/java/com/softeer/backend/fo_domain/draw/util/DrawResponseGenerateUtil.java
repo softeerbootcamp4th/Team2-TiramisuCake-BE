@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DrawResponseGenerateUtil {
-    public static final String BASE_URL = "https://softeer.shop/share/";
+    public static final String BASE_URL = "https://softeer.site/share/";
 
     private final ShareUrlInfoRepository shareUrlInfoRepository;
     private final DrawUtil drawUtil;

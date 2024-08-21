@@ -112,6 +112,13 @@ public class MainPageService {
         else
             fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
 
+        String fcfsTime = "";
+        if(firstFcfsSetting.getStartTime().getMinute() != 0){
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+        }
+        else
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
+
         return MainPageEventInfoResponseDto.builder()
                 .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))
                 .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))
@@ -125,8 +132,7 @@ public class MainPageService {
                 .remainDrawCount(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.REMAIN_DRAW_COUNT.name()), decimalFormat.format(remainDrawCount)))
                 .fcfsHint(quizManager.getHint())
-                .isFcfsAvailable(fcfsSettingManager.isFcfsEntryAvailable(LocalDateTime.now()))
-                .nextFcfsStartTime(fcfsSettingManager.getNextFcfsTime(LocalDateTime.now()))
+                .fcfsStartTime(fcfsSettingManager.getNowOrNextFcfsTime(LocalDateTime.now()))
                 .build();
     }
 

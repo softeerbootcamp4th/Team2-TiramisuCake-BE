@@ -55,6 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        log.info("request uri: {}", request.getRequestURI());
+
         // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
         if (CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())) {
             filterChain.doFilter(request, response);

@@ -129,7 +129,7 @@ public class MainPageServiceTest {
         when(drawSettingManager.getStartDate()).thenReturn(LocalDate.of(2024, 8, 1));
         when(drawSettingManager.getEndDate()).thenReturn(LocalDate.of(2024, 8, 31));
         when(quizManager.getHint()).thenReturn("퀴즈 힌트");
-        when(fcfsSettingManager.getNextFcfsTime(any())).thenReturn(LocalDateTime.of(2024, 8, 22, 11, 0));
+        when(fcfsSettingManager.getNowOrNextFcfsTime(any())).thenReturn(LocalDateTime.of(2024, 8, 22, 11, 0));
 
         // When
         MainPageEventInfoResponseDto response = mainPageService.getEventPageInfo();

@@ -1,5 +1,6 @@
-package com.softeer.backend.fo_domain.draw.dto.result;
+package com.softeer.backend.fo_domain.draw.dto.history;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -9,5 +10,6 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 public class DrawHistoryResponseDto {
+    @JsonProperty("isDrawWin")
     private boolean isDrawWin;
 }

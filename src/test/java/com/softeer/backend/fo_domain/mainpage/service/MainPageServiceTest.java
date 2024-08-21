@@ -73,7 +73,8 @@ public class MainPageServiceTest {
         s3ContentMap.put(S3FileName.FCFS_REWARD_IMAGE_1.name(), "fcfs_reward_image_1.jpg");
         s3ContentMap.put(S3FileName.FCFS_REWARD_IMAGE_2.name(), "fcfs_reward_image_2.jpg");
         s3ContentMap.put(S3FileName.DRAW_REWARD_IMAGE_1.name(), "draw_reward_image_1.jpg");
-        s3ContentMap.put(S3FileName.DRAW_REWARD_IMAGE_2_3.name(), "draw_reward_image_2_3.jpg");
+        s3ContentMap.put(S3FileName.DRAW_REWARD_IMAGE_2.name(), "draw_reward_image_2.jpg");
+        s3ContentMap.put(S3FileName.DRAW_REWARD_IMAGE_3.name(), "draw_reward_image_3.jpg");
 
         when(staticResourceUtil.getTextContentMap()).thenReturn(textContentMap);
         when(staticResourceUtil.getS3ContentMap()).thenReturn(s3ContentMap);
@@ -99,7 +100,8 @@ public class MainPageServiceTest {
         assertThat(drawInfo.getTitle()).isEqualTo("추첨 제목");
         assertThat(drawInfo.getContent()).isEqualTo("추첨 내용");
         assertThat(drawInfo.getRewardImage1()).isEqualTo("draw_reward_image_1.jpg");
-        assertThat(drawInfo.getRewardImage2()).isEqualTo("draw_reward_image_2_3.jpg");
+        assertThat(drawInfo.getRewardImage2()).isEqualTo("draw_reward_image_2.jpg");
+        assertThat(drawInfo.getRewardImage3()).isEqualTo("draw_reward_image_3.jpg");
     }
 
     @Test
@@ -137,7 +139,7 @@ public class MainPageServiceTest {
         assertThat(response.getStartDate()).isEqualTo("2024.08.01");
         assertThat(response.getEndDate()).isEqualTo("2024.08.31");
         assertThat(response.getFcfsHint()).isEqualTo("퀴즈 힌트");
-        assertThat(response.getFcfsStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 22, 11, 0));
+        assertThat(response.getNextFcfsStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 22, 11, 0));
     }
 
     @Test

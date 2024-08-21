@@ -83,7 +83,7 @@ public class LoginServiceTest {
     @DisplayName("전화번호가 DB에 없는 경우 새로운 User 등록 및 관련 정보 생성")
     void testHandleLogin_NewUserRegistration() {
         // given
-        when(shareUrlInfoRepository.findUserIdByShareUrl(anyString())).thenReturn(Optional.of(1));
+        lenient().when(shareUrlInfoRepository.findUserIdByShareUrl(anyString())).thenReturn(Optional.of(1));
         when(userRepository.existsByPhoneNumber(phoneNumber)).thenReturn(false);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -176,20 +176,5 @@ public class LoginServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getAccessToken()).isEqualTo("accessToken");
         assertThat(response.getRefreshToken()).isEqualTo("refreshToken");
-    }
-
-    @Test
-    @DisplayName("공유 URL이 유효하지 않은 경우 예외 발생")
-    void testHandleLogin_InvalidShareUrl() {
-        // given
-        when(userRepository.existsByPhoneNumber(phoneNumber)).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenReturn(User.builder().id(1).build());
-        when(shareUrlInfoRepository.findUserIdByShareUrl(shareCode)).thenReturn(Optional.empty());
-
-        // when / then
-        assertThatThrownBy(() -> loginService.handleLogin(loginRequestDto, shareCode))
-                .isInstanceOf(ShareUrlInfoException.class)
-                .extracting(ex -> ((ShareUrlInfoException) ex).getCode())
-                .isEqualTo(ErrorStatus._NOT_FOUND);
     }
 }

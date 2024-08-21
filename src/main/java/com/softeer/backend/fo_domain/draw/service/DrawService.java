@@ -1,11 +1,14 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -16,6 +19,10 @@ import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 추첨 참여 로직을 처리하기 위한 클래스
@@ -30,11 +37,12 @@ public class DrawService {
     private final DrawResponseGenerateUtil drawResponseGenerateUtil;
     private final DrawAttendanceCountUtil drawAttendanceCountUtil;
     private final DrawSettingManager drawSettingManager;
+    private final DrawRepository drawRepository;
 
     /**
      * 1. 연속 참여일수 조회
-     *  1-1. 만약 7일 연속 참여했다면 상품 정보 응답
-     *  1-2. 만약 7일 미만 참여라면 일반 정보 응답
+     * 1-1. 만약 7일 연속 참여했다면 상품 정보 응답
+     * 1-2. 만약 7일 미만 참여라면 일반 정보 응답
      */
     public DrawMainResponseDto getDrawMainPageInfo(Integer userId) {
         // 참여 정보 (연속참여일수) 조회
@@ -135,16 +143,41 @@ public class DrawService {
 
     /**
      * 당첨 내역 조회하는 메서드
+     * 1. DB 조회
+     * 2. redis 조회
+     * 3. 내역을 리스트로 만들어서 반환
+     * 3-1. 내역이 없다면 내역이 없다는 응답 반환
      *
-     * 1. 당첨자라면 WinModal과 같은 당첨 내역 응답
-     * 2. 낙첨자라면 LoseModal과 같은 공유 url 응답
+     * @param userId 사용자 아이디
+     * @return 당첨 내역에 따른 응답
      */
     public DrawHistoryResponseDto getDrawHistory(Integer userId) {
         int ranking = drawRedisUtil.getRankingIfWinner(userId);
+        List<Draw> drawList = drawRepository.findAllByUserIdOrderByWinningDateAsc(userId);
+        List<DrawHistoryDto> drawHistoryList = new ArrayList<>();
 
+        // DB내역을 리스트로 만들기
+        for (Draw draw : drawList) {
+            int drawRank = draw.getRank();
+            drawHistoryList.add(DrawHistoryDto.builder()
+                    .drawRank(drawRank)
+                    .winningDate(draw.getWinningDate())
+                    .image(drawResponseGenerateUtil.getImageUrl(drawRank))
+                    .build());
+        }
+
+        // redis 내역을 리스트로 만들기
         if (ranking != 0) {
+            drawHistoryList.add(DrawHistoryDto.builder()
+                    .drawRank(ranking)
+                    .winningDate(LocalDate.now())
+                    .image(drawResponseGenerateUtil.getImageUrl(ranking))
+                    .build());
+        }
+
+        if (!drawHistoryList.isEmpty()) {
             // 당첨자라면
-            return drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(ranking);
+            return drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(drawHistoryList);
         }
 
         // 당첨자가 아니라면

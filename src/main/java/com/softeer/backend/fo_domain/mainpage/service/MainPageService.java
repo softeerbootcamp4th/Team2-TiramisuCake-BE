@@ -52,7 +52,7 @@ public class MainPageService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "staticResources", key = "'event'")
-    public MainPageEventStaticResponseDto getEventPageStatic(){
+    public MainPageEventStaticResponseDto getEventPageStatic() {
 
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
         Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
@@ -60,15 +60,23 @@ public class MainPageService {
         MainPageEventStaticResponseDto.EventInfo fcfsInfo = MainPageEventStaticResponseDto.EventInfo.builder()
                 .title(textContentMap.get(StaticTextName.FCFS_TITLE.name()))
                 .content(textContentMap.get(StaticTextName.FCFS_CONTENT.name()))
+                .rewardName1(textContentMap.get(StaticTextName.FCFS_REWARD_NAME_1.name()))
+                .rewardName2(textContentMap.get(StaticTextName.FCFS_REWARD_NAME_2.name()))
+                .rewardName3(null)
                 .rewardImage1(s3ContentMap.get(S3FileName.FCFS_REWARD_IMAGE_1.name()))
                 .rewardImage2(s3ContentMap.get(S3FileName.FCFS_REWARD_IMAGE_2.name()))
+                .rewardImage3(null)
                 .build();
 
         MainPageEventStaticResponseDto.EventInfo drawInfo = MainPageEventStaticResponseDto.EventInfo.builder()
                 .title(textContentMap.get(StaticTextName.DRAW_TITLE.name()))
                 .content(textContentMap.get(StaticTextName.DRAW_CONTENT.name()))
+                .rewardName1(textContentMap.get(StaticTextName.DRAW_REWARD_NAME_1.name()))
+                .rewardName2(textContentMap.get(StaticTextName.DRAW_REWARD_NAME_2.name()))
+                .rewardName3(textContentMap.get(StaticTextName.DRAW_REWARD_NAME_3.name()))
                 .rewardImage1(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_1.name()))
-                .rewardImage2(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_2_3.name()))
+                .rewardImage2(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_2.name()))
+                .rewardImage3(s3ContentMap.get(S3FileName.DRAW_REWARD_IMAGE_3.name()))
                 .build();
 
         return MainPageEventStaticResponseDto.builder()
@@ -83,7 +91,7 @@ public class MainPageService {
      * 메인 페이지에서 이벤트 정보를 반환하는 메서드
      */
     @Transactional(readOnly = true)
-    public MainPageEventInfoResponseDto getEventPageInfo(){
+    public MainPageEventInfoResponseDto getEventPageInfo() {
 
         setTotalVisitorsCount();
 
@@ -95,7 +103,14 @@ public class MainPageService {
         int totalDrawWinner = drawSettingManager.getWinnerNum1()
                 + drawSettingManager.getWinnerNum2() + drawSettingManager.getWinnerNum3();
 
-        int remainDrawCount = totalDrawWinner - (int)drawRepository.count();
+        int remainDrawCount = totalDrawWinner - (int) drawRepository.count();
+
+        String fcfsTime = "";
+        if(firstFcfsSetting.getStartTime().getMinute() != 0){
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+        }
+        else
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
 
         String fcfsTime = "";
         if(firstFcfsSetting.getStartTime().getMinute() != 0){
@@ -122,7 +137,7 @@ public class MainPageService {
     }
 
     // 이벤트 기간이면 redis에 사이트 방문자 수 +1 하기
-    public void setTotalVisitorsCount(){
+    public void setTotalVisitorsCount() {
 
         LocalDate now = LocalDate.now();
 

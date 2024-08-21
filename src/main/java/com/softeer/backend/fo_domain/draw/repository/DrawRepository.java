@@ -13,4 +13,6 @@ public interface DrawRepository extends JpaRepository<Draw, Integer> {
 
     @Query("SELECT d FROM Draw d JOIN FETCH d.user WHERE d.rank = :rank")
     List<Draw> findDrawWithUser(@Param("rank") int rank);
+
+    List<Draw> findAllByUserIdOrderByWinningDateAsc(Integer userId);
 }

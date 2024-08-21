@@ -1,8 +1,6 @@
 package com.softeer.backend.fo_domain.draw.util;
 
-import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.global.staticresources.constant.S3FileName;
-import com.softeer.backend.global.staticresources.repository.S3ContentRepository;
 import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

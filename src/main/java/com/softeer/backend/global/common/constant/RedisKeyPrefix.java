@@ -18,7 +18,7 @@ public enum RedisKeyPrefix {
     DRAW_PARTICIPANT_COUNT_PREFIX("DRAW_PARTICIPANT_COUNT"),
 
     // 사이트 방문자 수
-    TOTAL_VISITORS_COUNT_PREFIX("TOTAL_VISITORS_COUNT_");
+    TOTAL_VISITORS_COUNT_PREFIX("TOTAL_VISITORS_COUNT");
 
 
     private final String prefix;

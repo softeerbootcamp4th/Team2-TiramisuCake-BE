@@ -22,7 +22,7 @@ public class MainPageEventStaticResponseDto {
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class EventInfo{
+    public static class EventInfo {
 
         private String title;
 
@@ -31,6 +31,8 @@ public class MainPageEventStaticResponseDto {
         private String rewardImage1;
 
         private String rewardImage2;
+
+        private String rewardImage3;
 
     }
 

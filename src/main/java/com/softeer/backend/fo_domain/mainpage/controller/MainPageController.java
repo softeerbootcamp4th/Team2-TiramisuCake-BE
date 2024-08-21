@@ -29,8 +29,8 @@ public class MainPageController {
      * 메인 페이지에서 정적 정보를 반환하는 메서드
      */
     @GetMapping("/event/static")
-    public ResponseEntity<ResponseDto<MainPageEventStaticResponseDto>> getEventPageStatic(){
-        MainPageEventStaticResponseDto mainPageEventStaticResponseDto= mainPageService.getEventPageStatic();
+    public ResponseEntity<ResponseDto<MainPageEventStaticResponseDto>> getEventPageStatic() {
+        MainPageEventStaticResponseDto mainPageEventStaticResponseDto = mainPageService.getEventPageStatic();
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic()) // 1일 동안 public 캐싱
@@ -41,7 +41,7 @@ public class MainPageController {
      * 메인 페이지에서 이벤트 정보를 반환하는 메서드
      */
     @GetMapping("/event/info")
-    public ResponseDto<MainPageEventInfoResponseDto> getEventPageInfo(){
+    public ResponseDto<MainPageEventInfoResponseDto> getEventPageInfo() {
 
         MainPageEventInfoResponseDto mainPageEventInfoResponseDto = mainPageService.getEventPageInfo();
 
@@ -52,7 +52,7 @@ public class MainPageController {
      * 메인 페이지에서 자동차 설명 정보를 반환하는 메서드
      */
     @GetMapping("/car")
-    public ResponseEntity<ResponseDto<MainPageCarResponseDto>> getCarPage(){
+    public ResponseEntity<ResponseDto<MainPageCarResponseDto>> getCarPage() {
 
         MainPageCarResponseDto mainPageCarResponseDto = mainPageService.getCarPage();
 

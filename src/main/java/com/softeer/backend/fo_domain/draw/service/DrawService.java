@@ -1,11 +1,13 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
-import com.softeer.backend.fo_domain.draw.dto.result.DrawHistoryResponseDto;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -17,6 +19,8 @@ import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DrawService {
@@ -27,6 +31,7 @@ public class DrawService {
     private final DrawResponseGenerateUtil drawResponseGenerateUtil;
     private final DrawAttendanceCountUtil drawAttendanceCountUtil;
     private final DrawSettingManager drawSettingManager;
+    private final DrawRepository drawRepository;
 
     /**
      * 1. 연속 참여일수 조회
@@ -124,14 +129,17 @@ public class DrawService {
 
     /**
      * 당첨 내역 조회하는 메서드
-     * 1. 당첨자라면 WinModal과 같은 당첨 내역 모달 응답
-     * 2. 낙첨자라면 LoseModal과 같은 공유 url 모달 응답
+     * 1. DB 조회
+     * 2. redis 조회
+     * 3. 내역을 리스트로 만들어서 반환
+     *  3-1. 내역이 없다면 내역이 없다는 응답 반환
      *
      * @param userId 사용자 아이디
      * @return 당첨 내역에 따른 응답
      */
     public DrawHistoryResponseDto getDrawHistory(Integer userId) {
         int ranking = drawRedisUtil.getRankingIfWinner(userId);
+        List<Draw> drawList = drawRepository.findAllByUserIdOrderByWinningDateAsc(userId);
 
         if (ranking != 0) {
             // 당첨자라면

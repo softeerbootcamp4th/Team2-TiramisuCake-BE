@@ -73,8 +73,7 @@ public class QuizManager {
             if (fcfsSettingDto != null) {
                 LocalDateTime endTime = fcfsSettingDto.getEndTime();
 
-                // localDate가 startDate의 하루 다음날과 같은지 확인
-                if (endTime.isBefore(now)) {
+                if (now.isBefore(endTime)) {
                     return quizList.get(i).getHint();
                 }
             }

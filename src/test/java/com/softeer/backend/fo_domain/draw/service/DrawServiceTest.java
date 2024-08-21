@@ -1,6 +1,8 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainFullAttendResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
@@ -11,6 +13,7 @@ import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryLoserResponseDt
 import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryWinnerResponseDto;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
+import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawModalGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
@@ -28,10 +31,17 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 
 @Transactional
@@ -53,6 +63,8 @@ class DrawServiceTest {
     private DrawAttendanceCountUtil drawAttendanceCountUtil;
     @Mock
     private DrawSettingManager drawSettingManager;
+    @Mock
+    DrawRepository drawRepository;
 
     @InjectMocks
     private DrawService drawService;
@@ -113,7 +125,7 @@ class DrawServiceTest {
                 .drawAttendanceCount(7)
                 .build();
 
-        Mockito.when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
 
         ShareInfo shareInfo = ShareInfo.builder()
                 .userId(userId)
@@ -121,9 +133,9 @@ class DrawServiceTest {
                 .remainDrawCount(1)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(7);
+        when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(7);
 
         DrawMainFullAttendResponseDto expectedResponse = DrawMainFullAttendResponseDto
                 .builder()
@@ -160,7 +172,7 @@ class DrawServiceTest {
                 .drawAttendanceCount(1)
                 .build();
 
-        Mockito.when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
 
         ShareInfo shareInfo = ShareInfo.builder()
                 .userId(userId)
@@ -168,9 +180,9 @@ class DrawServiceTest {
                 .remainDrawCount(1)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(1);
+        when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(1);
 
         DrawMainResponseDto expectedResponse = DrawMainResponseDto
                 .builder()
@@ -201,7 +213,7 @@ class DrawServiceTest {
                 .remainDrawCount(0)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
         ArrayList<String> images = new ArrayList<>();
         images.add("left");
@@ -214,7 +226,7 @@ class DrawServiceTest {
                 .shareUrl("https://softeer.site/share/of8w")
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+        when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -240,7 +252,7 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
         ArrayList<String> images = new ArrayList<>();
         images.add("left");
@@ -253,9 +265,9 @@ class DrawServiceTest {
                 .shareUrl("https://softeer.site/share/of8w")
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+        when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(3);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(3);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -281,11 +293,11 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
 
-        Mockito.when(drawUtil.isDrawWin()).thenReturn(false);
+        when(drawUtil.isDrawWin()).thenReturn(false);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("left");
@@ -298,7 +310,7 @@ class DrawServiceTest {
                 .shareUrl("https://softeer.site/share/of8w")
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
+        when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(drawLoseModalResponseDto);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -324,18 +336,18 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
 
-        Mockito.when(drawSettingManager.getWinnerNum1()).thenReturn(1);
-        Mockito.when(drawSettingManager.getWinnerNum2()).thenReturn(10);
-        Mockito.when(drawSettingManager.getWinnerNum3()).thenReturn(100);
+        when(drawSettingManager.getWinnerNum1()).thenReturn(1);
+        when(drawSettingManager.getWinnerNum2()).thenReturn(10);
+        when(drawSettingManager.getWinnerNum3()).thenReturn(100);
 
-        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
-        Mockito.when(drawUtil.getRanking()).thenReturn(1);
+        when(drawUtil.isDrawWin()).thenReturn(true);
+        when(drawUtil.getRanking()).thenReturn(1);
 
-        Mockito.when(drawRedisUtil.isWinner(userId, 1, 1)).thenReturn(true);
+        when(drawRedisUtil.isWinner(userId, 1, 1)).thenReturn(true);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("up");
@@ -356,7 +368,7 @@ class DrawServiceTest {
                 .winModal(winModal)
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawWinnerResponse(1)).thenReturn(drawWinModalResponseDto);
+        lenient().when(drawResponseGenerateUtil.generateDrawWinnerResponse(1)).thenReturn(drawWinModalResponseDto);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -367,10 +379,10 @@ class DrawServiceTest {
         assertThat(actualResponse.getImages().get(0)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(1)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(2)).isEqualTo("up");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getSubtitle()).isEqualTo("아이패드에 당첨됐어요!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_1.svg");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo("아이패드에 당첨됐어요!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_1.svg");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
                 "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.");
     }
 
@@ -386,18 +398,18 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
 
-        Mockito.when(drawSettingManager.getWinnerNum1()).thenReturn(1);
-        Mockito.when(drawSettingManager.getWinnerNum2()).thenReturn(10);
-        Mockito.when(drawSettingManager.getWinnerNum3()).thenReturn(100);
+        when(drawSettingManager.getWinnerNum1()).thenReturn(1);
+        when(drawSettingManager.getWinnerNum2()).thenReturn(10);
+        when(drawSettingManager.getWinnerNum3()).thenReturn(100);
 
-        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
-        Mockito.when(drawUtil.getRanking()).thenReturn(2);
+        when(drawUtil.isDrawWin()).thenReturn(true);
+        when(drawUtil.getRanking()).thenReturn(2);
 
-        Mockito.when(drawRedisUtil.isWinner(userId, 2, 10)).thenReturn(true);
+        when(drawRedisUtil.isWinner(userId, 2, 10)).thenReturn(true);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("up");
@@ -418,7 +430,7 @@ class DrawServiceTest {
                 .winModal(winModal)
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawWinnerResponse(2)).thenReturn(drawWinModalResponseDto);
+        when(drawResponseGenerateUtil.generateDrawWinnerResponse(2)).thenReturn(drawWinModalResponseDto);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -429,10 +441,10 @@ class DrawServiceTest {
         assertThat(actualResponse.getImages().get(0)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(1)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(2)).isEqualTo("up");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getSubtitle()).isEqualTo("현대백화점 쿠폰 10만원퀀에 당첨됐어요!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_2.svg");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo("현대백화점 쿠폰 10만원퀀에 당첨됐어요!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_2.svg");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
                 "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.");
     }
 
@@ -448,18 +460,18 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
 
-        Mockito.when(drawSettingManager.getWinnerNum1()).thenReturn(1);
-        Mockito.when(drawSettingManager.getWinnerNum2()).thenReturn(10);
-        Mockito.when(drawSettingManager.getWinnerNum3()).thenReturn(100);
+        when(drawSettingManager.getWinnerNum1()).thenReturn(1);
+        when(drawSettingManager.getWinnerNum2()).thenReturn(10);
+        when(drawSettingManager.getWinnerNum3()).thenReturn(100);
 
-        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
-        Mockito.when(drawUtil.getRanking()).thenReturn(3);
+        when(drawUtil.isDrawWin()).thenReturn(true);
+        when(drawUtil.getRanking()).thenReturn(3);
 
-        Mockito.when(drawRedisUtil.isWinner(userId, 3, 100)).thenReturn(true);
+        when(drawRedisUtil.isWinner(userId, 3, 100)).thenReturn(true);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("up");
@@ -480,7 +492,7 @@ class DrawServiceTest {
                 .winModal(winModal)
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawWinnerResponse(3)).thenReturn(drawWinModalResponseDto);
+        when(drawResponseGenerateUtil.generateDrawWinnerResponse(3)).thenReturn(drawWinModalResponseDto);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -491,10 +503,10 @@ class DrawServiceTest {
         assertThat(actualResponse.getImages().get(0)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(1)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(2)).isEqualTo("up");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getSubtitle()).isEqualTo("현대백화점 쿠폰 1만원퀀에 당첨됐어요!");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_3.svg");
-        assertThat(((DrawWinModalResponseDto)actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo("축하합니다!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo("현대백화점 쿠폰 1만원퀀에 당첨됐어요!");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getImg()).isEqualTo("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_3.svg");
+        assertThat(((DrawWinModalResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
                 "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.");
     }
 
@@ -510,18 +522,18 @@ class DrawServiceTest {
                 .remainDrawCount(2)
                 .build();
 
-        Mockito.when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
 
-        Mockito.when(drawSettingManager.getWinnerNum1()).thenReturn(1);
-        Mockito.when(drawSettingManager.getWinnerNum2()).thenReturn(10);
-        Mockito.when(drawSettingManager.getWinnerNum3()).thenReturn(100);
+        when(drawSettingManager.getWinnerNum1()).thenReturn(1);
+        when(drawSettingManager.getWinnerNum2()).thenReturn(10);
+        when(drawSettingManager.getWinnerNum3()).thenReturn(100);
 
-        Mockito.when(drawUtil.isDrawWin()).thenReturn(true);
-        Mockito.when(drawUtil.getRanking()).thenReturn(1);
+        when(drawUtil.isDrawWin()).thenReturn(true);
+        when(drawUtil.getRanking()).thenReturn(1);
 
-        Mockito.when(drawRedisUtil.isWinner(userId, 1, 1)).thenReturn(false);
+        when(drawRedisUtil.isWinner(userId, 1, 1)).thenReturn(false);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("up");
@@ -534,7 +546,7 @@ class DrawServiceTest {
                 .shareUrl("https://softeer.shop/share/of8w")
                 .build();
 
-        Mockito.when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(expectedResponse);
+        when(drawResponseGenerateUtil.generateDrawLoserResponse(userId)).thenReturn(expectedResponse);
 
         // when
         DrawModalResponseDto actualResponse = drawService.participateDrawEvent(userId);
@@ -545,160 +557,58 @@ class DrawServiceTest {
         assertThat(actualResponse.getImages().get(0)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(1)).isEqualTo("up");
         assertThat(actualResponse.getImages().get(2)).isEqualTo("down");
-        assertThat(((DrawLoseModalResponseDto)actualResponse).getShareUrl()).isEqualTo("https://softeer.shop/share/of8w");
+        assertThat(((DrawLoseModalResponseDto) actualResponse).getShareUrl()).isEqualTo("https://softeer.shop/share/of8w");
     }
 
     @BeforeEach
     @DisplayName("getDrawHistory를 위한 초기화")
     void setUpGetDrawHistory() {
-        WinModal firstWinModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("아이패드에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_1.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
-
-        WinModal secondWinModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 쿠폰 10만원퀀에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_2.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
-
-        WinModal thirdWinModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 쿠폰 1만원퀀에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_3.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
-
-        DrawHistoryWinnerResponseDto firstWinnerResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(firstWinModal)
-                .build();
-
-        DrawHistoryWinnerResponseDto secondWinnerResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(secondWinModal)
-                .build();
-
-        DrawHistoryWinnerResponseDto thirdWinnerResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(thirdWinModal)
-                .build();
-
-        Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(1)).thenReturn(firstWinnerResponse);
-        Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(2)).thenReturn(secondWinnerResponse);
-        Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(3)).thenReturn(thirdWinnerResponse);
-
-        DrawHistoryLoserResponseDto loserResponseDto = DrawHistoryLoserResponseDto.builder()
+        lenient().when(drawService.getDrawHistory(6)).thenReturn(DrawHistoryLoserResponseDto.builder()
                 .isDrawWin(false)
                 .shareUrl("https://softeer.shop/share/of8w")
-                .build();
-
-        Mockito.lenient().when(drawResponseGenerateUtil.generateDrawHistoryLoserResponse(6)).thenReturn(loserResponseDto);
+                .build());
     }
 
     @Test
-    @DisplayName("1등 당첨자일 경우 당첨 내역 조회 시 당첨 결과 ")
-    void getDrawHistoryFirstWinner() {
-        // given
-        Integer userId = 6;
+    @DisplayName("getDrawHistory - 사용자가 당첨자인 경우")
+    void testGetDrawHistory_WhenUserIsWinner() {
+        // Given
+        Integer userId = 1;
+        List<Draw> drawList;
+        int redisRank = 1; // Mock된 redis 순위 (1, 2, 3 중 하나로 설정)
+        List<DrawHistoryDto> drawHistoryList;
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(1);
+        drawList = Arrays.asList(
+                Draw.builder().rank(2).winningDate(LocalDate.of(2022, 1, 1)).build(),
+                Draw.builder().rank(3).winningDate(LocalDate.of(2022, 2, 1)).build()
+        );
 
-        WinModal winModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("아이패드에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_1.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
+        drawHistoryList = Arrays.asList(
+                DrawHistoryDto.builder().drawRank(2).winningDate(LocalDate.of(2022, 1, 1)).image("url1").build(),
+                DrawHistoryDto.builder().drawRank(3).winningDate(LocalDate.of(2022, 2, 1)).image("url2").build(),
+                DrawHistoryDto.builder().drawRank(redisRank).winningDate(LocalDate.now()).image("url3").build()
+        );
 
-        DrawHistoryWinnerResponseDto expectedResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(winModal)
-                .build();
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(redisRank);
+        when(drawRepository.findAllByUserIdOrderByWinningDateAsc(userId)).thenReturn(drawList);
+        when(drawResponseGenerateUtil.getImageUrl(anyInt())).thenReturn("url1", "url2", "url3");
+        when(drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(anyList())).thenReturn(
+                DrawHistoryWinnerResponseDto.builder()
+                        .isDrawWin(true)
+                        .historyList(drawHistoryList)
+                        .build()
+        );
 
-        // when
-        DrawHistoryResponseDto actualResponse = drawService.getDrawHistory(userId);
+        // When
+        DrawHistoryResponseDto response = drawService.getDrawHistory(userId);
 
-        // then
-        assertThat(actualResponse).isNotEqualTo(null);
-        assertThat(actualResponse.isDrawWin()).isEqualTo(true);
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo(expectedResponse.getWinModal().getTitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo(expectedResponse.getWinModal().getSubtitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getImg()).isEqualTo(expectedResponse.getWinModal().getImg());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo(expectedResponse.getWinModal().getDescription());
-    }
+        // Then
+        assertThat((DrawHistoryWinnerResponseDto)response).isNotNull();
+        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList()).hasSize(3);
 
-    @Test
-    @DisplayName("2등 당첨자일 경우 당첨 내역 조회 시 당첨 결과 ")
-    void getDrawHistorySecondWinner() {
-        // given
-        Integer userId = 6;
-
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(2);
-
-        WinModal winModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 쿠폰 10만원퀀에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_2.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
-
-        DrawHistoryWinnerResponseDto expectedResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(winModal)
-                .build();
-
-        // when
-        DrawHistoryResponseDto actualResponse = drawService.getDrawHistory(userId);
-
-        // then
-        assertThat(actualResponse).isNotEqualTo(null);
-        assertThat(actualResponse.isDrawWin()).isEqualTo(true);
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo(expectedResponse.getWinModal().getTitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo(expectedResponse.getWinModal().getSubtitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getImg()).isEqualTo(expectedResponse.getWinModal().getImg());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo(expectedResponse.getWinModal().getDescription());
-    }
-
-    @Test
-    @DisplayName("3등 당첨자일 경우 당첨 내역 조회 시 당첨 결과 ")
-    void getDrawHistoryThirdWinner() {
-        // given
-        Integer userId = 6;
-
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(3);
-
-        WinModal winModal = WinModal.builder()
-                .title("축하합니다!")
-                .subtitle("현대백화점 쿠폰 1만원퀀에 당첨됐어요!")
-                .img("https://d1wv99asbppzjv.cloudfront.net/main-page/draw_reward_image_3.svg")
-                .description("이벤트 경품 수령을 위해 등록된 전화번호로 영업일 기준 3~5일 내 개별 안내가 진행될 예정입니다.\n" +
-                        "이벤트 당첨 이후 개인정보 제공을 거부하거나 개별 안내를 거부하는 경우, 당첨이 취소될 수 있습니다.")
-                .build();
-
-        DrawHistoryWinnerResponseDto expectedResponse = DrawHistoryWinnerResponseDto.builder()
-                .isDrawWin(true)
-                .winModal(winModal)
-                .build();
-
-        // when
-        DrawHistoryResponseDto actualResponse = drawService.getDrawHistory(userId);
-
-        // then
-        assertThat(actualResponse).isNotEqualTo(null);
-        assertThat(actualResponse.isDrawWin()).isEqualTo(true);
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getTitle()).isEqualTo(expectedResponse.getWinModal().getTitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getSubtitle()).isEqualTo(expectedResponse.getWinModal().getSubtitle());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getImg()).isEqualTo(expectedResponse.getWinModal().getImg());
-        assertThat(((DrawHistoryWinnerResponseDto) actualResponse).getWinModal().getDescription()).isEqualTo(expectedResponse.getWinModal().getDescription());
+        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(0).getDrawRank()).isEqualTo(2);
+        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(1).getDrawRank()).isEqualTo(3);
+        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(2).getDrawRank()).isEqualTo(redisRank);
     }
 
     @Test
@@ -707,7 +617,8 @@ class DrawServiceTest {
         // given
         Integer userId = 6;
 
-        Mockito.when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRedisUtil.getRankingIfWinner(userId)).thenReturn(0);
+        when(drawRepository.findAllByUserIdOrderByWinningDateAsc(userId)).thenReturn(new ArrayList<>());
 
         DrawHistoryLoserResponseDto expectedResponse = DrawHistoryLoserResponseDto.builder()
                 .isDrawWin(false)

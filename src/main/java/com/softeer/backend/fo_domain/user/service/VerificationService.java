@@ -9,6 +9,7 @@ import com.softeer.backend.fo_domain.user.properties.SmsProperties;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.util.RandomCodeUtil;
 import com.softeer.backend.global.util.StringRedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -24,20 +25,12 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class VerificationService {
     private final DefaultMessageService messageService;
     private final StringRedisUtil stringRedisUtil;
-    private final SmsProperties smsProperties;
     private final RandomCodeUtil randomCodeUtil;
-
-    public VerificationService(SmsProperties smsProperties, StringRedisUtil stringRedisUtil,
-                               RandomCodeUtil randomCodeUtil) {
-        this.messageService = NurigoApp.INSTANCE.initialize(
-                smsProperties.getKey(), smsProperties.getSecret(), smsProperties.getUrl());
-        this.smsProperties = smsProperties;
-        this.stringRedisUtil = stringRedisUtil;
-        this.randomCodeUtil = randomCodeUtil;
-    }
+    private final SmsProperties smsProperties;
 
     /**
      * 인증 코드를 발급하는 메서드

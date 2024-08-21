@@ -156,19 +156,17 @@ public class DrawService {
         }
 
         // redis 내역을 리스트로 만들기
-        drawHistoryList.add(DrawHistoryDto.builder()
-                .drawRank(ranking)
-                .winningDate(LocalDate.now())
-                .image(drawResponseGenerateUtil.getImageUrl(ranking))
-                .build());
-
-        if (!drawHistoryList.isEmpty()) {
-
+        if (ranking != 0) {
+            drawHistoryList.add(DrawHistoryDto.builder()
+                    .drawRank(ranking)
+                    .winningDate(LocalDate.now())
+                    .image(drawResponseGenerateUtil.getImageUrl(ranking))
+                    .build());
         }
 
-        if (ranking != 0) {
+        if (!drawHistoryList.isEmpty()) {
             // 당첨자라면
-            return drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(ranking);
+            return drawResponseGenerateUtil.generateDrawHistoryWinnerResponse(drawHistoryList);
         }
 
         // 당첨자가 아니라면

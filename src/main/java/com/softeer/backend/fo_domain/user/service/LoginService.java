@@ -78,15 +78,10 @@ public class LoginService {
             // 공유한 사람의 "내가 초대한 친구 수" 추가
             // 공유받은 사람은 이미 공유 url로 참여했다고 표시해주기
             if (shareCode != null) {
-                // 공유한 사람의 아이디
-                if (shareUrlInfoRepository.existsByShareUrl(shareCode)) {
-                    // 공유한 사용자의 userId 조회
-                    Integer shareUserId = shareUrlInfoRepository.findUserIdByShareUrl(shareCode)
-                            .orElseThrow(() -> new ShareUrlInfoException(ErrorStatus._NOT_FOUND));
-
-                    // 공유한 사람 추첨 기회 추가
-                    shareInfoRepository.increaseInvitedNumAndRemainDrawCount(shareUserId);
-                }
+                // 공유한 사용자의 userId 조회 및 조건에 따른 로직 실행
+                // userId가 null이 아닌 경우에만 실행
+                shareUrlInfoRepository.findUserIdByShareUrl(shareCode)
+                        .ifPresent(shareInfoRepository::increaseInvitedNumAndRemainDrawCount);
             }
         }
         // 전화번호가 이미 User DB에 등록되어 있는 경우

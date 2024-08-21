@@ -1,11 +1,13 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.*;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
+import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
@@ -20,8 +22,14 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -39,6 +47,8 @@ public class FcfsService {
     private final FcfsRedisUtil fcfsRedisUtil;
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
+
+    private final FcfsRepository fcfsRepository;
 
     /**
      * 선착순 페이지에 필요한 정보를 반환하는 메서드
@@ -233,6 +243,55 @@ public class FcfsService {
                 .subTitle(textContentMap.get(StaticTextName.FCFS_LOSER_SUBTITLE.name()))
                 .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
                 .build();
+    }
+
+    /**
+     * 선착순 당첨 기록 응답을 반환하는 메서드
+     */
+    public FcfsHistoryResponseDto getFcfsHistory(int userId){
+        fcfsRepository.findByUserIdOrderByWinningDateAsc(userId);
+        List<FcfsHistoryResponseDto.FcfsHistory> fcfsHistoryList = new ArrayList<>();
+
+        Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
+
+        LocalDate now = LocalDate.now();
+        Integer round = fcfsSettingManager.getFcfsRoundForHistory(now);
+        if(round == null)
+            round = fcfsSettingManager.getFcfsRoundForHistory(now.minusDays(1));
+        if(round != null
+                && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId)){
+            Map<String, Integer> fcfsMap = fcfsRedisUtil.getHashEntries(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round);
+
+            for (Map.Entry<String, Integer> entry : fcfsMap.entrySet()) {
+                if (entry.getValue().equals(userId)) {
+                    String fcfsCode = entry.getKey();
+
+                    fcfsHistoryList.add(FcfsHistoryResponseDto.FcfsHistory.builder()
+                            .barcode(s3ContentMap.get(S3FileName.BARCODE_IMAGE.name()))
+                            .fcfsCode(fcfsCode)
+                            .winningDate(now)
+                            .build());
+
+                    break;
+                }
+            }
+        }
+
+        List<Fcfs> fcfsList = fcfsRepository.findByUserIdOrderByWinningDateAsc(userId);
+        fcfsHistoryList.addAll(fcfsList.stream()
+                .map((fcfs) ->
+                    FcfsHistoryResponseDto.FcfsHistory.builder()
+                            .barcode(s3ContentMap.get(S3FileName.BARCODE_IMAGE.name()))
+                            .fcfsCode(fcfs.getCode())
+                            .winningDate(fcfs.getWinningDate())
+                            .build()
+                ).toList());
+
+        return FcfsHistoryResponseDto.builder()
+                .isFcfsWin(!fcfsHistoryList.isEmpty())
+                .fcfsHistoryList(fcfsHistoryList)
+                .build();
+
     }
 
 }

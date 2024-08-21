@@ -22,4 +22,6 @@ public interface FcfsRepository extends JpaRepository<Fcfs, Integer> {
     @Query("SELECT f FROM Fcfs f JOIN FETCH f.user WHERE f.round = :round")
     List<Fcfs> findFcfsWithUser(@Param("round") int round);
 
+    List<Fcfs> findByUserIdOrderByWinningDateAsc(Integer userId);
+
 }

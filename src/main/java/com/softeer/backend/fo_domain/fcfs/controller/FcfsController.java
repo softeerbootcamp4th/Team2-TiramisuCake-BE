@@ -1,14 +1,13 @@
 package com.softeer.backend.fo_domain.fcfs.controller;
 
+import com.softeer.backend.fo_domain.fcfs.dto.FcfsHistoryResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsPageResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
-import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResult;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.global.annotation.AuthInfo;
 import com.softeer.backend.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +60,14 @@ public class FcfsController {
         FcfsResultResponseDto fcfsResultResponseDto = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
 
         return ResponseDto.onSuccess(fcfsResultResponseDto);
+    }
+
+    @GetMapping("/fcfs/history")
+    public ResponseDto<FcfsHistoryResponseDto> getFcfsHistory(@Parameter(hidden = true) @AuthInfo Integer userId){
+
+        FcfsHistoryResponseDto fcfsHistoryResponseDto = fcfsService.getFcfsHistory(userId);
+
+        return ResponseDto.onSuccess(fcfsHistoryResponseDto);
     }
 
 

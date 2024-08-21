@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 /**
  * 선착순 설정 정보 Dto 클래스
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @Setter

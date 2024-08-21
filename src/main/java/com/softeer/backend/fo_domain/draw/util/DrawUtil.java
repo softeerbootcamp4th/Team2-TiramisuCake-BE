@@ -101,17 +101,17 @@ public class DrawUtil {
     @Cacheable(value = "staticResources", key = "'drawImage_' + #direction")
     public String getImageUrl(int direction) {
 
-        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
+        Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
 
         String directionImage;
         if (direction == 0) {
-            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_UP_IMAGE.name());
+            directionImage = s3ContentMap.get(S3FileName.DRAW_BLOCK_UP_IMAGE.name());
         } else if (direction == 1) {
-            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_RIGHT_IMAGE.name());
+            directionImage = s3ContentMap.get(S3FileName.DRAW_BLOCK_RIGHT_IMAGE.name());
         } else if (direction == 2) {
-            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_DOWN_IMAGE.name());
+            directionImage = s3ContentMap.get(S3FileName.DRAW_BLOCK_DOWN_IMAGE.name());
         } else {
-            directionImage = textContentMap.get(S3FileName.DRAW_BLOCK_LEFT_IMAGE.name());
+            directionImage = s3ContentMap.get(S3FileName.DRAW_BLOCK_LEFT_IMAGE.name());
         }
         return directionImage;
     }

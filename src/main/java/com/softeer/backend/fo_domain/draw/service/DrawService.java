@@ -2,6 +2,7 @@ package com.softeer.backend.fo_domain.draw.service;
 
 import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.domain.DrawParticipationInfo;
+import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryDto;
 import com.softeer.backend.fo_domain.draw.dto.main.DrawMainResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
@@ -19,6 +20,8 @@ import com.softeer.backend.global.util.DrawRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -132,7 +135,7 @@ public class DrawService {
      * 1. DB 조회
      * 2. redis 조회
      * 3. 내역을 리스트로 만들어서 반환
-     *  3-1. 내역이 없다면 내역이 없다는 응답 반환
+     * 3-1. 내역이 없다면 내역이 없다는 응답 반환
      *
      * @param userId 사용자 아이디
      * @return 당첨 내역에 따른 응답
@@ -140,6 +143,28 @@ public class DrawService {
     public DrawHistoryResponseDto getDrawHistory(Integer userId) {
         int ranking = drawRedisUtil.getRankingIfWinner(userId);
         List<Draw> drawList = drawRepository.findAllByUserIdOrderByWinningDateAsc(userId);
+        List<DrawHistoryDto> drawHistoryList = new ArrayList<>();
+
+        // DB내역을 리스트로 만들기
+        for (Draw draw : drawList) {
+            int drawRank = draw.getRank();
+            drawHistoryList.add(DrawHistoryDto.builder()
+                    .drawRank(drawRank)
+                    .winningDate(draw.getWinningDate())
+                    .image(drawResponseGenerateUtil.getImageUrl(drawRank))
+                    .build());
+        }
+
+        // redis 내역을 리스트로 만들기
+        drawHistoryList.add(DrawHistoryDto.builder()
+                .drawRank(ranking)
+                .winningDate(LocalDate.now())
+                .image(drawResponseGenerateUtil.getImageUrl(ranking))
+                .build());
+
+        if (!drawHistoryList.isEmpty()) {
+
+        }
 
         if (ranking != 0) {
             // 당첨자라면

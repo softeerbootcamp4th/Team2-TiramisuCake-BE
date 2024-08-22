@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.admin.service;
+package com.softeer.backend.bo_domain.admin.service;
 
 import com.softeer.backend.bo_domain.admin.domain.Admin;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;

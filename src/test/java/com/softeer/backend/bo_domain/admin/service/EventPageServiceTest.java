@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.admin.service;
+package com.softeer.backend.bo_domain.admin.service;
 
 import com.softeer.backend.bo_domain.admin.dto.event.DrawEventTimeRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.event.EventPageResponseDto;

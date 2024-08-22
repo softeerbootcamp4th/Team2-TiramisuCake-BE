@@ -103,6 +103,7 @@ public class DbInsertScheduler {
                         .user(user)
                         .round(round)
                         .code(code)
+                        .winningDate(now.minusDays(1))
                         .build();
 
                 // 코드와 사용자 저장

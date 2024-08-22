@@ -9,8 +9,6 @@ import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
-import com.softeer.backend.fo_domain.draw.test.DrawDatabaseTest;
-import com.softeer.backend.fo_domain.draw.test.DrawDatabaseUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
@@ -57,7 +55,11 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
+        int drawAttendanceCount = drawParticipationInfo.getDrawAttendanceCount();
+
+        if (drawAttendanceCount != 7) {
+            drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
+        }
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 

@@ -112,13 +112,6 @@ public class MainPageService {
         else
             fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
 
-        String fcfsTime = "";
-        if(firstFcfsSetting.getStartTime().getMinute() != 0){
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
-        }
-        else
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
-
         return MainPageEventInfoResponseDto.builder()
                 .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))
                 .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))

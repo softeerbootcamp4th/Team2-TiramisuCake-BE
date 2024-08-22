@@ -27,9 +27,6 @@ public class MainPageEventInfoResponseDto {
 
     private String fcfsHint;
 
-    @JsonProperty("isFcfsAvailable")
-    private boolean isFcfsAvailable;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime nextFcfsStartTime;
+    private LocalDateTime fcfsStartTime;
 }

@@ -62,7 +62,7 @@ public class FcfsController {
         return ResponseDto.onSuccess(fcfsResultResponseDto);
     }
 
-    @GetMapping("/fcfs/history")
+    @GetMapping("/history")
     public ResponseDto<FcfsHistoryResponseDto> getFcfsHistory(@Parameter(hidden = true) @AuthInfo Integer userId){
 
         FcfsHistoryResponseDto fcfsHistoryResponseDto = fcfsService.getFcfsHistory(userId);

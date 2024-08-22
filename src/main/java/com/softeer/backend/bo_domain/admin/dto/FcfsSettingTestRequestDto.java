@@ -13,10 +13,10 @@ public class FcfsSettingTestRequestDto {
 
     private int round;
 
-    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
 
-    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endTime;
 
     private int winnerNum;

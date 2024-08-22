@@ -101,6 +101,14 @@ public enum StaticTextName {
 
     FCFS_LOSER_TITLE,
     FCFS_LOSER_SUBTITLE,
-    FCFS_LOSER_CAUTION;
+    FCFS_LOSER_CAUTION,
+
+    // 선착순 이벤트 종료로 인한 응모 실패 모달
+    FCFS_CLOSED_TITLE,
+    FCFS_CLOSED_SUBTITLE,
+
+    // 선착순 이벤트 당첨된 상황에서 중복으로 응모할 때의 실패 모달
+    FCFS_DUPLICATED_TITLE,
+    FCFS_DUPLICATED_SUBTITLE;
 
 }

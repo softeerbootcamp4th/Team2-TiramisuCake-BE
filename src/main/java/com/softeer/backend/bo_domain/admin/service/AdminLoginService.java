@@ -1,11 +1,15 @@
 package com.softeer.backend.bo_domain.admin.service;
 
 import com.softeer.backend.bo_domain.admin.domain.Admin;
+import com.softeer.backend.bo_domain.admin.dto.DrawSettingTestRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.FcfsSettingTestRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminSignUpRequestDto;
 import com.softeer.backend.bo_domain.admin.exception.AdminException;
 import com.softeer.backend.bo_domain.admin.repository.AdminRepository;
 import com.softeer.backend.bo_domain.admin.util.PasswordEncoder;
+import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RoleType;
 import com.softeer.backend.global.common.dto.JwtClaimsDto;
@@ -29,6 +33,8 @@ public class AdminLoginService {
     private final JwtUtil jwtUtil;
     private final StringRedisUtil stringRedisUtil;
     private final PasswordEncoder passwordEncoder;
+    private final FcfsSettingManager fcfsSettingManager;
+    private final DrawSettingManager drawSettingManager;
 
     /**
      * 어드민 계정 로그인을 처리하는 메서드
@@ -90,5 +96,13 @@ public class AdminLoginService {
                 .account(adminSignUpRequestDto.getAccount())
                 .password(passwordEncoder.encode(adminSignUpRequestDto.getPassword()))
                 .build());
+    }
+
+    public void setFcfsSetting(FcfsSettingTestRequestDto fcfsSettingTestRequestDto) {
+        fcfsSettingManager.setFcfsSettingByAdmin(fcfsSettingTestRequestDto);
+    }
+
+    public void setDrawSetting(DrawSettingTestRequestDto drawSettingTestRequestDto) {
+        drawSettingManager.setDrawSettingByAdmin(drawSettingTestRequestDto);
     }
 }

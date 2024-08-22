@@ -23,10 +23,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * 선착순 관련 이벤트를 처리하는 클래스
@@ -155,8 +158,7 @@ public class FcfsService {
 
             return getFcfsResult(true, false, code);
         }
-
-        if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+        else if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
             && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
             return getFcfsResult(false, true, null);
 

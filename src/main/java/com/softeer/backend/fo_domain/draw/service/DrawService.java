@@ -53,7 +53,11 @@ public class DrawService {
         ShareInfo shareInfo = shareInfoRepository.findShareInfoByUserId(userId)
                 .orElseThrow(() -> new ShareInfoException(ErrorStatus._NOT_FOUND));
 
-        int drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
+        int drawAttendanceCount = drawParticipationInfo.getDrawAttendanceCount();
+
+        if (drawAttendanceCount != 7) {
+            drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
+        }
         int invitedNum = shareInfo.getInvitedNum();
         int remainDrawCount = shareInfo.getRemainDrawCount();
 
@@ -70,18 +74,18 @@ public class DrawService {
 
     /**
      * 추첨 이벤트 참여를 위한 메서드
-     *
+     * <p>
      * 1. 남은 참여 기회가 0이라면 실패 응답 반환하고 종료
      * 2. 추첨 이벤트 참여자 수 증가
      * 3. 해당 사용자의 추첨 이벤트 참여 기회 1회 차감
      * 4. 오늘 이미 당첨된 사용자인지 확인
-     *  4-1. 이미 당첨된 사용자라면 사용자의 낙첨 횟수 1회 증가, 낙첨 응답 반환
+     * 4-1. 이미 당첨된 사용자라면 사용자의 낙첨 횟수 1회 증가, 낙첨 응답 반환
      * 5. 추첨 이벤트 설정으로부터 각 등수의 당첨자 수 조회
      * 6. 추첨 로직 실행
-     *  6-1. 당첨자일 경우
-     *   6-1-1. 레디스에 해당 등수의 자리가 남았을 경우: 레디스에 사용자 넣기, 해당 사용자의 당첨 횟수 증가, 당첨 응답 반환
-     *   6-1-2. 레디스에 해당 등수의 자리가 없을 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
-     *  6-2. 낙첨자일 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
+     * 6-1. 당첨자일 경우
+     * 6-1-1. 레디스에 해당 등수의 자리가 남았을 경우: 레디스에 사용자 넣기, 해당 사용자의 당첨 횟수 증가, 당첨 응답 반환
+     * 6-1-2. 레디스에 해당 등수의 자리가 없을 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
+     * 6-2. 낙첨자일 경우 해당 사용자의 낙첨 횟수 증가, 낙첨 응답 반환
      */
     public DrawModalResponseDto participateDrawEvent(Integer userId) {
         // 복권 기회 조회

@@ -20,4 +20,6 @@ public class FcfsSettingTestRequestDto {
     private LocalDateTime endTime;
 
     private int winnerNum;
+
+    private boolean isFcfsClosed;
 }

@@ -197,6 +197,8 @@ public class FcfsSettingManager {
                 .build();
 
         fcfsSettingList.set(fcfsSettingTestRequestDto.getRound()-1, fcfsSettingDto);
+
+        isFcfsClosed = fcfsSettingTestRequestDto.isFcfsClosed();
     }
 
 }

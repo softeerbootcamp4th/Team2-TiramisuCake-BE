@@ -2,8 +2,6 @@ package com.softeer.backend.fo_domain.draw.test.tablelock;
 
 import com.softeer.backend.fo_domain.draw.test.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,104 +100,4 @@ public class DrawDatabaseUtil {
 
         return false;
     }
-
-
-//    @Transactional
-//    public boolean isFirstWinner(Integer userId, int winnerNum) {
-//        String sql = "LOCK TABLES test_database.draw_test_first_winner_list WRITE; "
-//                + "INSERT INTO test_database.draw_test_first_winner_list (user_id) "
-//                + "SELECT ? FROM dual WHERE (SELECT COUNT(*) FROM test_database.draw_test_first_winner_list) < ?; "
-//                + "UNLOCK TABLES;";
-//
-//        int rowsAffected = jdbcTemplate.update(sql, userId, winnerNum);
-//
-//        return rowsAffected > 0;
-//    }
-//
-//    @Transactional
-//    public boolean isSecondWinner(Integer userId, int winnerNum) {
-//        String sql = "LOCK TABLES test_database.draw_test_second_winner_list WRITE; "
-//                + "INSERT INTO test_database.draw_test_second_winner_list (user_id) "
-//                + "SELECT ? FROM dual WHERE (SELECT COUNT(*) FROM test_database.draw_test_second_winner_list) < ?; "
-//                + "UNLOCK TABLES;";
-//
-//        int rowsAffected = jdbcTemplate.update(sql, userId, winnerNum);
-//
-//        return rowsAffected > 0;
-//    }
-//
-//    @Transactional
-//    public boolean isThirdWinner(Integer userId, int winnerNum) {
-//        String sql = "LOCK TABLES test_database.draw_test_third_winner_list WRITE; "
-//                + "INSERT INTO test_database.draw_test_third_winner_list (user_id) "
-//                + "SELECT ? FROM dual WHERE (SELECT COUNT(*) FROM test_database.draw_test_third_winner_list) < ?; "
-//                + "UNLOCK TABLES;";
-//
-//        int rowsAffected = jdbcTemplate.update(sql, userId, winnerNum);
-//
-//        return rowsAffected > 0;
-//    }
-
-//    private boolean isFirstWinner(Integer userId, int winnerNum) {
-//        // 테이블 락을 설정합니다.
-//        drawTestFirstWinnerListRepository.lockFirstWinnerTable();
-//
-//        try {
-//            if (drawTestFirstWinnerListRepository.count() < winnerNum) {
-//                DrawTestFirstWinnerList firstWinner = DrawTestFirstWinnerList.builder()
-//                        .userId(userId)
-//                        .build();
-//
-//                drawTestFirstWinnerListRepository.save(firstWinner);
-//                return true;
-//            }
-//        } finally {
-//            // 테이블 락을 해제합니다.
-//            drawTestFirstWinnerListRepository.unlockFirstWinnerTable();
-//        }
-//
-//        return false;
-//    }
-//
-//    private boolean isSecondWinner(Integer userId, int winnerNum) {
-//        // 테이블 락을 설정합니다.
-//        drawTestSecondWinnerListRepository.lockSecondWinnerTable();
-//
-//        try {
-//            if (drawTestSecondWinnerListRepository.count() < winnerNum) {
-//                DrawTestSecondWinnerList secondWinner = DrawTestSecondWinnerList.builder()
-//                        .userId(userId)
-//                        .build();
-//
-//                drawTestSecondWinnerListRepository.save(secondWinner);
-//                return true;
-//            }
-//        } finally {
-//            // 테이블 락을 해제합니다.
-//            drawTestSecondWinnerListRepository.unlockSecondWinnerTable();
-//        }
-//
-//        return false;
-//    }
-//
-//    private boolean isThirdWinner(Integer userId, int winnerNum) {
-//        // 테이블 락을 설정합니다.
-//        drawTestThirdWinnerListRepository.lockThirdWinnerTable();
-//
-//        try {
-//            if (drawTestThirdWinnerListRepository.count() < winnerNum) {
-//                DrawTestThirdWinnerList thirdWinner = DrawTestThirdWinnerList.builder()
-//                        .userId(userId)
-//                        .build();
-//
-//                drawTestThirdWinnerListRepository.save(thirdWinner);
-//                return true;
-//            }
-//        } finally {
-//            // 테이블 락을 해제합니다.
-//            drawTestThirdWinnerListRepository.unlockThirdWinnerTable();
-//        }
-//
-//        return false;
-//    }
 }

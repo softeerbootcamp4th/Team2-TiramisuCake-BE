@@ -2,8 +2,6 @@ package com.softeer.backend.fo_domain.draw.test.withoutlock;
 
 import com.softeer.backend.fo_domain.draw.test.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;

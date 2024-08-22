@@ -107,10 +107,10 @@ public class MainPageService {
 
         String fcfsTime = "";
         if(firstFcfsSetting.getStartTime().getMinute() != 0){
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
         }
         else
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
 
         return MainPageEventInfoResponseDto.builder()
                 .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))

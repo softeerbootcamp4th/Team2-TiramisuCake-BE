@@ -94,7 +94,7 @@ public class DrawService {
 
         // 만약 남은 참여 기회가 0이라면
         if (shareInfo.getRemainDrawCount() == 0) {
-            return drawResponseGenerateUtil.generateDrawLoserResponse(userId);
+            throw new DrawException(ErrorStatus._NOT_FOUND);
         }
 
         drawRedisUtil.increaseDrawParticipationCount(); // 추첨 이벤트 참여자수 증가

@@ -77,7 +77,7 @@ public class FcfsSettingManager {
     /**
      * 인수로 넘어온 선착순 설정 정보를 바인딩하는 메서드
      */
-    public void setFcfsSettingList(List<FcfsSetting> fcfsSettings){
+    public void setFcfsSettingList(List<FcfsSetting> fcfsSettings) {
 
         fcfsSettings.forEach((fcfsSetting) -> {
             fcfsSettingList.set(fcfsSetting.getRound() - 1, FcfsSettingDto.builder()
@@ -110,19 +110,19 @@ public class FcfsSettingManager {
     /**
      * 선착순 이벤트 당첨 가능한 인원수를 반환하는 메서드
      */
-    public int getFcfsWinnerNum(){
+    public int getFcfsWinnerNum() {
         return fcfsSettingList.get(0).getWinnerNum();
     }
 
     /**
      * 현재 시간을 기준으로 선착순 이벤트가 활성화 되어 있는지를 반환하는 메서드
      */
-    public boolean isFcfsEntryAvailable(LocalDateTime now){
-        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+    public boolean isFcfsEntryAvailable(LocalDateTime now) {
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
             LocalDateTime endTime = fcfsSettingDto.getEndTime();
 
-            if((now.isEqual(startTime) || now.isAfter(startTime))
+            if ((now.isEqual(startTime) || now.isAfter(startTime))
                     && (now.isEqual(endTime) || now.isBefore(endTime))) {
                 return true;
             }
@@ -133,13 +133,13 @@ public class FcfsSettingManager {
     /**
      * 현재 시간에 해당하는 선착순 이벤트의 round값을 반환하는 메서드
      */
-    public Integer getFcfsRound(LocalDateTime now){
+    public Integer getFcfsRound(LocalDateTime now) {
 
-        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
             LocalDateTime endTime = fcfsSettingDto.getEndTime();
 
-            if((now.isEqual(startTime) || now.isAfter(startTime))
+            if ((now.isEqual(startTime) || now.isAfter(startTime))
                     && (now.isEqual(endTime) || now.isBefore(endTime))) {
                 return fcfsSettingDto.getRound();
             }
@@ -150,13 +150,38 @@ public class FcfsSettingManager {
     /**
      * 현재 시간을 기준으로 다음 선착순 이벤트의 시작 시간을 반환하는 메서드
      */
-    public LocalDateTime getNextFcfsTime(LocalDateTime now){
+    public LocalDateTime getNextFcfsTime(LocalDateTime now) {
 
-        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
 
-            if(now.isBefore(startTime)) {
+            if (now.isBefore(startTime)) {
                 return startTime;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 현재 선착순 이벤트가 진행중이라면 현재 이벤트의 시작시간을, 진행중이 아니라면 다음 이벤트 시작시간을 반환하는 메서드
+     */
+    public LocalDateTime getNowOrNextFcfsTime(LocalDateTime now) {
+
+        Integer round = getFcfsRound(now);
+        if(round != null){
+            return fcfsSettingList.get(round-1).getStartTime();
+        }
+
+        return getNextFcfsTime(now);
+    }
+
+    public Integer getFcfsRoundForHistory(LocalDate now) {
+
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            LocalDateTime startTime = fcfsSettingDto.getStartTime();
+
+            if (now.isEqual(startTime.toLocalDate())) {
+                return fcfsSettingDto.getRound();
             }
         }
         return null;

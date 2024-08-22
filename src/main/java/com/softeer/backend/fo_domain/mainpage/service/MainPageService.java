@@ -36,7 +36,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MainPageService {
     private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    private final DateTimeFormatter fcfsTimeFormatter = DateTimeFormatter.ofPattern("a h", Locale.KOREAN);
+    private final DateTimeFormatter fcfsTimeFormatter = DateTimeFormatter.ofPattern("a h시", Locale.KOREAN);
+    private final DateTimeFormatter fcfsTimeMinFormatter = DateTimeFormatter.ofPattern("a h시 m분", Locale.KOREAN);
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
     private final EventLockRedisUtil eventLockRedisUtil;
@@ -104,20 +105,34 @@ public class MainPageService {
 
         int remainDrawCount = totalDrawWinner - (int) drawRepository.count();
 
+        String fcfsTime = "";
+        if(firstFcfsSetting.getStartTime().getMinute() != 0){
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+        }
+        else
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
+
+        String fcfsTime = "";
+        if(firstFcfsSetting.getStartTime().getMinute() != 0){
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+        }
+        else
+            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
+
         return MainPageEventInfoResponseDto.builder()
                 .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))
                 .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))
                 .fcfsInfo(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_INFO.name()),
                         staticResourceUtil.getKoreanDayOfWeek(firstFcfsSetting.getStartTime().getDayOfWeek()),
                         staticResourceUtil.getKoreanDayOfWeek(secondFcfsSetting.getStartTime().getDayOfWeek()),
-                        firstFcfsSetting.getStartTime().format(fcfsTimeFormatter),
+                        fcfsTime,
                         firstFcfsSetting.getWinnerNum()))
                 .totalDrawWinner(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.TOTAL_DRAW_WINNER.name()), decimalFormat.format(totalDrawWinner)))
                 .remainDrawCount(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.REMAIN_DRAW_COUNT.name()), decimalFormat.format(remainDrawCount)))
                 .fcfsHint(quizManager.getHint())
-                .fcfsStartTime(fcfsSettingManager.getNextFcfsTime(LocalDateTime.now()))
+                .fcfsStartTime(fcfsSettingManager.getNowOrNextFcfsTime(LocalDateTime.now()))
                 .build();
     }
 

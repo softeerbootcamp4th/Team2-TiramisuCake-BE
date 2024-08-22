@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -38,8 +39,7 @@ public class Fcfs {
     @Column(name = "code")
     private String code;
 
-    @CreatedDate
     @Column(name = "winning_date", nullable = false)
-    private LocalDateTime winningDate;
+    private LocalDate winningDate;
 
 }

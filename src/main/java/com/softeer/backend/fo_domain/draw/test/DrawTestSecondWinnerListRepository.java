@@ -15,14 +15,6 @@ public interface DrawTestSecondWinnerListRepository extends JpaRepository<DrawTe
 
     long count();
 
-    @Modifying
-    @Query(value = "LOCK TABLE test_database.draw_test_second_winner_list WRITE", nativeQuery = true)
-    void lockSecondWinnerTable();
-
-    @Modifying
-    @Query(value = "UNLOCK TABLES", nativeQuery = true)
-    void unlockSecondWinnerTable();
-
     // 또는 JPA 엔티티에 대해 비관적 잠금을 직접 적용
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT d FROM DrawTestSecondWinnerList d")

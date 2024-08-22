@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class FcfsSettingTestRequestDto {
 
     private int round;
-  
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startTime;
 

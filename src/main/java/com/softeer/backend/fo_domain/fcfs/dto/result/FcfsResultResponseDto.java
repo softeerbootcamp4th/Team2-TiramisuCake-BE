@@ -13,7 +13,7 @@ import lombok.*;
 public class FcfsResultResponseDto {
 
     @JsonProperty("isFcfsWinner")
-    private boolean isFcfsWinner;
+    private boolean fcfsWinner;
 
     private FcfsResult fcfsResult;
 }

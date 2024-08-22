@@ -108,7 +108,7 @@ public class FcfsService {
         if (fcfsSettingManager.isFcfsClosed()) {
             countFcfsParticipant(round);
 
-            return getFcfsResult(false, null);
+            return getFcfsResult(false, false, null);
         }
 
         // 선착순 등록을 처리하는 메서드 호출
@@ -156,10 +156,14 @@ public class FcfsService {
                 fcfsSettingManager.setFcfsClosed(true);
             }
 
-            return getFcfsResult(true, code);
+            return getFcfsResult(true, false, code);
         }
+        else if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+            && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
+            return getFcfsResult(false, true, null);
 
-        return getFcfsResult(false, null);
+
+        return getFcfsResult(false, false, null);
 
     }
 
@@ -182,31 +186,26 @@ public class FcfsService {
     /**
      * 선착순 결과 모달 응답 Dto를 만들어서 반환하는 메서드
      */
-    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, String fcfsCode) {
-
-        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
-        Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
+    public FcfsResultResponseDto getFcfsResult(boolean fcfsWin, boolean isDuplicated, String fcfsCode) {
 
         FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);
 
         FcfsService fcfsService = fcfsServiceProvider.getObject();
 
         if (fcfsWin) {
-            FcfsSuccessResult fcfsSuccessResult = fcfsService.getFcfsSuccessResult(
-                    textContentMap, s3ContentMap, firstFcfsSetting
-            );
+            FcfsSuccessResult fcfsSuccessResult = fcfsService.getFcfsSuccessResult(firstFcfsSetting);
             fcfsSuccessResult.setFcfsCode(fcfsCode);
 
             return FcfsResultResponseDto.builder()
-                    .isFcfsWinner(fcfsWin)
+                    .fcfsWinner(fcfsWin)
                     .fcfsResult(fcfsSuccessResult)
                     .build();
         }
 
-        FcfsFailResult fcfsFailResult = fcfsService.getFcfsFailResult(textContentMap);
+        FcfsFailResult fcfsFailResult = fcfsService.getFcfsFailResult(isDuplicated);
 
         return FcfsResultResponseDto.builder()
-                .isFcfsWinner(fcfsWin)
+                .fcfsWinner(fcfsWin)
                 .fcfsResult(fcfsFailResult)
                 .build();
     }
@@ -215,8 +214,10 @@ public class FcfsService {
      * 선착순 당첨 모달 정보 중, 정적 정보를 반환하는 메서드
      */
     @Cacheable(value = "staticResources", key = "'fcfsSuccess'")
-    public FcfsSuccessResult getFcfsSuccessResult(Map<String, String> textContentMap, Map<String, String> s3ContentMap,
-                                                  FcfsSettingDto firstFcfsSetting) {
+    public FcfsSuccessResult getFcfsSuccessResult(FcfsSettingDto firstFcfsSetting) {
+
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
+        Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
 
         return FcfsSuccessResult.builder()
                 .title(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_WINNER_TITLE.name()),
@@ -235,9 +236,17 @@ public class FcfsService {
     /**
      * 선착순 실패 모달 정보 중, 정적 정보를 반환하는 메서드
      */
-    @Cacheable(value = "staticResources", key = "'fcfsFail'")
-    public FcfsFailResult getFcfsFailResult(Map<String, String> textContentMap) {
+    @Cacheable(value = "staticResources", key = "'fcfsFail_' + #isDuplicated")
+    public FcfsFailResult getFcfsFailResult(boolean isDuplicated) {
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
+        if(isDuplicated){
+            return FcfsFailResult.builder()
+                    .title(textContentMap.get(StaticTextName.FCFS_DUPLICATED_TITLE.name()))
+                    .subTitle(textContentMap.get(StaticTextName.FCFS_DUPLICATED_SUBTITLE.name()))
+                    .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
+                    .build();
+        }
         return FcfsFailResult.builder()
                 .title(textContentMap.get(StaticTextName.FCFS_LOSER_TITLE.name()))
                 .subTitle(textContentMap.get(StaticTextName.FCFS_LOSER_SUBTITLE.name()))
@@ -250,11 +259,21 @@ public class FcfsService {
      */
     public FcfsHistoryResponseDto getFcfsHistory(int userId){
         fcfsRepository.findByUserIdOrderByWinningDateAsc(userId);
-        List<FcfsHistoryResponseDto.FcfsHistory> fcfsHistoryList = new ArrayList<>();
 
         Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
 
         LocalDate now = LocalDate.now();
+
+        List<Fcfs> fcfsList = fcfsRepository.findByUserIdOrderByWinningDateAsc(userId);
+        List<FcfsHistoryResponseDto.FcfsHistory> fcfsHistoryList = new ArrayList<>(fcfsList.stream()
+                .map((fcfs) ->
+                        FcfsHistoryResponseDto.FcfsHistory.builder()
+                                .barcode(s3ContentMap.get(S3FileName.BARCODE_IMAGE.name()))
+                                .fcfsCode(fcfs.getCode())
+                                .winningDate(fcfs.getWinningDate())
+                                .build()
+                ).toList());
+
         Integer round = fcfsSettingManager.getFcfsRoundForHistory(now);
         if(round == null)
             round = fcfsSettingManager.getFcfsRoundForHistory(now.minusDays(1));
@@ -276,16 +295,6 @@ public class FcfsService {
                 }
             }
         }
-
-        List<Fcfs> fcfsList = fcfsRepository.findByUserIdOrderByWinningDateAsc(userId);
-        fcfsHistoryList.addAll(fcfsList.stream()
-                .map((fcfs) ->
-                    FcfsHistoryResponseDto.FcfsHistory.builder()
-                            .barcode(s3ContentMap.get(S3FileName.BARCODE_IMAGE.name()))
-                            .fcfsCode(fcfs.getCode())
-                            .winningDate(fcfs.getWinningDate())
-                            .build()
-                ).toList());
 
         return FcfsHistoryResponseDto.builder()
                 .isFcfsWin(!fcfsHistoryList.isEmpty())

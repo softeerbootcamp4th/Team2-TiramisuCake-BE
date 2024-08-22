@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.draw.service;
 
+import com.softeer.backend.bo_domain.admin.dto.DrawSettingTestRequestDto;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
@@ -71,6 +72,18 @@ public class DrawSettingManager {
         this.winnerNum1 = drawSetting.getWinnerNum1();
         this.winnerNum2 = drawSetting.getWinnerNum2();
         this.winnerNum3 = drawSetting.getWinnerNum3();
+    }
+
+    public void setDrawSettingByAdmin(DrawSettingTestRequestDto drawSettingTestRequestDto) {
+
+        this.startDate = drawSettingTestRequestDto.getStartDate();
+        this.endDate = drawSettingTestRequestDto.getEndDate();
+        this.startTime = drawSettingTestRequestDto.getStartTime();
+        this.endTime = drawSettingTestRequestDto.getEndTime();
+        this.winnerNum1 = drawSettingTestRequestDto.getWinnerNum1();
+        this.winnerNum2 = drawSettingTestRequestDto.getWinnerNum2();
+        this.winnerNum3 = drawSettingTestRequestDto.getWinnerNum3();
+
     }
 
 }

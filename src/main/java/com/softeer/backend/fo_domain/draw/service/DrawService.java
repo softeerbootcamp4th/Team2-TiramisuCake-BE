@@ -9,6 +9,8 @@ import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryResponseDto;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
+import com.softeer.backend.fo_domain.draw.test.DrawDatabaseTest;
+import com.softeer.backend.fo_domain.draw.test.DrawDatabaseUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;

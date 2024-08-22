@@ -12,4 +12,9 @@ public interface DrawTestParticipantCountRepository extends JpaRepository<DrawTe
     @Modifying
     @Query("UPDATE DrawTestParticipantCount p SET p.count = p.count + 1 WHERE p.participantCountId = 1")
     void increaseParticipantCount();
+
+    @Modifying
+    @Transactional
+    @Query(value = "LOCK TABLE draw_test_participant_count IN EXCLUSIVE MODE", nativeQuery = true)
+    void lockParticipantCountTable();
 }

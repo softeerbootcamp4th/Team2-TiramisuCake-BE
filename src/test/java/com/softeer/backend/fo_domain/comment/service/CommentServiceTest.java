@@ -42,7 +42,7 @@ class CommentServiceTest {
         List<Comment> comments = createComments();
 
         Page<Comment> page = new PageImpl<>(comments, PageRequest.of(0, SCROLL_SIZE + 1), comments.size());
-        when(commentRepository.findAllByIdLessThanEqualOrderByIdDesc(anyInt(), any(PageRequest.class)))
+        when(commentRepository.findAllByIdLessThanOrderByIdDesc(anyInt(), any(PageRequest.class)))
                 .thenReturn(page);
 
         // When
@@ -55,19 +55,19 @@ class CommentServiceTest {
         // 첫 번째 기대평
         CommentsResponseDto.CommentResponse firstCommentResponse = response.getComments().get(0);
         assertThat(firstCommentResponse).isNotNull();
-        assertThat(firstCommentResponse.getIsMine()).isFalse();
-        assertThat(firstCommentResponse.getNickName()).isEqualTo("user2");
+        assertThat(firstCommentResponse.getIsMine()).isTrue();
+        assertThat(firstCommentResponse.getNickName()).isEqualTo("user1(나)");
         assertThat(firstCommentResponse.getCommentType()).isEqualTo(1);
 
         // 두 번째 기대평
         CommentsResponseDto.CommentResponse secondCommentResponse = response.getComments().get(1);
         assertThat(secondCommentResponse).isNotNull();
-        assertThat(secondCommentResponse.getIsMine()).isTrue();
-        assertThat(secondCommentResponse.getNickName()).isEqualTo("user1" + CommentNickname.MY_NICKNAME_SUFFIX);
+        assertThat(secondCommentResponse.getIsMine()).isFalse();
+        assertThat(secondCommentResponse.getNickName()).isEqualTo("user2");
         assertThat(secondCommentResponse.getCommentType()).isEqualTo(1);
 
         verify(commentRepository, times(1))
-                .findAllByIdLessThanEqualOrderByIdDesc(eq(cursor), any(PageRequest.class));
+                .findAllByIdLessThanOrderByIdDesc(eq(cursor), any(PageRequest.class));
     }
 
     @Test

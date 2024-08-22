@@ -1,4 +1,4 @@
-package com.softeer.backend.fo_domain.draw.test;
+package com.softeer.backend.fo_domain.draw.test.tablelock;
 
 import com.softeer.backend.fo_domain.draw.dto.participate.DrawModalResponseDto;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;

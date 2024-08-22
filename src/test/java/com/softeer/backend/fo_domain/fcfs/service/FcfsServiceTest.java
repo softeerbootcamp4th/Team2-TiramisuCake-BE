@@ -125,7 +125,7 @@ class FcfsServiceTest {
         when(fcfsSettingManager.isFcfsClosed()).thenReturn(false);
 
         FcfsResultResponseDto successResponse = FcfsResultResponseDto.builder()
-                .isFcfsWinner(true)
+                .fcfsWinner(true)
                 .build();
         when(mockFcfsService.saveFcfsWinners(userId, round)).thenReturn(successResponse);
 
@@ -178,8 +178,6 @@ class FcfsServiceTest {
         when(randomCodeUtil.generateRandomCode(5)).thenReturn("ABCDE");
         when(fcfsServiceProvider.getObject()).thenReturn(mockFcfsService);
 
-        when(staticResourceUtil.getTextContentMap()).thenReturn(new HashMap<>());
-        when(staticResourceUtil.getTextContentMap()).thenReturn(new HashMap<>());
         FcfsSettingDto mockSettingDto = new FcfsSettingDto();
         when(fcfsSettingManager.getFcfsSettingByRound(1)).thenReturn(mockSettingDto);
 
@@ -187,7 +185,7 @@ class FcfsServiceTest {
                 .fcfsCode("ABCDE")
                 .build();
 
-        when(mockFcfsService.getFcfsSuccessResult(anyMap(), anyMap(), any(FcfsSettingDto.class)))
+        when(mockFcfsService.getFcfsSuccessResult(any(FcfsSettingDto.class)))
                 .thenReturn(successResult);
 
         // When
@@ -229,20 +227,18 @@ class FcfsServiceTest {
                 .winnerNum(10)
                 .build();
         when(fcfsServiceProvider.getObject()).thenReturn(mockFcfsService);
-        when(staticResourceUtil.getTextContentMap()).thenReturn(textContentMap);
-        when(staticResourceUtil.getS3ContentMap()).thenReturn(s3ContentMap);
         when(fcfsSettingManager.getFcfsSettingByRound(1)).thenReturn(fcfsSettingDto);
 
         FcfsSuccessResult successResult = FcfsSuccessResult.builder()
                 .fcfsCode("ABCDE")
                 .build();
 
-        when(mockFcfsService.getFcfsSuccessResult(anyMap(), anyMap(), any(FcfsSettingDto.class)))
+        when(mockFcfsService.getFcfsSuccessResult(any(FcfsSettingDto.class)))
                 .thenReturn(successResult);
 
 
         // When
-        FcfsResultResponseDto response = fcfsService.getFcfsResult(true, "A12345");
+        FcfsResultResponseDto response = fcfsService.getFcfsResult(true, false, "A12345");
 
         // Then
         assertThat(response).isNotNull();

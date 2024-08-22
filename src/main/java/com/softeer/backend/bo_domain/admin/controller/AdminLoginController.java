@@ -1,5 +1,7 @@
 package com.softeer.backend.bo_domain.admin.controller;
 
+import com.softeer.backend.bo_domain.admin.dto.DrawSettingTestRequestDto;
+import com.softeer.backend.bo_domain.admin.dto.FcfsSettingTestRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminLoginRequestDto;
 import com.softeer.backend.bo_domain.admin.dto.login.AdminSignUpRequestDto;
 import com.softeer.backend.bo_domain.admin.service.AdminLoginService;
@@ -50,6 +52,23 @@ public class AdminLoginController {
     ResponseDto<Void> handleSignUp(@Valid @RequestBody AdminSignUpRequestDto adminSignUpRequestDto) {
 
         adminLoginService.handleSignUp(adminSignUpRequestDto);
+
+        return ResponseDto.onSuccess();
+    }
+
+    @PostMapping("/fcfs/test")
+    ResponseDto<Void> setFcfsSetting(@RequestBody FcfsSettingTestRequestDto fcfsSettingTestRequestDto) {
+
+        adminLoginService.setFcfsSetting(fcfsSettingTestRequestDto);
+
+        return ResponseDto.onSuccess();
+    }
+
+
+    @PostMapping("/draw/test")
+    ResponseDto<Void> setDrawSetting(@RequestBody DrawSettingTestRequestDto drawSettingTestRequestDto) {
+
+        adminLoginService.setDrawSetting(drawSettingTestRequestDto);
 
         return ResponseDto.onSuccess();
     }

@@ -3,6 +3,7 @@ package com.softeer.backend.fo_domain.fcfs.interceptor;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
+import io.micrometer.core.ipc.http.HttpSender;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,16 @@ public class FcfsTimeCheckInterceptor implements HandlerInterceptor {
 
         if (!fcfsSettingManager.isFcfsEntryAvailable(now)) {
 
-            log.error("Cannot access the FCFS event");
-            throw new FcfsException(ErrorStatus._BAD_REQUEST);
+            if("GET".equalsIgnoreCase(request.getMethod())){
+                log.error("Cannot access the FCFS event");
+                throw new FcfsException(ErrorStatus._BAD_REQUEST);
+            }
+
+            else if("POST".equalsIgnoreCase(request.getMethod())){
+                log.error("Cannot participate FCFS event");
+                throw new FcfsException(ErrorStatus._FCFS_ALREADY_CLOSED);
+            }
+
         }
 
 

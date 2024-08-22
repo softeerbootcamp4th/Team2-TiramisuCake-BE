@@ -44,7 +44,6 @@ public class ScrollPaginationUtil<T> {
         } else {
             itemsList = new ArrayList<>(itemsWithNextCursor.subList(0, countPerScroll));
         }
-        Collections.reverse(itemsList);
 
         return itemsList;
     }

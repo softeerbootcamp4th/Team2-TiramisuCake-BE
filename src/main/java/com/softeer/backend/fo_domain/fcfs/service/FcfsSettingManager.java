@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
+import com.softeer.backend.bo_domain.admin.dto.FcfsSettingTestRequestDto;
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.domain.Quiz;
@@ -185,6 +186,19 @@ public class FcfsSettingManager {
             }
         }
         return null;
+    }
+
+    public void setFcfsSettingByAdmin(FcfsSettingTestRequestDto fcfsSettingTestRequestDto){
+        FcfsSettingDto fcfsSettingDto = FcfsSettingDto.builder()
+                .round(fcfsSettingTestRequestDto.getRound())
+                .startTime(fcfsSettingTestRequestDto.getStartTime())
+                .endTime(fcfsSettingTestRequestDto.getEndTime())
+                .winnerNum(fcfsSettingTestRequestDto.getWinnerNum())
+                .build();
+
+        fcfsSettingList.set(fcfsSettingTestRequestDto.getRound()-1, fcfsSettingDto);
+
+        isFcfsClosed = fcfsSettingTestRequestDto.isFcfsClosed();
     }
 
 }

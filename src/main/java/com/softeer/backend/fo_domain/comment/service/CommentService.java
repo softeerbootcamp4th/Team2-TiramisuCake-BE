@@ -32,7 +32,7 @@ public class CommentService {
     public CommentsResponseDto getComments(Integer userId, Integer cursor) {
 
         PageRequest pageRequest = PageRequest.of(0, SCROLL_SIZE + 1);
-        Page<Comment> page = commentRepository.findAllByIdLessThanEqualOrderByIdDesc(cursor, pageRequest);
+        Page<Comment> page = commentRepository.findAllByIdLessThanOrderByIdDesc(cursor, pageRequest);
 
         List<Comment> comments = page.getContent();
 

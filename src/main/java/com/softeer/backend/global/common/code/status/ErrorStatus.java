@@ -36,7 +36,10 @@ public enum ErrorStatus implements BaseErrorCode {
     _AUTH_CODE_ISSUE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "A403",
             "인증 코드 발급 횟수를 초과하였습니다. 나중에 다시 시도하세요."),
     _AUTH_CODE_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "A404", "인증되지 않은 상태에서 로그인 할 수 없습니다."),
-    _AUTH_USERNAME_NOT_MATCH(HttpStatus.BAD_REQUEST, "A405", "이미 등록된 번호입니다.");
+    _AUTH_USERNAME_NOT_MATCH(HttpStatus.BAD_REQUEST, "A405", "이미 등록된 번호입니다."),
+
+    // FCFS ERROR
+    _FCFS_ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "F400", "이미 선착순 이벤트가 마감되었습니다.");
 
     // 예외의 Http 상태값
     private final HttpStatus httpStatus;

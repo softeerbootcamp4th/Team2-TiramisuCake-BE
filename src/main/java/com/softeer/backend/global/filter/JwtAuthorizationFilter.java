@@ -25,7 +25,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 인가검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
-            "/admin/login", "/admin/signup"
+            "/admin/login", "/admin/signup",
+            "/admin/fcfs/test", "/admin/draw/test"
     };
 
     @Override

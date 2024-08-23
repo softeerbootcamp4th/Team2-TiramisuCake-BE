@@ -12,6 +12,7 @@ public enum StaticTextName {
     FCFS_INFO,
     FCFS_TITLE,
     FCFS_CONTENT,
+    DRAW_INFO,
 
     TOTAL_DRAW_WINNER,
     REMAIN_DRAW_COUNT,

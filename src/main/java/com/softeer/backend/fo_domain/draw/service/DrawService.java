@@ -14,6 +14,7 @@ import com.softeer.backend.fo_domain.draw.test.tablelock.DrawDatabaseTest;
 import com.softeer.backend.fo_domain.draw.test.tablelock.DrawDatabaseUtil;
 import com.softeer.backend.fo_domain.draw.test.withoutlock.DrawDatabaseWithoutLockTest;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
+import com.softeer.backend.fo_domain.draw.util.DrawRemainDrawCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;

@@ -22,6 +22,11 @@ public interface ShareInfoRepository extends JpaRepository<ShareInfo, Integer> {
 
     @Modifying
     @Transactional
+    @Query("UPDATE ShareInfo s SET s.remainDrawCount = s.remainDrawCount + 1 WHERE s.userId = :userId")
+    void increaseRemainDrawCount(Integer userId);
+
+    @Modifying
+    @Transactional
     @Query("UPDATE ShareInfo  s SET s.remainDrawCount = s.remainDrawCount - 1 WHERE s.userId = :userId")
     void decreaseRemainDrawCount(Integer userId);
 }

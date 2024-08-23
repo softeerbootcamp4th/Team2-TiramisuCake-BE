@@ -10,6 +10,7 @@ import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
+import com.softeer.backend.fo_domain.draw.util.DrawRemainDrawCountUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
 import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
@@ -38,6 +39,7 @@ public class DrawService {
     private final DrawAttendanceCountUtil drawAttendanceCountUtil;
     private final DrawSettingManager drawSettingManager;
     private final DrawRepository drawRepository;
+    private final DrawRemainDrawCountUtil drawRemainDrawCountUtil;
 
     /**
      * 1. 연속 참여일수 조회
@@ -59,7 +61,8 @@ public class DrawService {
             drawAttendanceCount = drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo);
         }
         int invitedNum = shareInfo.getInvitedNum();
-        int remainDrawCount = shareInfo.getRemainDrawCount();
+        // 새로 접속 시 남은 추첨 횟수 증가시켜주는 로직
+        int remainDrawCount = drawRemainDrawCountUtil.handleRemainDrawCount(userId, shareInfo.getRemainDrawCount(), drawParticipationInfo);
 
         System.out.println("Draw Attendance = " + drawAttendanceCount);
 

@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.fcfs.service.FcfsHandler;
 
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
+import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
@@ -11,6 +12,10 @@ import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
+import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCount;
+import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCountRepository;
+import com.softeer.backend.fo_domain.user.domain.User;
+import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
@@ -24,9 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -42,6 +49,9 @@ public class FcfsHandlerByDB implements FcfsHandler {
     private final FcfsRedisUtil fcfsRedisUtil;
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
+    private final FcfsCountRepository fcfsCountRepository;
+    private final FcfsRepository fcfsRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -74,44 +84,41 @@ public class FcfsHandlerByDB implements FcfsHandler {
         return fcfsHandlerByDB.saveFcfsWinners(userId, round);
     }
 
+    @Transactional
     public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
 
-        long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);
+        FcfsCount fcfsCount = fcfsCountRepository.findByRound(round)
+                .orElseThrow(() -> new IllegalArgumentException("Round not found"));
 
-        if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
-                && !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId)) {
+        int fcfsNum = fcfsCount.getFcfsNum();
 
-            // redis에 userId 등록
-            fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId);
+        if(fcfsNum < fcfsSettingManager.getFcfsWinnerNum()){
+            Optional<Fcfs> fcfs = fcfsRepository.findByUserIdAndRound(userId, round);
+            if(fcfs.isPresent()){
+                return getFcfsResult(false, true, null);
+            }
 
-            // 중복되지 않는 code를 생성
+            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("User not found"));
+
             String code = makeFcfsCode(round);
-            while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {
+            while (fcfsRepository.findByCode(code).isPresent()) {
                 code = makeFcfsCode(round);
             }
 
-            // redis에 선착순 code 등록
-            fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
+            fcfsRepository.save(Fcfs.builder()
+                    .user(user)
+                    .round(round)
+                    .code(code)
+                    .winningDate(fcfsSettingManager.getFcfsSettingByRound(round).getStartTime().toLocalDate())
+                    .build());
 
-            // redis에 code-userId 형태로 등록(hash)
-            fcfsRedisUtil.addToHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round, code, userId);
-
-            // redis에 선착순 참가자 수 +1
-            countFcfsParticipant(round);
-
-            // 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClodes 변수값을 true로 설정
-            if (numOfWinners + 1 == fcfsSettingManager.getFcfsWinnerNum()) {
-                fcfsSettingManager.setFcfsClosed(true);
-            }
+            fcfsCount.setFcfsNum(fcfsCount.getFcfsNum()+1);
 
             return getFcfsResult(true, false, code);
         }
-        else if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
-                && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
-            return getFcfsResult(false, true, null);
-
 
         return getFcfsResult(false, false, null);
+
 
     }
 

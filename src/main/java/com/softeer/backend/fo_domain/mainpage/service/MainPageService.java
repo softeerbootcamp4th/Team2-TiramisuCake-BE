@@ -35,9 +35,9 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class MainPageService {
-    private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    private final DateTimeFormatter fcfsTimeFormatter = DateTimeFormatter.ofPattern("a h시", Locale.KOREAN);
-    private final DateTimeFormatter fcfsTimeMinFormatter = DateTimeFormatter.ofPattern("a h시 m분", Locale.KOREAN);
+    private final DateTimeFormatter eventDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+    private final DateTimeFormatter eventTimeFormatter = DateTimeFormatter.ofPattern("a h시", Locale.KOREAN);
+    private final DateTimeFormatter eventTimeMinFormatter = DateTimeFormatter.ofPattern("a h시 m분", Locale.KOREAN);
     private final DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
     private final EventLockRedisUtil eventLockRedisUtil;
@@ -107,25 +107,41 @@ public class MainPageService {
 
         String fcfsTime = "";
         if(firstFcfsSetting.getStartTime().getMinute() != 0){
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeMinFormatter);
+            fcfsTime = firstFcfsSetting.getStartTime().format(eventTimeMinFormatter);
         }
         else
-            fcfsTime = firstFcfsSetting.getStartTime().format(fcfsTimeFormatter);
+            fcfsTime = firstFcfsSetting.getStartTime().format(eventTimeFormatter);
+
+        String drawStartTime = "";
+        String drawEndTime = "";
+        if(drawSettingManager.getStartTime().getMinute() != 0)
+            drawStartTime = drawSettingManager.getStartTime().format(eventTimeMinFormatter);
+        else
+            drawStartTime = drawSettingManager.getStartTime().format(eventTimeFormatter);
+
+        if(drawSettingManager.getEndTime().getMinute() != 0)
+            drawEndTime = drawSettingManager.getEndTime().format(eventTimeMinFormatter);
+        else
+            drawEndTime = drawSettingManager.getEndTime().format(eventTimeFormatter);
 
         return MainPageEventInfoResponseDto.builder()
-                .startDate(drawSettingManager.getStartDate().format(eventTimeFormatter))
-                .endDate(drawSettingManager.getEndDate().format(eventTimeFormatter))
+                .startDate(drawSettingManager.getStartDate().format(eventDateFormatter))
+                .endDate(drawSettingManager.getEndDate().format(eventDateFormatter))
                 .fcfsInfo(staticResourceUtil.format(textContentMap.get(StaticTextName.FCFS_INFO.name()),
                         staticResourceUtil.getKoreanDayOfWeek(firstFcfsSetting.getStartTime().getDayOfWeek()),
                         staticResourceUtil.getKoreanDayOfWeek(secondFcfsSetting.getStartTime().getDayOfWeek()),
                         fcfsTime,
                         firstFcfsSetting.getWinnerNum()))
+                .drawInfo(staticResourceUtil.format(textContentMap.get(StaticTextName.DRAW_INFO.name()),
+                        drawStartTime, drawEndTime))
                 .totalDrawWinner(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.TOTAL_DRAW_WINNER.name()), decimalFormat.format(totalDrawWinner)))
                 .remainDrawCount(staticResourceUtil.format(
                         textContentMap.get(StaticTextName.REMAIN_DRAW_COUNT.name()), decimalFormat.format(remainDrawCount)))
                 .fcfsHint(quizManager.getHint())
                 .fcfsStartTime(fcfsSettingManager.getNowOrNextFcfsTime(LocalDateTime.now()))
+                .drawStartTime(drawSettingManager.getStartTime())
+                .drawEndTime(drawSettingManager.getEndTime())
                 .build();
     }
 

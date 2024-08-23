@@ -15,10 +15,7 @@ import com.softeer.backend.fo_domain.draw.dto.history.DrawHistoryWinnerResponseD
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawParticipationInfoRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
-import com.softeer.backend.fo_domain.draw.util.DrawAttendanceCountUtil;
-import com.softeer.backend.fo_domain.draw.util.DrawModalGenerateUtil;
-import com.softeer.backend.fo_domain.draw.util.DrawResponseGenerateUtil;
-import com.softeer.backend.fo_domain.draw.util.DrawUtil;
+import com.softeer.backend.fo_domain.draw.util.*;
 import com.softeer.backend.fo_domain.share.domain.ShareInfo;
 import com.softeer.backend.fo_domain.share.repository.ShareInfoRepository;
 import com.softeer.backend.global.util.DrawRedisUtil;
@@ -32,7 +29,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,6 +62,8 @@ class DrawServiceTest {
     private DrawModalGenerateUtil drawModalGenerateUtil;
     @Mock
     private DrawAttendanceCountUtil drawAttendanceCountUtil;
+    @Mock
+    private DrawRemainDrawCountUtil drawRemainDrawCountUtil;
     @Mock
     private DrawSettingManager drawSettingManager;
     @Mock
@@ -119,13 +122,19 @@ class DrawServiceTest {
                 .build();
 
         DrawParticipationInfo drawParticipationInfo = DrawParticipationInfo.builder()
-                .userId(6)
+                .userId(userId)
                 .drawWinningCount(10)
                 .drawLosingCount(10)
                 .drawAttendanceCount(7)
+                .lastAttendance(LocalDateTime.parse("2024-08-23 15:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
 
-        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+        Clock fixedClock = Clock.fixed(LocalDateTime.of(2024, 8, 23, 15, 30, 0)
+                .atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(fixedClock);
+
+        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId))
+                .thenReturn(Optional.ofNullable(drawParticipationInfo));
 
         ShareInfo shareInfo = ShareInfo.builder()
                 .userId(userId)
@@ -133,17 +142,23 @@ class DrawServiceTest {
                 .remainDrawCount(1)
                 .build();
 
-        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId))
+                .thenReturn(Optional.ofNullable(shareInfo));
 
         lenient().when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(7);
 
-        DrawMainFullAttendResponseDto expectedResponse = DrawMainFullAttendResponseDto
-                .builder()
+        when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, 1, drawParticipationInfo))
+                .thenReturn(3);
+
+        DrawMainFullAttendResponseDto expectedResponse = DrawMainFullAttendResponseDto.builder()
                 .invitedNum(3)
-                .remainDrawCount(1)
+                .remainDrawCount(3)
                 .drawAttendanceCount(7)
                 .fullAttendModal(fullAttendModal)
                 .build();
+
+        when(drawResponseGenerateUtil.generateMainFullAttendResponse(3, 3, 7 % 8))
+                .thenReturn(expectedResponse);
 
         // when
         DrawMainResponseDto actualResponse = drawService.getDrawMainPageInfo(userId);
@@ -153,10 +168,13 @@ class DrawServiceTest {
         assertThat(actualResponse.getInvitedNum()).isEqualTo(expectedResponse.getInvitedNum());
         assertThat(actualResponse.getRemainDrawCount()).isEqualTo(expectedResponse.getRemainDrawCount());
         assertThat(actualResponse.getDrawAttendanceCount()).isEqualTo(expectedResponse.getDrawAttendanceCount());
-        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
-        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
-        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
-        assertThat(((DrawMainFullAttendResponseDto) actualResponse).getFullAttendModal().getDescription()).isEqualTo(expectedResponse.getFullAttendModal().getDescription());
+
+        DrawMainFullAttendResponseDto actualFullAttendResponse = (DrawMainFullAttendResponseDto) actualResponse;
+
+        assertThat(actualFullAttendResponse.getFullAttendModal().getTitle()).isEqualTo(expectedResponse.getFullAttendModal().getTitle());
+        assertThat(actualFullAttendResponse.getFullAttendModal().getSubtitle()).isEqualTo(expectedResponse.getFullAttendModal().getSubtitle());
+        assertThat(actualFullAttendResponse.getFullAttendModal().getImg()).isEqualTo(expectedResponse.getFullAttendModal().getImg());
+        assertThat(actualFullAttendResponse.getFullAttendModal().getDescription()).isEqualTo(expectedResponse.getFullAttendModal().getDescription());
     }
 
     @Test
@@ -172,7 +190,8 @@ class DrawServiceTest {
                 .drawAttendanceCount(1)
                 .build();
 
-        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId)).thenReturn(Optional.ofNullable(drawParticipationInfo));
+        when(drawParticipationInfoRepository.findDrawParticipationInfoByUserId(userId))
+                .thenReturn(Optional.ofNullable(drawParticipationInfo));
 
         ShareInfo shareInfo = ShareInfo.builder()
                 .userId(userId)
@@ -180,16 +199,21 @@ class DrawServiceTest {
                 .remainDrawCount(1)
                 .build();
 
-        when(shareInfoRepository.findShareInfoByUserId(userId)).thenReturn(Optional.ofNullable(shareInfo));
+        when(shareInfoRepository.findShareInfoByUserId(userId))
+                .thenReturn(Optional.ofNullable(shareInfo));
 
         when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(1);
 
-        DrawMainResponseDto expectedResponse = DrawMainResponseDto
-                .builder()
+        when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, shareInfo.getRemainDrawCount(), drawParticipationInfo))
+                .thenReturn(1);
+
+        DrawMainResponseDto expectedResponse = DrawMainResponseDto.builder()
                 .invitedNum(3)
                 .remainDrawCount(1)
                 .drawAttendanceCount(1)
                 .build();
+
+        when(drawResponseGenerateUtil.generateMainNotAttendResponse(3, 1, 1)).thenReturn(expectedResponse);
 
         // when
         DrawMainResponseDto actualResponse = drawService.getDrawMainPageInfo(userId);
@@ -583,12 +607,12 @@ class DrawServiceTest {
         DrawHistoryResponseDto response = drawService.getDrawHistory(userId);
 
         // Then
-        assertThat((DrawHistoryWinnerResponseDto)response).isNotNull();
-        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList()).hasSize(3);
+        assertThat((DrawHistoryWinnerResponseDto) response).isNotNull();
+        assertThat(((DrawHistoryWinnerResponseDto) response).getHistoryList()).hasSize(3);
 
-        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(0).getDrawRank()).isEqualTo(2);
-        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(1).getDrawRank()).isEqualTo(3);
-        assertThat(((DrawHistoryWinnerResponseDto)response).getHistoryList().get(2).getDrawRank()).isEqualTo(redisRank);
+        assertThat(((DrawHistoryWinnerResponseDto) response).getHistoryList().get(0).getDrawRank()).isEqualTo(2);
+        assertThat(((DrawHistoryWinnerResponseDto) response).getHistoryList().get(1).getDrawRank()).isEqualTo(3);
+        assertThat(((DrawHistoryWinnerResponseDto) response).getHistoryList().get(2).getDrawRank()).isEqualTo(redisRank);
     }
 
     @Test

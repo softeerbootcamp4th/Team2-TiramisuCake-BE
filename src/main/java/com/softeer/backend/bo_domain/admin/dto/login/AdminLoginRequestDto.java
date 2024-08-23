@@ -15,13 +15,9 @@ import lombok.*;
 public class AdminLoginRequestDto {
 
     @NotNull
-    @Pattern(regexp = ValidationConstant.ADMIN_ACCOUNT_REGEX,
-            message = ValidationConstant.ADMIN_ACCOUNT_MSG)
     private String account;
 
 
     @NotNull
-    @Pattern(regexp = ValidationConstant.ADMIN_PASSWORD_REGEX,
-            message = ValidationConstant.ADMIN_PASSWORD_MSG)
     private String password;
 }

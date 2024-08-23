@@ -172,8 +172,6 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                     .build());
         }
 
-        //TODO
-        // DRAW 관련 예외일 경우, body 구성하는 코드 필요
         if (redissonKeyName.contains("DRAW")) {
             body = ResponseDto.onSuccess(
                     DrawLoseModalResponseDto.builder()

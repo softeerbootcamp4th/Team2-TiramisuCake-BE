@@ -17,6 +17,7 @@ public class AdminLoginRequestDto {
     @NotNull
     private String account;
 
+
     @NotNull
     private String password;
 }

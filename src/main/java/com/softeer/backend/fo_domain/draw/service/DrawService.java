@@ -64,8 +64,6 @@ public class DrawService {
         // 새로 접속 시 남은 추첨 횟수 증가시켜주는 로직
         int remainDrawCount = drawRemainDrawCountUtil.handleRemainDrawCount(userId, shareInfo.getRemainDrawCount(), drawParticipationInfo);
 
-        System.out.println("Draw Attendance = " + drawAttendanceCount);
-
         if (drawAttendanceCount >= 7) {
             // 7일 연속 출석자라면
             return drawResponseGenerateUtil.generateMainFullAttendResponse(invitedNum, remainDrawCount, drawAttendanceCount % 8);

@@ -16,8 +16,16 @@ public class DrawRemainDrawCountUtil {
     private final ShareInfoRepository shareInfoRepository;
 
     public int handleRemainDrawCount(Integer userId, int remainDrawCount, DrawParticipationInfo drawParticipationInfo) {
-        LocalDate lastAttendance = drawParticipationInfo.getLastAttendance().toLocalDate();
+        LocalDate lastAttendance = drawParticipationInfo.getLastAttendance() != null
+                ? drawParticipationInfo.getLastAttendance().toLocalDate()
+                : null;
         LocalDate now = LocalDate.now();
+
+        if (lastAttendance == null) {
+            // lastAttendance가 null인 경우 remainDrawCount를 반환
+            return remainDrawCount;
+        }
+
         if (now.isAfter(lastAttendance)) {
             shareInfoRepository.increaseRemainDrawCount(userId);
             return remainDrawCount + 1;

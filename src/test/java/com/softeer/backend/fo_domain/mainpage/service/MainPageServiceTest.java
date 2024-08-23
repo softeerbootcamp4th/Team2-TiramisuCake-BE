@@ -24,6 +24,7 @@ import org.springframework.beans.factory.ObjectProvider;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +131,8 @@ public class MainPageServiceTest {
         when(drawSettingManager.getEndDate()).thenReturn(LocalDate.of(2024, 8, 31));
         when(quizManager.getHint()).thenReturn("퀴즈 힌트");
         when(fcfsSettingManager.getNowOrNextFcfsTime(any())).thenReturn(LocalDateTime.of(2024, 8, 22, 11, 0));
+        when(drawSettingManager.getStartTime()).thenReturn(LocalTime.of(22, 11, 0));
+        when(drawSettingManager.getEndTime()).thenReturn(LocalTime.of(22, 11, 0));
 
         // When
         MainPageEventInfoResponseDto response = mainPageService.getEventPageInfo();

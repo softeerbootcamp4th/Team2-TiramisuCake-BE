@@ -9,14 +9,12 @@ import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
-import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
 import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCount;
 import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCountRepository;
 import com.softeer.backend.fo_domain.user.domain.User;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
-import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.constant.S3FileName;
@@ -38,10 +36,10 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FcfsHandlerByDB implements FcfsHandler {
+public class FcfsHandlerByPessimisticLock implements FcfsHandler {
 
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
-    private final ObjectProvider<FcfsHandlerByDB> fcfsHandlerProvider;
+    private final ObjectProvider<FcfsHandlerByPessimisticLock> fcfsHandlerProvider;
 
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
@@ -80,8 +78,8 @@ public class FcfsHandlerByDB implements FcfsHandler {
         }
 
         // 선착순 등록을 처리하는 메서드 호출
-        FcfsHandlerByDB fcfsHandlerByDB = fcfsHandlerProvider.getObject();
-        return fcfsHandlerByDB.saveFcfsWinners(userId, round);
+        FcfsHandlerByPessimisticLock fcfsHandlerByPessimisticLock = fcfsHandlerProvider.getObject();
+        return fcfsHandlerByPessimisticLock.saveFcfsWinners(userId, round);
     }
 
     @Transactional
@@ -145,10 +143,10 @@ public class FcfsHandlerByDB implements FcfsHandler {
 
         FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);
 
-        FcfsHandlerByDB fcfsHandlerByDB = fcfsHandlerProvider.getObject();
+        FcfsHandlerByPessimisticLock fcfsHandlerByPessimisticLock = fcfsHandlerProvider.getObject();
 
         if (fcfsWin) {
-            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByDB.getFcfsSuccessResult(firstFcfsSetting);
+            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByPessimisticLock.getFcfsSuccessResult(firstFcfsSetting);
             fcfsSuccessResult.setFcfsCode(fcfsCode);
 
             return FcfsResultResponseDto.builder()
@@ -157,7 +155,7 @@ public class FcfsHandlerByDB implements FcfsHandler {
                     .build();
         }
 
-        FcfsFailResult fcfsFailResult = fcfsHandlerByDB.getFcfsFailResult(isDuplicated);
+        FcfsFailResult fcfsFailResult = fcfsHandlerByPessimisticLock.getFcfsFailResult(isDuplicated);
 
         return FcfsResultResponseDto.builder()
                 .fcfsWinner(fcfsWin)

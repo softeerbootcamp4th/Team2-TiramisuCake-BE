@@ -42,15 +42,15 @@ public class DrawUtil {
      */
     public void performDraw() {
         Random random = new Random();
-        int randomNum = random.nextInt(100) + 1; // 랜덤 수
+        int randomNum = random.nextInt(10) + 1; // 랜덤 수
 
         if (randomNum <= this.first) {
             isDrawWin = true;
             ranking = 1;
-        } else if (randomNum <= this.second) {
+        } else if (randomNum <= this.first + this.second) {
             isDrawWin = true;
             ranking = 2;
-        } else if (randomNum <= this.third) {
+        } else if (randomNum <= this.first + this.second + this.third) {
             isDrawWin = true;
             ranking = 3;
         }
@@ -104,7 +104,6 @@ public class DrawUtil {
      */
     @Cacheable(value = "staticResources", key = "'drawImage_' + #direction")
     public String getImageUrl(int direction) {
-
         Map<String, String> s3ContentMap = staticResourceUtil.getS3ContentMap();
 
         String directionImage;

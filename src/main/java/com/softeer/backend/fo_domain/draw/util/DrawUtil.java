@@ -42,7 +42,7 @@ public class DrawUtil {
      */
     public void performDraw() {
         Random random = new Random();
-        int randomNum = random.nextInt(10) + 1; // 랜덤 수
+        int randomNum = random.nextInt(100) + 1; // 랜덤 수
 
         if (randomNum <= this.first) {
             isDrawWin = true;

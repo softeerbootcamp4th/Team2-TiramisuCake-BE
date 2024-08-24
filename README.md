@@ -78,3 +78,14 @@
 - 데이터베이스 : `MySQL 8.0`, `JPA`, `Redis`
 - 배포: `Github Action` , `S3`, `CodeDeploy`
 - API 문서 : `Swagger 3.0.0`
+
+## 아키텍처
+
+### 서버
+![image](https://github.com/user-attachments/assets/27d75bce-055f-4ba6-a093-2b9b8af75c3a)
+
+### 배포
+![image](https://github.com/user-attachments/assets/ae5c53bf-2507-43b6-971b-8dfb7d7effa0)
+
+
+

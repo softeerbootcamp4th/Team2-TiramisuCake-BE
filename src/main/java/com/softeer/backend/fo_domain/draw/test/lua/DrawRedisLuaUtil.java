@@ -64,7 +64,7 @@ public class DrawRedisLuaUtil {
      * 1-1. 자리가 남아있다면 사용자를 당첨자 리스트에 저장하고 true 반환
      * 1-2. 자리가 없다면 false 반환
      */
-    @EventLock(key = "DRAW_WINNER")
+    // @EventLock(key = "DRAW_WINNER")
     public boolean isWinner(Integer userId, int ranking, int winnerNum) {
         String drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
 

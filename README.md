@@ -1,4 +1,4 @@
-# 🍰 Team2-TiramisuCake-FE
+# 🍰 Team2-TiramisuCake-BE
 ### 🚙 The new IONIQ 5 이벤트 페이지 🚙
 <br />
 

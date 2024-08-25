@@ -53,7 +53,7 @@ public class FcfsHandlerByLuaScript implements FcfsHandler {
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
 
- 
+
     /**
      * 선착순 등록을 처리하고 결과 모달 정보를 반환하는 메서드
      * <p>

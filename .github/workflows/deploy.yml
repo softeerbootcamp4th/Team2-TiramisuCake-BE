@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     environment: aws
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'test/')
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'oracle'
-          
+
       - name: echo test
         run: |
           echo "EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}"
@@ -87,7 +87,7 @@ jobs:
       - name: Create application.yml
         run: |
           echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_PROD_YML }}" > src/main/resources/yml/application-prod.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/main/resources/yml/application-test.yml
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
@@ -109,6 +109,9 @@ jobs:
         run: aws deploy create-deployment
           --application-name ${{ secrets.AWS_CODE_DEPLOY_APPLICATION }}
           --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name ${{ secrets.AWS_CODE_DEPLOY_GROUP }}
+          --s3-location bucket=${{ secrets.AWS_S3_BUCKET }},key=cicd/$GITHUB_SHA.zip,bundleType=zip
+          --debug
           --deployment-group-name ${{ secrets.AWS_CODE_DEPLOY_GROUP }}
           --s3-location bucket=${{ secrets.AWS_S3_BUCKET }},key=cicd/$GITHUB_SHA.zip,bundleType=zip
           --debug

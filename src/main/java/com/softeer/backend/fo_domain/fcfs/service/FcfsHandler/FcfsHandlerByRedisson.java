@@ -36,6 +36,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Primary
 public class FcfsHandlerByRedisson implements FcfsHandler {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
     private final ObjectProvider<FcfsHandlerByRedisson> fcfsServiceProvider;

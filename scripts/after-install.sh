@@ -2,7 +2,7 @@
 
 # 경로 설정
 APP_DIR="/home/ubuntu/backend/build/libs"
-YML_PATH="/home/ubuntu/backend/src/main/resources/yml/application-prod.yml"
+YML_PATH="/home/ubuntu/backend/src/main/resources/yml/application-test.yml"
 PORT=5000
 
 # 포트가 사용 중인지 확인하고, 사용 중이면 해당 프로세스를 종료

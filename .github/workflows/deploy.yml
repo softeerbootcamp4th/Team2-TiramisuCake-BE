@@ -87,7 +87,7 @@ jobs:
       - name: Create application.yml
         run: |
           echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_PROD_YML }}" > src/main/resources/yml/application-prod.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/main/resources/yml/application-test.yml
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build

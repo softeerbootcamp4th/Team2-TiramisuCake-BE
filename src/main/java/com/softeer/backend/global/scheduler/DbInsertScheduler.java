@@ -2,6 +2,7 @@ package com.softeer.backend.global.scheduler;
 
 import com.softeer.backend.bo_domain.eventparticipation.domain.EventParticipation;
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
+import com.softeer.backend.fo_domain.comment.repository.CommentRepository;
 import com.softeer.backend.fo_domain.draw.domain.Draw;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
@@ -11,11 +12,10 @@ import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.user.domain.User;
 import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
+import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
-import com.softeer.backend.global.util.DrawRedisUtil;
-import com.softeer.backend.global.util.EventLockRedisUtil;
-import com.softeer.backend.global.util.FcfsRedisUtil;
+import com.softeer.backend.global.util.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +37,8 @@ import java.util.concurrent.ScheduledFuture;
 @RequiredArgsConstructor
 public class DbInsertScheduler {
 
+    public static final String SCHEDULER_CHECK = "SCHEDULER_CHECK";
+
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
     private final FcfsRedisUtil fcfsRedisUtil;
@@ -47,6 +49,8 @@ public class DbInsertScheduler {
     private final UserRepository userRepository;
     private final FcfsRepository fcfsRepository;
     private final DrawRepository drawRepository;
+    private final RandomCodeUtil randomCodeUtil;
+    private final CommentRepository commentRepository;
 
 
     private ScheduledFuture<?> scheduledFuture;
@@ -58,14 +62,21 @@ public class DbInsertScheduler {
     }
 
     public void scheduleTask() {
-        scheduledFuture = taskScheduler.schedule(this::insertData, new CronTrigger("0 0 2 * * *"));
+        scheduledFuture = taskScheduler.schedule(this::insertData, new CronTrigger("0 41 7 * * *"));
     }
 
     /**
-     * 선착순 당첨자, 추첨 당첨자, 총 방문자 수, 선착순 참여자 수, 추첨 참여자 수를 데이터베이스에 저장하는 메서드
+     * 선착순 당첨자, 추첨 당첨자, 총 방문자 수, 선착순 참여자 수, 추첨 참여자 수를 데이터베이스에 저장하고
+     * 선착순 코드값을 redis에 저장하는 메서드
      */
-    @Transactional
+    @EventLock(key = "SCHEDULER")
     protected void insertData() {
+
+        if(fcfsRedisUtil.getValue(SCHEDULER_CHECK) != null)
+            return;
+
+        fcfsRedisUtil.incrementValue(SCHEDULER_CHECK);
+
         LocalDate now = LocalDate.now();
         // 이벤트 기간이 아니라면 메서드 수행 x
         if (now.isBefore(drawSettingManager.getStartDate().plusDays(1)))
@@ -121,7 +132,10 @@ public class DbInsertScheduler {
         }
 
         // drawParticipantCount에 추첨 이벤트 참가자 수 할당하기
-        int drawParticipantCount = drawRedisUtil.getDrawParticipantCount();
+        Integer drawParticipantCount = drawRedisUtil.getDrawParticipantCount();
+        if(drawParticipantCount == null) {
+            drawParticipantCount = 0;
+        }
         // redis에서 추첨 참가자 수 삭제
         drawRedisUtil.deleteDrawParticipantCount();
 
@@ -160,6 +174,36 @@ public class DbInsertScheduler {
                 .drawParticipantCount(drawParticipantCount)
                 .eventDate(now.minusDays(1))
                 .build());
+
+        // 이벤트 당일날에 선착순 코드를 redis에 생성
+        if (fcfsSettingManager.getRoundForFcfsCode(now) != -1) {
+
+            int round = fcfsSettingManager.getRoundForFcfsCode(now);
+
+            int i = 0;
+            while (i < fcfsSettingManager.getFcfsWinnerNum()) {
+
+                String code = makeFcfsCode(round);
+                while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {
+                    code = makeFcfsCode(round);
+                }
+
+                fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
+
+                i++;
+            }
+        }
+
+        // 기대평이 10000개가 넘어가면 오래된 댓글들 5000개를 삭제
+        if(commentRepository.count() > 10000)
+            commentRepository.deleteOldComments();
+    }
+
+    /**
+     * 선착순 이벤트 코드를 생성하는 메서드
+     */
+    private String makeFcfsCode(int round) {
+        return (char) ('A' + round - 1) + randomCodeUtil.generateRandomCode(5);
     }
 
     /**

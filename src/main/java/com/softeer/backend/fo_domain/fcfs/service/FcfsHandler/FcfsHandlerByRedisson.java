@@ -92,7 +92,6 @@ public class FcfsHandlerByRedisson implements FcfsHandler {
      */
 
     @EventLock(key = "FCFS_#{#round}")
-    @Transactional
     public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
 
         long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);

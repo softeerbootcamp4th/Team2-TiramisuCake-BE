@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.fcfs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsHistoryResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsPageResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
@@ -47,17 +48,24 @@ public class FcfsController {
         return ResponseDto.onSuccess(fcfsPageResponseDto);
     }
 
+    @PostMapping("/insert")
+    public ResponseDto<Void> insertFcfsCode(@RequestParam("num") Integer num, @RequestParam("round") Integer round){
+        fcfsService.insertFcfsCode(num, round);
+
+        return ResponseDto.onSuccess();
+    }
+
     /**
      * 선착순 등록을 처리하는 메서드
      */
     @PostMapping
     public ResponseDto<FcfsResultResponseDto> handleFcfs(@Parameter(hidden = true) HttpServletRequest request,
                                      @Parameter(hidden = true) @AuthInfo Integer userId,
-                                     @RequestBody FcfsRequestDto fcfsRequestDto) {
+                                     @RequestBody FcfsRequestDto fcfsRequestDto) throws JsonProcessingException {
 
         int round = (Integer) request.getAttribute("round");
 
-        FcfsResultResponseDto fcfsResultResponseDto = fcfsService.handleFcfsEvent(userId, round, fcfsRequestDto);
+        FcfsResultResponseDto fcfsResultResponseDto = fcfsService.handleFcfs(userId, round, fcfsRequestDto);
 
         return ResponseDto.onSuccess(fcfsResultResponseDto);
     }

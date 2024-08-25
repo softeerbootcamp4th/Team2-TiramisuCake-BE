@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     Page<Comment> findAllByIdLessThanEqualOrderByIdDesc(Integer id, Pageable pageable);
+
+    Page<Comment> findAllByOrderByIdDesc(Pageable pageable);
 }

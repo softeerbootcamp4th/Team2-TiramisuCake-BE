@@ -107,6 +107,21 @@ public class FcfsSettingManager {
         return -1;  // 해당하는 데이터가 없는 경우
     }
 
+    public int getRoundForFcfsCode(LocalDate localDate){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            if (fcfsSettingDto != null) {
+                LocalDate startDate = fcfsSettingDto.getStartTime().toLocalDate();
+                LocalDate dayAfterStartDate = startDate.plusDays(1);
+
+                // localDate가 startDate의 하루 다음날과 같은지 확인
+                if (localDate.isBefore(dayAfterStartDate)) {
+                    return fcfsSettingDto.getRound();
+                }
+            }
+        }
+        return -1;
+    }
+
     /**
      * 선착순 이벤트 당첨 가능한 인원수를 반환하는 메서드
      */

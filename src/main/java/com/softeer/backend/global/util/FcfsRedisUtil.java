@@ -25,6 +25,10 @@ public class FcfsRedisUtil {
         stringRedisTemplate.opsForSet().add(key, value);
     }
 
+    public Long getStringSetSize(String key) {
+        return stringRedisTemplate.opsForSet().size(key);
+    }
+
     public void addToHash(String key, String field, Integer value) {
         integerRedisTemplate.opsForHash().put(key, field, value);
     }
@@ -43,6 +47,11 @@ public class FcfsRedisUtil {
 
     public boolean isValueInStringSet(String key, String value) {
         return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, value));
+    }
+
+    public String popFromStringSet(String key) {
+        // SPOP 명령어를 실행하여 집합에서 임의의 요소를 제거하고 반환
+        return stringRedisTemplate.opsForSet().pop(key);
     }
 
     public Map<String, Integer> getHashEntries(String key) {

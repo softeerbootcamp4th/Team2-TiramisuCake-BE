@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.fcfs.service.FcfsHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
 import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
@@ -13,6 +14,7 @@ import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
 import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCount;
 import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCountRepository;
+import com.softeer.backend.fo_domain.fcfs.service.test.LuaRedisUtil;
 import com.softeer.backend.fo_domain.user.domain.User;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
@@ -31,17 +33,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Primary
-public class FcfsHandlerByPessimisticLock implements FcfsHandler {
+public class FcfsHandlerByLuaScript implements FcfsHandler {
 
+    private final LuaRedisUtil luaRedisUtil;
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
-    private final ObjectProvider<FcfsHandlerByPessimisticLock> fcfsHandlerProvider;
+    private final ObjectProvider<FcfsHandlerByLuaScript> fcfsHandlerProvider;
 
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
@@ -49,9 +52,6 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
     private final FcfsRedisUtil fcfsRedisUtil;
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
-    private final FcfsCountRepository fcfsCountRepository;
-    private final FcfsRepository fcfsRepository;
-    private final UserRepository userRepository;
 
 
     /**
@@ -64,8 +64,8 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
      * 2-2. 값이 false라면 선착순 등록을 처리하는 메서드를 호출한다.
      */
     @Override
-    @Transactional
-    public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
+    @Transactional(readOnly = true)
+    public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) throws JsonProcessingException {
 
         // 퀴즈 정답이 유효한지 확인하고 유효하지 않다면 예외 발생
         if (!fcfsRequestDto.getAnswer().equals(quizManager.getQuiz(round).getAnswerWord())) {
@@ -82,51 +82,55 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
         }
 
         // 선착순 등록을 처리하는 메서드 호출
-        FcfsHandlerByPessimisticLock fcfsHandlerByPessimisticLock = fcfsHandlerProvider.getObject();
-        return fcfsHandlerByPessimisticLock.saveFcfsWinners(userId, round);
+        FcfsHandlerByLuaScript fcfsHandlerByLuaScript = fcfsHandlerProvider.getObject();
+        return fcfsHandlerByLuaScript.saveFcfsWinners(userId, round);
     }
 
 
-    public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
+    public FcfsResultResponseDto saveFcfsWinners(int userId, int round) throws JsonProcessingException {
 
-        FcfsCount fcfsCount = fcfsCountRepository.findByRound(round)
-                .orElseThrow(() -> new IllegalArgumentException("Round not found"));
+        int maxWinners = fcfsSettingManager.getFcfsWinnerNum();
 
-        int fcfsNum = fcfsCount.getFcfsNum();
+        // Define the Redis keys
+        String userIdSetKey = RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round;
+        String codeSetKey = RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round;
+        String codeUserIdHashKey = RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round;
+        String participantCountKey = RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round;
 
-        if(fcfsNum < fcfsSettingManager.getFcfsWinnerNum()){
-            Optional<Fcfs> fcfs = fcfsRepository.findByUserIdAndRound(userId, round);
-            if(fcfs.isPresent()){
+        String result = luaRedisUtil.executeFcfsScript(
+                userIdSetKey,
+                codeSetKey,
+                codeUserIdHashKey,
+                participantCountKey,
+                userId,
+                maxWinners);
+
+        switch (result) {
+            case "FCFS_CLOSED":
+            case "FCFS_CODE_EMPTY":
+
+                return getFcfsResult(false, false, null);
+
+            case "DUPLICATED":
+
                 return getFcfsResult(false, true, null);
-            }
 
-            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("User not found"));
+            default:
+                String code = result;
+                if (result.contains("_CLOSED")) {
+                    fcfsSettingManager.setFcfsClosed(true);
+                    code = result.replace("_CLOSED", "");
+                }
 
-            String code = makeFcfsCode(round);
-            while (fcfsRepository.findByCode(code).isPresent()) {
-                code = makeFcfsCode(round);
-            }
-
-            fcfsRepository.save(Fcfs.builder()
-                    .user(user)
-                    .round(round)
-                    .code(code)
-                    .winningDate(fcfsSettingManager.getFcfsSettingByRound(round).getStartTime().toLocalDate())
-                    .build());
-
-            fcfsCount.setFcfsNum(fcfsCount.getFcfsNum()+1);
-
-            return getFcfsResult(true, false, code);
+                return getFcfsResult(true, false, code);
         }
 
-        return getFcfsResult(false, false, null);
-
-
     }
+
 
     /**
      * 선착순 이벤트 코드를 반환하는 메서드
-     *
+     * <p>
      * round값에 따라 코드의 앞부분을 특정 문자로 고정한다.
      */
     private String makeFcfsCode(int round) {
@@ -147,10 +151,10 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
 
         FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);
 
-        FcfsHandlerByPessimisticLock fcfsHandlerByPessimisticLock = fcfsHandlerProvider.getObject();
+        FcfsHandlerByLuaScript fcfsHandlerByLuaScript = fcfsHandlerProvider.getObject();
 
         if (fcfsWin) {
-            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByPessimisticLock.getFcfsSuccessResult(firstFcfsSetting);
+            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByLuaScript.getFcfsSuccessResult(firstFcfsSetting);
             fcfsSuccessResult.setFcfsCode(fcfsCode);
 
             return FcfsResultResponseDto.builder()
@@ -159,7 +163,7 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
                     .build();
         }
 
-        FcfsFailResult fcfsFailResult = fcfsHandlerByPessimisticLock.getFcfsFailResult(isDuplicated);
+        FcfsFailResult fcfsFailResult = fcfsHandlerByLuaScript.getFcfsFailResult(isDuplicated);
 
         return FcfsResultResponseDto.builder()
                 .fcfsWinner(fcfsWin)
@@ -197,7 +201,7 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
     public FcfsFailResult getFcfsFailResult(boolean isDuplicated) {
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
-        if(isDuplicated){
+        if (isDuplicated) {
             return FcfsFailResult.builder()
                     .title(textContentMap.get(StaticTextName.FCFS_DUPLICATED_TITLE.name()))
                     .subTitle(textContentMap.get(StaticTextName.FCFS_DUPLICATED_SUBTITLE.name()))
@@ -210,7 +214,6 @@ public class FcfsHandlerByPessimisticLock implements FcfsHandler {
                 .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
                 .build();
     }
-
-
-
 }
+
+

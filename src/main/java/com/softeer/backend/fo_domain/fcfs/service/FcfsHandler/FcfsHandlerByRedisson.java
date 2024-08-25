@@ -2,19 +2,16 @@ package com.softeer.backend.fo_domain.fcfs.service.FcfsHandler;
 
 import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.Fcfs;
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsRequestDto;
-import com.softeer.backend.fo_domain.fcfs.dto.FcfsSettingDto;
+import com.softeer.backend.fo_domain.fcfs.dto.*;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
+import com.softeer.backend.fo_domain.fcfs.service.FcfsService;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.fo_domain.fcfs.service.QuizManager;
-import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCount;
-import com.softeer.backend.fo_domain.fcfs.service.test.FcfsCountRepository;
-import com.softeer.backend.fo_domain.user.domain.User;
-import com.softeer.backend.fo_domain.user.repository.UserRepository;
+import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.staticresources.constant.S3FileName;
@@ -26,20 +23,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FcfsHandlerByOptimisticLock implements FcfsHandler{
-
+public class FcfsHandlerByRedisson implements FcfsHandler {
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
-    private final ObjectProvider<FcfsHandlerByOptimisticLock> fcfsHandlerProvider;
+    private final ObjectProvider<FcfsHandlerByRedisson> fcfsServiceProvider;
 
     private final FcfsSettingManager fcfsSettingManager;
     private final DrawSettingManager drawSettingManager;
@@ -47,10 +46,8 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
     private final FcfsRedisUtil fcfsRedisUtil;
     private final RandomCodeUtil randomCodeUtil;
     private final StaticResourceUtil staticResourceUtil;
-    private final FcfsCountRepository fcfsCountRepository;
-    private final FcfsRepository fcfsRepository;
-    private final UserRepository userRepository;
 
+    private final FcfsRepository fcfsRepository;
 
     /**
      * 선착순 등록을 처리하고 결과 모달 정보를 반환하는 메서드
@@ -61,6 +58,7 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
      * 2-1. 값이 true라면 선착순 이벤트 참여자 수에 1을 더하고 실패 모달 정보를 반환한다.
      * 2-2. 값이 false라면 선착순 등록을 처리하는 메서드를 호출한다.
      */
+    @Override
     public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
 
         // 퀴즈 정답이 유효한지 확인하고 유효하지 않다면 예외 발생
@@ -78,51 +76,58 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
         }
 
         // 선착순 등록을 처리하는 메서드 호출
-        FcfsHandlerByOptimisticLock fcfsHandlerByOptimisticLock = fcfsHandlerProvider.getObject();
-        return fcfsHandlerByOptimisticLock.saveFcfsWinners(userId, round);
+        FcfsHandlerByRedisson fcfsHandlerByRedisson = fcfsServiceProvider.getObject();
+        return fcfsHandlerByRedisson.saveFcfsWinners(userId, round);
     }
 
+    /**
+     * 선착순 등록을 처리하는 메서드
+     * <p>
+     * 1. 선착순 당첨자 수가 남아있고 이미 선착순 이벤트에 당첨됐는지를 확인한다.
+     * 1-1. 당첨자가 모두 나왔거나 이미 선착순 이벤트에 당첨됐었다면, 선착순 실패 모달 정보를 반환한다.
+     * 2. redis에 선착순 등록 요청한 유저의 userId, 이벤트 코드를 저장하고 선착순 참가자 수에 1을 더한다.
+     * 3. 해당 유저를 마지막으로 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClose 변수값을 true로 설정한다.
+     * 4. 선착순 성공 모달 정보를 반환한다.
+     */
+
+    @EventLock(key = "FCFS_#{#round}")
     @Transactional
     public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
 
-        FcfsCount fcfsCount = fcfsCountRepository.findByRound(round)
-                .orElseThrow(() -> new IllegalArgumentException("Round not found"));
+        long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);
 
-        int fcfsNum = fcfsCount.getFcfsNum();
+        if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+                && !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId)) {
 
-        if(fcfsNum < fcfsSettingManager.getFcfsWinnerNum()){
-            Optional<Fcfs> fcfs = fcfsRepository.findByUserIdAndRound(userId, round);
-            if(fcfs.isPresent()){
-                return getFcfsResult(false, true, null);
+            // redis에 userId 등록
+            fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId);
+
+            String code = fcfsRedisUtil.popFromStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round);
+
+            // redis에 code-userId 형태로 등록(hash)
+            fcfsRedisUtil.addToHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round, code, userId);
+
+            // redis에 선착순 참가자 수 +1
+            countFcfsParticipant(round);
+
+            // 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClodes 변수값을 true로 설정
+            if (numOfWinners + 1 == fcfsSettingManager.getFcfsWinnerNum()) {
+                fcfsSettingManager.setFcfsClosed(true);
             }
-
-            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("User not found"));
-
-            String code = makeFcfsCode(round);
-            while (fcfsRepository.findByCode(code).isPresent()) {
-                code = makeFcfsCode(round);
-            }
-
-            fcfsRepository.save(Fcfs.builder()
-                    .user(user)
-                    .round(round)
-                    .code(code)
-                    .winningDate(fcfsSettingManager.getFcfsSettingByRound(round).getStartTime().toLocalDate())
-                    .build());
-
-            fcfsCount.setFcfsNum(fcfsCount.getFcfsNum()+1);
 
             return getFcfsResult(true, false, code);
-        }
+        } else if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+                && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
+            return getFcfsResult(false, true, null);
+
 
         return getFcfsResult(false, false, null);
-
 
     }
 
     /**
      * 선착순 이벤트 코드를 반환하는 메서드
-     *
+     * <p>
      * round값에 따라 코드의 앞부분을 특정 문자로 고정한다.
      */
     private String makeFcfsCode(int round) {
@@ -143,10 +148,10 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
 
         FcfsSettingDto firstFcfsSetting = fcfsSettingManager.getFcfsSettingByRound(1);
 
-        FcfsHandlerByOptimisticLock fcfsHandlerByOptimisticLock = fcfsHandlerProvider.getObject();
+        FcfsHandlerByRedisson fcfsHandlerByRedisson = fcfsServiceProvider.getObject();
 
         if (fcfsWin) {
-            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByOptimisticLock.getFcfsSuccessResult(firstFcfsSetting);
+            FcfsSuccessResult fcfsSuccessResult = fcfsHandlerByRedisson.getFcfsSuccessResult(firstFcfsSetting);
             fcfsSuccessResult.setFcfsCode(fcfsCode);
 
             return FcfsResultResponseDto.builder()
@@ -155,7 +160,7 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
                     .build();
         }
 
-        FcfsFailResult fcfsFailResult = fcfsHandlerByOptimisticLock.getFcfsFailResult(isDuplicated);
+        FcfsFailResult fcfsFailResult = fcfsHandlerByRedisson.getFcfsFailResult(isDuplicated);
 
         return FcfsResultResponseDto.builder()
                 .fcfsWinner(fcfsWin)
@@ -193,7 +198,7 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
     public FcfsFailResult getFcfsFailResult(boolean isDuplicated) {
         Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
-        if(isDuplicated){
+        if (isDuplicated) {
             return FcfsFailResult.builder()
                     .title(textContentMap.get(StaticTextName.FCFS_DUPLICATED_TITLE.name()))
                     .subTitle(textContentMap.get(StaticTextName.FCFS_DUPLICATED_SUBTITLE.name()))
@@ -206,4 +211,5 @@ public class FcfsHandlerByOptimisticLock implements FcfsHandler{
                 .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
                 .build();
     }
+
 }

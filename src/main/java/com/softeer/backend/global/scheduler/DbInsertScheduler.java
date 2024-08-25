@@ -16,6 +16,7 @@ import com.softeer.backend.global.common.constant.RedisKeyPrefix;
 import com.softeer.backend.global.util.DrawRedisUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import com.softeer.backend.global.util.FcfsRedisUtil;
+import com.softeer.backend.global.util.RandomCodeUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class DbInsertScheduler {
     private final UserRepository userRepository;
     private final FcfsRepository fcfsRepository;
     private final DrawRepository drawRepository;
+    private final RandomCodeUtil randomCodeUtil;
 
 
     private ScheduledFuture<?> scheduledFuture;
@@ -160,6 +162,30 @@ public class DbInsertScheduler {
                 .drawParticipantCount(drawParticipantCount)
                 .eventDate(now.minusDays(1))
                 .build());
+
+        if(fcfsSettingManager.getRoundForFcfsCode(now) != -1){
+
+            int round = fcfsSettingManager.getRoundForFcfsCode(now);
+
+            int i=0;
+            while(i < fcfsSettingManager.getFcfsWinnerNum()){
+
+                String code = makeFcfsCode(round);
+                while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {
+                    code = makeFcfsCode(round);
+                }
+
+                fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
+
+                i++;
+            }
+
+        }
+
+    }
+
+    private String makeFcfsCode(int round) {
+        return (char) ('A' + round - 1) + randomCodeUtil.generateRandomCode(5);
     }
 
     /**

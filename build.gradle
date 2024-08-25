@@ -69,6 +69,7 @@ dependencies {
 
 	// Redis 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.data:spring-data-redis'
 
 	// JWT 설정
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
@@ -89,7 +90,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	// redisson 설정
-	implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
+	implementation 'org.redisson:redisson:3.16.2'
 
 	// cool sms 설정
 	implementation 'net.nurigo:sdk:4.3.0'

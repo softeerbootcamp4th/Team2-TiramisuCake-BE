@@ -87,5 +87,8 @@
 ### 배포
 ![image](https://github.com/user-attachments/assets/ae5c53bf-2507-43b6-971b-8dfb7d7effa0)
 
-
+<details>
+    <summary>회고</summary>
+    https://www.notion.so/bside/3f4a3606067143fbb54bd5e584afe762
+</details>
 

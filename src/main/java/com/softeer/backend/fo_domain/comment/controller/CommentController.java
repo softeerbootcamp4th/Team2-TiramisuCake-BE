@@ -1,6 +1,7 @@
 package com.softeer.backend.fo_domain.comment.controller;
 
 import com.softeer.backend.fo_domain.comment.dto.CommentsResponseDto;
+import com.softeer.backend.fo_domain.comment.dto.CommentsResponsePageDto;
 import com.softeer.backend.fo_domain.comment.exception.CommentException;
 import com.softeer.backend.fo_domain.comment.service.CommentService;
 import com.softeer.backend.global.annotation.AuthInfo;
@@ -39,6 +40,14 @@ public class CommentController {
         return ResponseDto.onSuccess(commentsResponseDto);
     }
 
+    @GetMapping("/comment/page")
+    ResponseDto<CommentsResponsePageDto> getCommentByPage(@RequestParam(name = "page", defaultValue = "0") Integer page) {
+
+        CommentsResponsePageDto commentsResponsePageDto = commentService.getCommentsByPage(page);
+
+        return ResponseDto.onSuccess(commentsResponsePageDto);
+    }
+
     /**
      * 기대평을 등록하는 메서드
      */
@@ -53,6 +62,15 @@ public class CommentController {
         }
 
         commentService.saveComment(userId, commentType);
+
+        return ResponseDto.onSuccess();
+
+    }
+
+    @PostMapping("/comment/test")
+    ResponseDto<Void> saveCommentTest(@RequestParam(name = "num") Integer num) {
+
+        commentService.saveCommentTest(num);
 
         return ResponseDto.onSuccess();
 

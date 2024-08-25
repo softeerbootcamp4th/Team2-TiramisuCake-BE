@@ -23,10 +23,10 @@ public @interface EventLock {
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
     /**
-     * 락을 기다리는 시간 (default - 5000ms)
+     * 락을 기다리는 시간 (default - 500ms)
      * 락 획득을 위해 waitTime 만큼 대기한다
      */
-    long waitTime() default 5000L;
+    long waitTime() default 500L;
 
     /**
      * 락 임대 시간 (default - 100ms)

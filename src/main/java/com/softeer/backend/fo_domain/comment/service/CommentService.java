@@ -3,15 +3,18 @@ package com.softeer.backend.fo_domain.comment.service;
 import com.softeer.backend.fo_domain.comment.constant.CommentNickname;
 import com.softeer.backend.fo_domain.comment.domain.Comment;
 import com.softeer.backend.fo_domain.comment.dto.CommentsResponseDto;
+import com.softeer.backend.fo_domain.comment.dto.CommentsResponsePageDto;
 import com.softeer.backend.fo_domain.comment.repository.CommentRepository;
 import com.softeer.backend.fo_domain.comment.util.ScrollPaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * 기대평 요청을 처리하는 클래스
@@ -20,8 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
     private static final int SCROLL_SIZE = 30;
+    public static final int LAST_PAGE = -1;
 
     private final CommentRepository commentRepository;
+
 
     /**
      * SCROLL_SIZE 만큼의 기대평을 반환하는 메서드
@@ -38,6 +43,17 @@ public class CommentService {
 
         ScrollPaginationUtil<Comment> commentCursor = ScrollPaginationUtil.of(comments, SCROLL_SIZE);
         return CommentsResponseDto.of(commentCursor, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public CommentsResponsePageDto getCommentsByPage(int page) {
+
+        Pageable pageable = PageRequest.of(page, SCROLL_SIZE);
+        Page<Comment> commentPage = commentRepository.findAllByOrderByIdDesc(pageable);
+
+        List<Comment> comments = commentPage.getContent();
+
+        return CommentsResponsePageDto.of(comments, commentPage.hasNext() ? commentPage.getNumber() + 1 : LAST_PAGE);
     }
 
     /**
@@ -58,5 +74,22 @@ public class CommentService {
                 .userId(userId)
                 .build()
         );
+    }
+
+    @Transactional
+    public void saveCommentTest(int num){
+
+        int i=0;
+        while(i<num){
+            commentRepository.save(Comment.builder()
+                    .nickname(CommentNickname.getRandomNickname())
+                    .commentType(1 + new Random().nextInt(5))
+                    .userId(null)
+                    .build()
+            );
+
+            i++;
+        }
+
     }
 }

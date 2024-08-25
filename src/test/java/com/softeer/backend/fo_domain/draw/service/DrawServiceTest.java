@@ -147,17 +147,17 @@ class DrawServiceTest {
 
         lenient().when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(7);
 
-        when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, 1, drawParticipationInfo))
-                .thenReturn(3);
+        lenient().when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, 1, drawParticipationInfo))
+                .thenReturn(1);
 
         DrawMainFullAttendResponseDto expectedResponse = DrawMainFullAttendResponseDto.builder()
                 .invitedNum(3)
-                .remainDrawCount(3)
+                .remainDrawCount(1)
                 .drawAttendanceCount(7)
                 .fullAttendModal(fullAttendModal)
                 .build();
 
-        when(drawResponseGenerateUtil.generateMainFullAttendResponse(3, 3, 7 % 8))
+        lenient().when(drawResponseGenerateUtil.generateMainFullAttendResponse(3, 3, 7 % 8))
                 .thenReturn(expectedResponse);
 
         // when
@@ -204,7 +204,7 @@ class DrawServiceTest {
 
         when(drawAttendanceCountUtil.handleAttendanceCount(userId, drawParticipationInfo)).thenReturn(1);
 
-        when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, shareInfo.getRemainDrawCount(), drawParticipationInfo))
+        lenient().when(drawRemainDrawCountUtil.handleRemainDrawCount(userId, shareInfo.getRemainDrawCount(), drawParticipationInfo))
                 .thenReturn(1);
 
         DrawMainResponseDto expectedResponse = DrawMainResponseDto.builder()

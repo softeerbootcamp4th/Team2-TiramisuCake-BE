@@ -58,6 +58,10 @@ public class EventLockAop {
             boolean available = rLock.tryLock(eventLock.waitTime(), eventLock.leaseTime(), eventLock.timeUnit());
             if (!available) {
                 log.info("{} is locked", key);
+
+                if(key.contains("SCHEDULER"))
+                    return null;
+
                 throw new EventLockException(key);
             }
 
@@ -66,6 +70,9 @@ public class EventLockAop {
         } catch (InterruptedException e) {
             log.info("Interrupted while waiting for lock, key: {}", key);
             // lock을 얻는데 실패했다면 예외 던지기
+
+            if(key.contains("SCHEDULER"))
+                return null;
             throw new EventLockException(key);
         } finally {
             try {

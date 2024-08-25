@@ -56,6 +56,9 @@ public class AdminLoginController {
         return ResponseDto.onSuccess();
     }
 
+    /**
+     * 선착순 설정 정보를 바로 반영하게 하는 테스트용 메서드
+     */
     @PostMapping("/fcfs/test")
     ResponseDto<Void> setFcfsSetting(@RequestBody FcfsSettingTestRequestDto fcfsSettingTestRequestDto) {
 
@@ -64,7 +67,9 @@ public class AdminLoginController {
         return ResponseDto.onSuccess();
     }
 
-
+    /**
+     * 추첨 설정 정보를 바로 반영하게 하는 테스트용 메서드
+     */
     @PostMapping("/draw/test")
     ResponseDto<Void> setDrawSetting(@RequestBody DrawSettingTestRequestDto drawSettingTestRequestDto) {
 

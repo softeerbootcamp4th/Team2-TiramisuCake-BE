@@ -155,7 +155,8 @@ public class FcfsService {
 
             return getFcfsResult(true, false, code);
         }
-        else if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
+
+        if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
             && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
             return getFcfsResult(false, true, null);
 

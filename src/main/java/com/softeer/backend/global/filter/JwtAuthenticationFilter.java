@@ -39,8 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/login",
             "/main/event/static", "/main/event/info", "/main/car",
             "/admin/login", "/admin/signup",
-            "/share/**",
-            "/admin/fcfs/test","/admin/draw/test"
+            "/share/**", "/comment/page", "/fcfs/insert", "/comment/test"
     };
 
     // Access Token이 header에 있으면 인증하고 없으면 인증하지 않는 url 설정

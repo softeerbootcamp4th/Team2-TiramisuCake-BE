@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "fcfs")
 public class Fcfs {
 

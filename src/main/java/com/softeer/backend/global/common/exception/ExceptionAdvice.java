@@ -1,7 +1,5 @@
 package com.softeer.backend.global.common.exception;
 
-import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
-import com.softeer.backend.fo_domain.draw.util.DrawUtil;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
@@ -35,7 +33,6 @@ import java.util.*;
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     private final StaticResourceUtil staticResourceUtil;
-    private final DrawUtil drawUtil;
 
     /**
      * GeneralException을 처리하는 메서드
@@ -172,15 +169,9 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                     .build());
         }
 
-        if (redissonKeyName.contains("DRAW")) {
-            body = ResponseDto.onSuccess(
-                    DrawLoseModalResponseDto.builder()
-                            .isDrawWin(false)
-                            .images(drawUtil.generateLoseImages())
-                            .shareUrl("https://softeer.site")
-                            .build()
-            );
-        }
+
+        //TODO
+        // DRAW 관련 예외일 경우, body 구성하는 코드 필요
 
         return super.handleExceptionInternal(
                 e,
@@ -199,13 +190,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         if (e.getCode() == ErrorStatus._FCFS_ALREADY_CLOSED) {
             body = ResponseDto.onSuccess(FcfsResultResponseDto.builder()
-                    .fcfsWinner(false)
-                    .fcfsResult(FcfsFailResult.builder()
-                            .title(textContentMap.get(StaticTextName.FCFS_CLOSED_TITLE.name()))
-                            .subTitle(textContentMap.get(StaticTextName.FCFS_CLOSED_SUBTITLE.name()))
-                            .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
-                            .build())
-                    .build());
+                            .fcfsWinner(false)
+                            .fcfsResult(FcfsFailResult.builder()
+                                    .title(textContentMap.get(StaticTextName.FCFS_CLOSED_TITLE.name()))
+                                    .subTitle(textContentMap.get(StaticTextName.FCFS_CLOSED_SUBTITLE.name()))
+                                    .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
+                                    .build())
+                            .build());
         } else {
             body = ResponseDto.onFailure(e.getCode());
         }

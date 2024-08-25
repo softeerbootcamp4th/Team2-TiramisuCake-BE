@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 선착순 등록 정보 entity repository 클래스
@@ -23,5 +24,9 @@ public interface FcfsRepository extends JpaRepository<Fcfs, Integer> {
     List<Fcfs> findFcfsWithUser(@Param("round") int round);
 
     List<Fcfs> findByUserIdOrderByWinningDateAsc(Integer userId);
+
+    Optional<Fcfs> findByUserIdAndRound(Integer userId, int round);
+
+    Optional<Fcfs> findByCode(String code);
 
 }

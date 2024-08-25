@@ -3,7 +3,6 @@ package com.softeer.backend.fo_domain.fcfs.interceptor;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import io.micrometer.core.ipc.http.HttpSender;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

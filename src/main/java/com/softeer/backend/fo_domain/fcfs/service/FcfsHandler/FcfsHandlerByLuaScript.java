@@ -40,6 +40,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Primary
 public class FcfsHandlerByLuaScript implements FcfsHandler {
 
     private final LuaRedisUtil luaRedisUtil;

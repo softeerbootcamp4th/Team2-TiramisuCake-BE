@@ -37,7 +37,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Primary
 public class FcfsHandlerByPessimisticLock implements FcfsHandler {
 
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");

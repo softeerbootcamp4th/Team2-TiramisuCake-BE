@@ -178,4 +178,14 @@ feat/issue_num          feat/issue_num
     https://www.notion.so/bside/3f4a3606067143fbb54bd5e584afe762
 </details>
 
+<details>
+    <summary>Backlog</summary>
+    https://www.notion.so/bside/7018067e40a8431eb75f3f9bbc065bc7
+</details>
+
+<details>
+    <summary>API 명세서</summary>
+    https://www.notion.so/bside/API-3db27a272792430abc02b981b8acab42
+</details>
+
 

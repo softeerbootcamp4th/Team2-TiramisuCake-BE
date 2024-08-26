@@ -201,4 +201,21 @@ public class FcfsSettingManager {
         isFcfsClosed = fcfsSettingTestRequestDto.isFcfsClosed();
     }
 
+    /**
+     * 선착순 이벤트 날짜면 해당 라운드 값을 반환하는 메서드
+     */
+    public int getRoundForFcfsCode(LocalDate localDate){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            if (fcfsSettingDto != null) {
+                LocalDate startDate = fcfsSettingDto.getStartTime().toLocalDate();
+
+                // localDate가 startDate의 하루 다음날과 같은지 확인
+                if (localDate.isEqual(startDate)) {
+                    return fcfsSettingDto.getRound();
+                }
+            }
+        }
+        return -1;
+    }
+
 }

@@ -6,6 +6,7 @@ import com.softeer.backend.fo_domain.draw.service.DrawSettingManager;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsSettingRepository;
 import com.softeer.backend.fo_domain.fcfs.service.FcfsSettingManager;
+import com.softeer.backend.global.util.FcfsRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -23,6 +24,7 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 @RequiredArgsConstructor
 public class EventSettingScheduler {
+    public static final String SCHEDULER_CHECK = "SCHEDULER_CHECK";
 
     private final ThreadPoolTaskScheduler taskScheduler;
 
@@ -30,6 +32,7 @@ public class EventSettingScheduler {
     private final DrawSettingManager drawSettingManager;
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
+    private final FcfsRedisUtil fcfsRedisUtil;
 
     private ScheduledFuture<?> scheduledFuture;
 
@@ -57,5 +60,8 @@ public class EventSettingScheduler {
             fcfsSettingManager.setFcfsSettingList(fcfsSettings);
             drawSettingManager.setDrawSetting(drawSetting);
         }
+
+        if(fcfsRedisUtil.getValue(SCHEDULER_CHECK) != null)
+            fcfsRedisUtil.clearValue(SCHEDULER_CHECK);
     }
 }

@@ -8,6 +8,7 @@ import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
 import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsSuccessResult;
 import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.fo_domain.fcfs.repository.FcfsRepository;
+import com.softeer.backend.fo_domain.fcfs.util.LuaRedisUtil;
 import com.softeer.backend.global.annotation.EventLock;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.constant.RedisKeyPrefix;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +37,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class FcfsService {
+    public final static String FCFS_CLOSED = "FCFS_CLOSED";
+    public final static String FCFS_CODE_EMPTY = "FCFS_CODE_EMPTY";
+    public final static String DUPLICATED = "DUPLICATED";
+    public final static String _CLOSED = "_CLOSED";
+
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M월 d일");
     private final ObjectProvider<FcfsService> fcfsServiceProvider;
 
@@ -46,6 +53,7 @@ public class FcfsService {
     private final StaticResourceUtil staticResourceUtil;
 
     private final FcfsRepository fcfsRepository;
+    private final LuaRedisUtil luaRedisUtil;
 
     /**
      * 선착순 페이지에 필요한 정보를 반환하는 메서드
@@ -92,6 +100,7 @@ public class FcfsService {
      * 2-1. 값이 true라면 선착순 이벤트 참여자 수에 1을 더하고 실패 모달 정보를 반환한다.
      * 2-2. 값이 false라면 선착순 등록을 처리하는 메서드를 호출한다.
      */
+    @Transactional(readOnly = true)
     public FcfsResultResponseDto handleFcfsEvent(int userId, int round, FcfsRequestDto fcfsRequestDto) {
 
         // 퀴즈 정답이 유효한지 확인하고 유효하지 않다면 예외 발생
@@ -116,63 +125,50 @@ public class FcfsService {
     /**
      * 선착순 등록을 처리하는 메서드
      * <p>
-     * 1. 선착순 당첨자 수가 남아있고 이미 선착순 이벤트에 당첨됐는지를 확인한다.
-     * 1-1. 당첨자가 모두 나왔거나 이미 선착순 이벤트에 당첨됐었다면, 선착순 실패 모달 정보를 반환한다.
-     * 2. redis에 선착순 등록 요청한 유저의 userId, 이벤트 코드를 저장하고 선착순 참가자 수에 1을 더한다.
-     * 3. 해당 유저를 마지막으로 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClose 변수값을 true로 설정한다.
-     * 4. 선착순 성공 모달 정보를 반환한다.
+     * 1. 'FCFS_CLOSED', "FCFS_CODE_EMPTY" 가 반환되면 실패 모달을 반환한다.
+     * 2. 'DUPLICATED' 가 반환되면 중복으로 인한 실패 모달을 반환한다.
+     * 3. '_CLOSED' 가 code값에 있다면 fcfsSettingManager의 fcfsClosed 변수값을 true로 설정한다.
+     * 4. 선착순 당첨 성공 모달을 반환한다.
      */
-    @EventLock(key = "FCFS_#{#round}")
     public FcfsResultResponseDto saveFcfsWinners(int userId, int round) {
 
-        long numOfWinners = fcfsRedisUtil.getIntegerSetSize(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round);
+        int maxWinners = fcfsSettingManager.getFcfsWinnerNum();
 
-        if (numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
-                && !fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId)) {
+        String userIdSetKey = RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round;
+        String codeSetKey = RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round;
+        String codeUserIdHashKey = RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round;
+        String participantCountKey = RedisKeyPrefix.FCFS_PARTICIPANT_COUNT_PREFIX.getPrefix() + round;
 
-            // redis에 userId 등록
-            fcfsRedisUtil.addToIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId);
+        String result = luaRedisUtil.executeFcfsScript(
+                userIdSetKey,
+                codeSetKey,
+                codeUserIdHashKey,
+                participantCountKey,
+                userId,
+                maxWinners);
 
-            // 중복되지 않는 code를 생성
-            String code = makeFcfsCode(round);
-            while (fcfsRedisUtil.isValueInStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code)) {
-                code = makeFcfsCode(round);
-            }
+        switch (result) {
+            case FCFS_CLOSED:
+            case FCFS_CODE_EMPTY:
 
-            // redis에 선착순 code 등록
-            fcfsRedisUtil.addToStringSet(RedisKeyPrefix.FCFS_CODE_PREFIX.getPrefix() + round, code);
+                return getFcfsResult(false, false, null);
 
-            // redis에 code-userId 형태로 등록(hash)
-            fcfsRedisUtil.addToHash(RedisKeyPrefix.FCFS_CODE_USERID_PREFIX.getPrefix() + round, code, userId);
+            case DUPLICATED:
 
-            // redis에 선착순 참가자 수 +1
-            countFcfsParticipant(round);
+                return getFcfsResult(false, true, null);
 
-            // 선착순 당첨이 마감되면 FcfsSettingManager의 fcfsClodes 변수값을 true로 설정
-            if (numOfWinners + 1 == fcfsSettingManager.getFcfsWinnerNum()) {
-                fcfsSettingManager.setFcfsClosed(true);
-            }
+            default:
+                String code = result;
+                if (result.contains(_CLOSED)) {
+                    fcfsSettingManager.setFcfsClosed(true);
+                    code = result.replace(_CLOSED, "");
+                }
 
-            return getFcfsResult(true, false, code);
+                return getFcfsResult(true, false, code);
         }
 
-        if(numOfWinners < fcfsSettingManager.getFcfsWinnerNum()
-            && fcfsRedisUtil.isValueInIntegerSet(RedisKeyPrefix.FCFS_USERID_PREFIX.getPrefix() + round, userId))
-            return getFcfsResult(false, true, null);
-
-
-        return getFcfsResult(false, false, null);
-
     }
 
-    /**
-     * 선착순 이벤트 코드를 반환하는 메서드
-     *
-     * round값에 따라 코드의 앞부분을 특정 문자로 고정한다.
-     */
-    private String makeFcfsCode(int round) {
-        return (char) ('A' + round - 1) + randomCodeUtil.generateRandomCode(5);
-    }
 
     /**
      * redis에 저장된 선착순 이벤트 참여자 수를 1만큼 늘리는 메서드

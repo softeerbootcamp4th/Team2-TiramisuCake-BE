@@ -87,5 +87,95 @@
 ### 배포
 ![image](https://github.com/user-attachments/assets/ae5c53bf-2507-43b6-971b-8dfb7d7effa0)
 
+## 🙌 팀 규칙
+
+<details>
+    <summary>커밋 & 브랜치</summary>
+    
+# 커밋 컨벤션
+
+```
+// 예시
+
+label: subject
+
+- label은 issue label과 동일
+- subject은 해당 커밋에 대한 내용을 잘 이해할 수 있게 요약 할 것
+```
+
+# 브랜치 전략
+
+```jsx
+     main
+       |
+       |
+     develop
+       |
+       |--------------------------|
+       |                          |
+feat/issue_num          feat/issue_num
+
+- feat - 새로운 기능 구현
+- fix - 변경사항(변수, css 등)
+- refactor - 구조 변경 ex) api 전후 데이터 불러오기 변경?
+- Test - 테스트 코드
+
+```
+
+**master 브랜치**
+
+- 배포 가능한 상태만을 관리하는 브랜치
+
+**develop 브랜치**
+
+- 다음에 배포할 것을 개발하는 브랜치
+- 배포 후, 문제가 없으면 master 브랜치로 PR
+
+**feature 브랜치**
+
+- 새로운 기능을 추가할 때 사용하는 브랜치
+
+**브랜치 전략 - [아래 참고]/issue number**
+
+- feat - 새 기능
+- fix - 변경사항(변수, css 등)
+- refactor - 구조 변경 ex) api 전후 데이터 불러오기 변경?
+- test - 테스트 코드
+- chore - 환경 설정, 주석 제거, 이미지 파일 추가 등
+    
+</details>
+
+<details>
+    <summary>그라운드 룰</summary>
+    
+## 회의
+
+- 매일 아침에 **`30분`** 스크럼
+    - 개발 상황, 오류, 오늘 할 일
+- 매일 오후 6시에 가능하면 PR 하기
+- 회고 작성
+    - 매일 오후 **`6시 30분`**
+    - 알게된 점, 좋았던 점, 보완할 점
+
+## 커뮤니케이션
+
+- 매일 같이 밥먹기
+    - 밥 먹을 때 일 얘기 하지 않기
+- 회의 중에 서로 큰소리 내지 않기
+- 반박 의견 내기 전에 좋은 의견이라고 먼저 칭찬하기
+- 비난하지 말기
+- 마음에 안드는게 있어도 좋은 말을 먼저하고 그 다음에 마음에 안드는 것을 말하기
+- 리액션 잘해주기
+- 반말하기
+- 서로 인사 잘 하기
+- 동의할 때 “그래”가 아니라 “좋아”라고 말하기
+- 주말에 급한 사항이 아니면 Discord로 연락하지 말기(최대한 평일에 ~^^)
+- 지각, 조퇴 시 미리 알려주기
+</details>
+
+<details>
+    <summary>회고</summary>
+    https://www.notion.so/bside/3f4a3606067143fbb54bd5e584afe762
+</details>
 
 

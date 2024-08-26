@@ -98,10 +98,16 @@ public class AdminLoginService {
                 .build());
     }
 
+    /**
+     * 선착순 설정정보를 바로 반영하는 테스트용 메서드
+     */
     public void setFcfsSetting(FcfsSettingTestRequestDto fcfsSettingTestRequestDto) {
         fcfsSettingManager.setFcfsSettingByAdmin(fcfsSettingTestRequestDto);
     }
 
+    /**
+     * 추첨 설정정보를 바로 반영하는 테스트용 메서드
+     */
     public void setDrawSetting(DrawSettingTestRequestDto drawSettingTestRequestDto) {
         drawSettingManager.setDrawSettingByAdmin(drawSettingTestRequestDto);
     }

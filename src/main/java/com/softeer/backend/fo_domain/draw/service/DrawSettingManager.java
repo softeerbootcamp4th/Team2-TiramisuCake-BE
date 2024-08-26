@@ -56,8 +56,8 @@ public class DrawSettingManager {
         startTime = drawSetting.getStartTime();
         endTime = drawSetting.getEndTime();
         winnerNum1 = drawSetting.getWinnerNum1();
-        winnerNum2 = drawSetting.getWinnerNum2();
-        winnerNum3 = drawSetting.getWinnerNum3();
+        winnerNum2 = winnerNum1 + drawSetting.getWinnerNum2();
+        winnerNum3 = winnerNum2 + drawSetting.getWinnerNum3();
     }
 
     /**

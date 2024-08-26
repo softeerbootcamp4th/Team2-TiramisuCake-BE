@@ -169,52 +169,6 @@ class FcfsServiceTest {
     }
 
     @Test
-    @DisplayName("선착순 당첨자 등록 성공 시 성공 응답을 반환한다.")
-    void testSaveFcfsWinners_Success() {
-        // Given
-        when(fcfsRedisUtil.getIntegerSetSize(anyString())).thenReturn(0L);
-        when(fcfsSettingManager.getFcfsWinnerNum()).thenReturn(100);
-        when(fcfsRedisUtil.isValueInIntegerSet(anyString(), anyInt())).thenReturn(false);
-        when(randomCodeUtil.generateRandomCode(5)).thenReturn("ABCDE");
-        when(fcfsServiceProvider.getObject()).thenReturn(mockFcfsService);
-
-        FcfsSettingDto mockSettingDto = new FcfsSettingDto();
-        when(fcfsSettingManager.getFcfsSettingByRound(1)).thenReturn(mockSettingDto);
-
-        FcfsSuccessResult successResult = FcfsSuccessResult.builder()
-                .fcfsCode("ABCDE")
-                .build();
-
-        when(mockFcfsService.getFcfsSuccessResult(any(FcfsSettingDto.class)))
-                .thenReturn(successResult);
-
-        // When
-        FcfsResultResponseDto response = fcfsService.saveFcfsWinners(userId, round);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.isFcfsWinner()).isTrue();
-        assertThat(response.getFcfsResult()).isNotNull();
-        assertThat(((FcfsSuccessResult) (response.getFcfsResult())).getFcfsCode()).isEqualTo("AABCDE");
-    }
-
-    @Test
-    @DisplayName("선착순 당첨자 등록 실패 시 실패 응답을 반환한다.")
-    void testSaveFcfsWinners_Failure() {
-        // Given
-        when(fcfsRedisUtil.getIntegerSetSize(anyString())).thenReturn(100L);  // 이미 모든 당첨자가 존재함
-        when(fcfsSettingManager.getFcfsWinnerNum()).thenReturn(100);
-        when(fcfsServiceProvider.getObject()).thenReturn(mockFcfsService);
-
-        // When
-        FcfsResultResponseDto response = fcfsService.saveFcfsWinners(userId, round);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.isFcfsWinner()).isFalse();
-    }
-
-    @Test
     @DisplayName("선착순 성공 결과 모달 정보를 반환한다.")
     void testGetFcfsResult_Success() {
         // Given

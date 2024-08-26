@@ -1,6 +1,7 @@
 package com.softeer.backend.global.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softeer.backend.fo_domain.draw.interceptor.DrawTimeCheckInterceptor;
 import com.softeer.backend.fo_domain.fcfs.interceptor.FcfsTimeCheckInterceptor;
 import com.softeer.backend.global.annotation.argumentresolver.AuthInfoArgumentResolver;
 import com.softeer.backend.global.config.properties.JwtProperties;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -33,6 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtProperties jwtProperties;
 
     private final FcfsTimeCheckInterceptor fcfsTimeCheckInterceptor;
+    private final DrawTimeCheckInterceptor drawTimeCheckInterceptor;
 
     /**
      * AuthInfo 애노테이션에 대한 Argument Resolver 등록
@@ -47,6 +50,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(fcfsTimeCheckInterceptor)
                 .addPathPatterns("/fcfs");
+
+        registry.addInterceptor(drawTimeCheckInterceptor)
+                .addPathPatterns("/event/draw");
     }
 
     /**
@@ -61,7 +67,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://softeer.site", "http://localhost:5173", "https://softeer.shop",
                         "https://d3qmq1ffhp5il9.cloudfront.net") // 허용할 도메인 설정
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정
-                .allowedHeaders("Content-Type", "Authorization", "Authorization-Refresh") // 허용할 헤더 설정
+                .allowedHeaders("Content-Type", "Authorization", "Authorization-Refresh", "X-Share-Code") // 허용할 헤더 설정
                 .exposedHeaders("Authorization", "Authorization-Refresh") // 클라이언트에 노출할 헤더 설정
                 .allowCredentials(true) // 자격 증명 허용
                 .maxAge(3600); // preflight 요청의 캐시 시간 설정 (초 단위)
@@ -101,6 +107,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registrationBean.addUrlPatterns("/admin/*");
         registrationBean.setOrder(3);
         return registrationBean;
+    }
+
+    /**
+     * etag를 생성 및 관리해주는 필터 등록
+     */
+    @Bean
+    public FilterRegistrationBean<ShallowEtagHeaderFilter> shallowEtagHeaderFilter() {
+        FilterRegistrationBean<ShallowEtagHeaderFilter> filterRegistrationBean
+                = new FilterRegistrationBean<>(new ShallowEtagHeaderFilter());
+        filterRegistrationBean.addUrlPatterns("/main/event/static", "/main/car");
+        return filterRegistrationBean;
     }
 
 }

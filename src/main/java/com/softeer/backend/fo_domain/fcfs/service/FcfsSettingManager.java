@@ -1,5 +1,6 @@
 package com.softeer.backend.fo_domain.fcfs.service;
 
+import com.softeer.backend.bo_domain.admin.dto.FcfsSettingTestRequestDto;
 import com.softeer.backend.bo_domain.eventparticipation.repository.EventParticipationRepository;
 import com.softeer.backend.fo_domain.fcfs.domain.FcfsSetting;
 import com.softeer.backend.fo_domain.fcfs.domain.Quiz;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 선착순 이벤트 정보를 관리하는 클래스
+ * 선착순 이벤트 속성 정보를 관리하는 클래스
  */
 @Slf4j
 @Getter
@@ -36,25 +37,24 @@ public class FcfsSettingManager {
     private final QuizRepository quizRepository;
 
     private List<FcfsSettingDto> fcfsSettingList;
-    private QuizDto tutorialQuiz;
-    private List<QuizDto> quizList;
-
 
     @Setter
     private boolean isFcfsClosed = false;
-
 
     @PostConstruct
     public void init() {
         loadInitialData();
     }
 
+    /**
+     * 선착순 round에 해당하는 선착순 설정 정보 Dto를 반환하는 메서드
+     */
     public FcfsSettingDto getFcfsSettingByRound(int round) {
         return fcfsSettingList.get(round - 1);
     }
 
     /**
-     * round 1에 해당하는 선착순 이벤트 속성으로 초기화
+     * 선착순 이벤트 속성 정보를 DB에서 가져와서 초기화하는 메서드
      */
     public void loadInitialData() {
 
@@ -73,44 +73,26 @@ public class FcfsSettingManager {
                     .winnerNum(fcfsSetting.getWinnerNum())
                     .build());
         });
-
-        List<Quiz> quizs = quizRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-        quizList = new ArrayList<>();
-
-        quizs.forEach((quiz) -> {
-
-            QuizDto quizDto = QuizDto.builder()
-                    .hint(quiz.getHint())
-                    .answerWord(quiz.getAnswerWord())
-                    .answerSentence(quiz.getAnswerSentence().replace("\\n", "\n"))
-                    .startIndex(quiz.getStartIndex())
-                    .endIndex(quiz.getEndIndex())
-                    .build();
-
-            if(quiz.getHint().equals("튜토리얼"))
-                tutorialQuiz = quizDto;
-            else
-                quizList.add(quizDto);
-        });
-
-
     }
 
-    public void setFcfsTime(List<FcfsSetting> fcfsSettingList) {
-        fcfsSettingList
-                .forEach((fcfsSetting) -> {
-                    FcfsSettingDto fcfsSettingDto = this.fcfsSettingList.get(fcfsSetting.getRound()-1);
-                    fcfsSettingDto.setStartTime(fcfsSetting.getStartTime());
-                    fcfsSettingDto.setEndTime(fcfsSetting.getEndTime());
-                });
-    }
+    /**
+     * 인수로 넘어온 선착순 설정 정보를 바인딩하는 메서드
+     */
+    public void setFcfsSettingList(List<FcfsSetting> fcfsSettings) {
 
-    public void setFcfsWinnerNum(int fcfsWinnerNum) {
-        fcfsSettingList.forEach((fcfsSettingDto) -> {
-            fcfsSettingDto.setWinnerNum(fcfsWinnerNum);
+        fcfsSettings.forEach((fcfsSetting) -> {
+            fcfsSettingList.set(fcfsSetting.getRound() - 1, FcfsSettingDto.builder()
+                    .round(fcfsSetting.getRound())
+                    .startTime(fcfsSetting.getStartTime())
+                    .endTime(fcfsSetting.getEndTime())
+                    .winnerNum(fcfsSetting.getWinnerNum())
+                    .build());
         });
     }
 
+    /**
+     * 인수로 넘어온 날짜값에 해당하는 선착순 rount값을 반환하는 메서드
+     */
     public int getRoundForScheduler(LocalDate localDate) {
         for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             if (fcfsSettingDto != null) {
@@ -126,42 +108,22 @@ public class FcfsSettingManager {
         return -1;  // 해당하는 데이터가 없는 경우
     }
 
-    public int getFcfsWinnerNum(){
+    /**
+     * 선착순 이벤트 당첨 가능한 인원수를 반환하는 메서드
+     */
+    public int getFcfsWinnerNum() {
         return fcfsSettingList.get(0).getWinnerNum();
     }
 
-    public String getHint(){
-
-        LocalDateTime now = LocalDateTime.now();
-
-        for (int i=0; i<fcfsSettingList.size(); i++) {
-
-            FcfsSettingDto fcfsSettingDto = fcfsSettingList.get(i);
-
-            if (fcfsSettingDto != null) {
-                LocalDateTime endTime = fcfsSettingDto.getEndTime();
-
-                // localDate가 startDate의 하루 다음날과 같은지 확인
-                if (endTime.isBefore(now)) {
-                    return quizList.get(i).getHint();
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public QuizDto getQuiz(int round){
-        log.info("quiz: {}", quizList.get(round-1));
-        return quizList.get(round - 1);
-    }
-
-    public boolean isFcfsEntryAvailable(LocalDateTime now){
-        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+    /**
+     * 현재 시간을 기준으로 선착순 이벤트가 활성화 되어 있는지를 반환하는 메서드
+     */
+    public boolean isFcfsEntryAvailable(LocalDateTime now) {
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
             LocalDateTime endTime = fcfsSettingDto.getEndTime();
 
-            if((now.isEqual(startTime) || now.isAfter(startTime))
+            if ((now.isEqual(startTime) || now.isAfter(startTime))
                     && (now.isEqual(endTime) || now.isBefore(endTime))) {
                 return true;
             }
@@ -169,13 +131,16 @@ public class FcfsSettingManager {
         return false;
     }
 
-    public Integer getFcfsRound(LocalDateTime now){
+    /**
+     * 현재 시간에 해당하는 선착순 이벤트의 round값을 반환하는 메서드
+     */
+    public Integer getFcfsRound(LocalDateTime now) {
 
-        for(FcfsSettingDto fcfsSettingDto : fcfsSettingList){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
             LocalDateTime startTime = fcfsSettingDto.getStartTime();
             LocalDateTime endTime = fcfsSettingDto.getEndTime();
 
-            if((now.isEqual(startTime) || now.isAfter(startTime))
+            if ((now.isEqual(startTime) || now.isAfter(startTime))
                     && (now.isEqual(endTime) || now.isBefore(endTime))) {
                 return fcfsSettingDto.getRound();
             }
@@ -183,5 +148,74 @@ public class FcfsSettingManager {
         return null;
     }
 
+    /**
+     * 현재 시간을 기준으로 다음 선착순 이벤트의 시작 시간을 반환하는 메서드
+     */
+    public LocalDateTime getNextFcfsTime(LocalDateTime now) {
+
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            LocalDateTime startTime = fcfsSettingDto.getStartTime();
+
+            if (now.isBefore(startTime)) {
+                return startTime;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 현재 선착순 이벤트가 진행중이라면 현재 이벤트의 시작시간을, 진행중이 아니라면 다음 이벤트 시작시간을 반환하는 메서드
+     */
+    public LocalDateTime getNowOrNextFcfsTime(LocalDateTime now) {
+
+        Integer round = getFcfsRound(now);
+        if(round != null){
+            return fcfsSettingList.get(round-1).getStartTime();
+        }
+
+        return getNextFcfsTime(now);
+    }
+
+    public Integer getFcfsRoundForHistory(LocalDate now) {
+
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            LocalDateTime startTime = fcfsSettingDto.getStartTime();
+
+            if (now.isEqual(startTime.toLocalDate())) {
+                return fcfsSettingDto.getRound();
+            }
+        }
+        return null;
+    }
+
+    public void setFcfsSettingByAdmin(FcfsSettingTestRequestDto fcfsSettingTestRequestDto){
+        FcfsSettingDto fcfsSettingDto = FcfsSettingDto.builder()
+                .round(fcfsSettingTestRequestDto.getRound())
+                .startTime(fcfsSettingTestRequestDto.getStartTime())
+                .endTime(fcfsSettingTestRequestDto.getEndTime())
+                .winnerNum(fcfsSettingTestRequestDto.getWinnerNum())
+                .build();
+
+        fcfsSettingList.set(fcfsSettingTestRequestDto.getRound()-1, fcfsSettingDto);
+
+        isFcfsClosed = fcfsSettingTestRequestDto.isFcfsClosed();
+    }
+
+    /**
+     * 선착순 이벤트 날짜면 해당 라운드 값을 반환하는 메서드
+     */
+    public int getRoundForFcfsCode(LocalDate localDate){
+        for (FcfsSettingDto fcfsSettingDto : fcfsSettingList) {
+            if (fcfsSettingDto != null) {
+                LocalDate startDate = fcfsSettingDto.getStartTime().toLocalDate();
+
+                // localDate가 startDate의 하루 다음날과 같은지 확인
+                if (localDate.isEqual(startDate)) {
+                    return fcfsSettingDto.getRound();
+                }
+            }
+        }
+        return -1;
+    }
 
 }

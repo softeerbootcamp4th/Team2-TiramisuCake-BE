@@ -1,8 +1,16 @@
 package com.softeer.backend.global.common.exception;
 
+import com.softeer.backend.fo_domain.draw.dto.participate.DrawLoseModalResponseDto;
+import com.softeer.backend.fo_domain.draw.util.DrawUtil;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsFailResult;
+import com.softeer.backend.fo_domain.fcfs.dto.result.FcfsResultResponseDto;
+import com.softeer.backend.fo_domain.fcfs.exception.FcfsException;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
 import com.softeer.backend.global.common.response.ResponseDto;
+import com.softeer.backend.global.staticresources.constant.StaticTextName;
+import com.softeer.backend.global.staticresources.util.StaticResourceUtil;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +21,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.*;
@@ -24,7 +31,11 @@ import java.util.*;
  */
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+
+    private final StaticResourceUtil staticResourceUtil;
+    private final DrawUtil drawUtil;
 
     /**
      * GeneralException을 처리하는 메서드
@@ -39,9 +50,20 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleGeneralExceptionInternal(generalException, errorReasonHttpStatus, HttpHeaders.EMPTY, webRequest);
     }
 
+    /**
+     * 분산락 예외를 처리하는 메서드
+     */
     @ExceptionHandler
-    public ModelAndView handleEventLockException(EventLockException eventLockException, WebRequest webRequest) {
+    public ResponseEntity<Object> handleEventLockException(EventLockException eventLockException, WebRequest webRequest) {
         return handleEventLockExceptionInternal(eventLockException, HttpHeaders.EMPTY, webRequest);
+    }
+
+    /**
+     * 선착순 예외를 처리하는 메서드
+     */
+    @ExceptionHandler
+    public ResponseEntity<Object> handleFcfsException(FcfsException FcfsException, WebRequest webRequest) {
+        return handleFcfsExceptionInternal(FcfsException, HttpHeaders.EMPTY, webRequest);
     }
 
     /**
@@ -130,24 +152,72 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     // EventLockException에 대한 client 응답 객체를 생성하는 메서드
-    private ModelAndView handleEventLockExceptionInternal(EventLockException e, HttpHeaders headers, WebRequest webRequest) {
+    private ResponseEntity<Object> handleEventLockExceptionInternal(EventLockException e, HttpHeaders headers, WebRequest webRequest) {
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
 
         log.error("EventLockException captured in ExceptionAdvice", e);
 
         String redissonKeyName = e.getRedissonKeyName();
 
-        ModelAndView modelAndView = new ModelAndView();
+        ResponseDto<Object> body = null;
 
-        if (redissonKeyName.contains("FCFS")){
-
-            modelAndView.setViewName("redirect:/fcfs/result");
-            modelAndView.addObject("fcfsWin", false);
+        if (redissonKeyName.contains("FCFS")) {
+            body = ResponseDto.onSuccess(FcfsResultResponseDto.builder()
+                    .fcfsWinner(false)
+                    .fcfsResult(FcfsFailResult.builder()
+                            .title(textContentMap.get(StaticTextName.FCFS_LOSER_TITLE.name()))
+                            .subTitle(textContentMap.get(StaticTextName.FCFS_LOSER_SUBTITLE.name()))
+                            .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
+                            .build())
+                    .build());
         }
 
-        //TODO
-        // DRAW 관련 예외일 경우, body 구성하는 코드 필요
+        if (redissonKeyName.contains("DRAW")) {
+            body = ResponseDto.onSuccess(
+                    DrawLoseModalResponseDto.builder()
+                            .isDrawWin(false)
+                            .images(drawUtil.generateLoseImages())
+                            .shareUrl("https://softeer.site")
+                            .build()
+            );
+        }
 
-        return modelAndView;
+        return super.handleExceptionInternal(
+                e,
+                body,
+                headers,
+                HttpStatus.OK,
+                webRequest
+        );
+    }
+
+    // FcfsException 대한 client 응답 객체를 생성하는 메서드
+    private ResponseEntity<Object> handleFcfsExceptionInternal(FcfsException e, HttpHeaders headers, WebRequest webRequest) {
+        Map<String, String> textContentMap = staticResourceUtil.getTextContentMap();
+
+        ResponseDto<Object> body = null;
+
+        if (e.getCode() == ErrorStatus._FCFS_ALREADY_CLOSED) {
+            body = ResponseDto.onSuccess(FcfsResultResponseDto.builder()
+                    .fcfsWinner(false)
+                    .fcfsResult(FcfsFailResult.builder()
+                            .title(textContentMap.get(StaticTextName.FCFS_CLOSED_TITLE.name()))
+                            .subTitle(textContentMap.get(StaticTextName.FCFS_CLOSED_SUBTITLE.name()))
+                            .caution(textContentMap.get(StaticTextName.FCFS_LOSER_CAUTION.name()))
+                            .build())
+                    .build());
+        } else {
+            body = ResponseDto.onFailure(e.getCode());
+        }
+
+
+        return super.handleExceptionInternal(
+                e,
+                body,
+                headers,
+                HttpStatus.OK,
+                webRequest
+        );
     }
 
     // ConstraintViolationException에 대한 client 응답 객체를 생성하는 메서드

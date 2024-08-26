@@ -4,13 +4,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+/**
+ * 추첨 참여 정보 엔티티 클래스
+ */
 @Getter
 @Entity
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "draw_participation_info")
 public class DrawParticipationInfo {
     @Id
@@ -23,14 +28,9 @@ public class DrawParticipationInfo {
     @Column(name = "draw_losing_count")
     private Integer drawLosingCount;
 
-    @Column(name = "draw_participation_count")
-    private Integer drawParticipationCount;
+    @Column(name = "draw_attendance_count")
+    private Integer drawAttendanceCount;
 
-    @Builder
-    public DrawParticipationInfo(Integer userId, Integer drawWinningCount, Integer drawLosingCount, Integer drawParticipationCount) {
-        this.userId = userId;
-        this.drawWinningCount = drawWinningCount;
-        this.drawLosingCount = drawLosingCount;
-        this.drawParticipationCount = drawParticipationCount;
-    }
+    @Column(name = "last_attendance")
+    private LocalDateTime lastAttendance;
 }

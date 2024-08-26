@@ -23,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 어드민 페이지의 당첨 관리 페이지 요청을 처리하는 클래스
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,15 +35,19 @@ public class WinnerPageService {
     private final DrawRepository drawRepository;
     private final FcfsSettingRepository fcfsSettingRepository;
     private final DrawSettingRepository drawSettingRepository;
-    private final FcfsSettingManager fcfsSettingManager;
-    private final DrawSettingManager drawSettingManager;
 
+    /**
+     * 당첨 관리 페이지 정보를 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     public WinnerPageResponseDto getWinnerPage() {
 
-        return WinnerPageResponseDto.of(fcfsSettingManager, drawSettingManager);
+        return WinnerPageResponseDto.of(fcfsSettingRepository.findAll(), drawSettingRepository.findAll().get(0));
     }
 
+    /**
+     * 선착순 당첨자 목록을 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     public FcfsWinnerListResponseDto getFcfsWinnerList(int round) {
         List<Fcfs> fcfsList = fcfsRepository.findFcfsWithUser(round);
@@ -48,6 +55,9 @@ public class WinnerPageService {
         return FcfsWinnerListResponseDto.of(fcfsList, round);
     }
 
+    /**
+     * 추첨 당첨자 목록을 반환하는 메서드
+     */
     @Transactional(readOnly = true)
     public DrawWinnerListResponseDto getDrawWinnerList(int rank) {
         List<Draw> drawList = drawRepository.findDrawWithUser(rank);
@@ -55,15 +65,19 @@ public class WinnerPageService {
         return DrawWinnerListResponseDto.of(drawList, rank);
     }
 
+    /**
+     * 선착순 당첨자 수를 수정하는 메서드
+     */
     @Transactional
     public void updateFcfsWinnerNum(FcfsWinnerUpdateRequestDto fcfsWinnerUpdateRequestDto) {
         List<FcfsSetting> fcfsSettingList = fcfsSettingRepository.findAll();
 
         fcfsSettingList.forEach((fcfsSetting) -> fcfsSetting.setWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum()));
-
-        fcfsSettingManager.setFcfsWinnerNum(fcfsWinnerUpdateRequestDto.getFcfsWinnerNum());
     }
 
+    /**
+     * 추첨 당첨자 수를 수정하는 메서드
+     */
     @Transactional
     public void updateDrawWinnerNum(DrawWinnerUpdateRequestDto drawWinnerUpdateRequestDto) {
         DrawSetting drawSetting = drawSettingRepository.findAll().get(0);
@@ -71,9 +85,5 @@ public class WinnerPageService {
         drawSetting.setWinnerNum1(drawWinnerUpdateRequestDto.getFirstWinnerNum());
         drawSetting.setWinnerNum2(drawWinnerUpdateRequestDto.getSecondWinnerNum());
         drawSetting.setWinnerNum3(drawWinnerUpdateRequestDto.getThirdWinnerNum());
-
-        drawSettingManager.setDrawWinnerNum(drawWinnerUpdateRequestDto.getFirstWinnerNum(),
-                drawWinnerUpdateRequestDto.getSecondWinnerNum(),
-                drawWinnerUpdateRequestDto.getThirdWinnerNum());
     }
 }

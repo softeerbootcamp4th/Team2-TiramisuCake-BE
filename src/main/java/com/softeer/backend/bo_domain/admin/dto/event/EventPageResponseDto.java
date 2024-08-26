@@ -14,6 +14,9 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 이벤트 페이지 정보 응답 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
@@ -58,21 +61,21 @@ public class EventPageResponseDto {
 
     }
 
-    public static EventPageResponseDto of(FcfsSettingManager fcfsSettingManager, DrawSettingManager drawSettingManager) {
-        List<FcfsEvent> fcfsEventList = fcfsSettingManager.getFcfsSettingList().stream()
-                .map((fcfsSettingDto) ->
+    public static EventPageResponseDto of(List<FcfsSetting> fcfsSettingList, DrawSetting drawSetting) {
+        List<FcfsEvent> fcfsEventList = fcfsSettingList.stream()
+                .map((fcfsSetting) ->
                         EventPageResponseDto.FcfsEvent.builder()
-                                .round(fcfsSettingDto.getRound())
-                                .startTime(fcfsSettingDto.getStartTime())
-                                .endTime(fcfsSettingDto.getEndTime())
+                                .round(fcfsSetting.getRound())
+                                .startTime(fcfsSetting.getStartTime())
+                                .endTime(fcfsSetting.getEndTime())
                                 .build())
                 .toList();
 
         DrawEvent drawEvent = DrawEvent.builder()
-                .startDate(drawSettingManager.getStartDate())
-                .endDate(drawSettingManager.getEndDate())
-                .startTime(drawSettingManager.getStartTime())
-                .endTime(drawSettingManager.getEndTime())
+                .startDate(drawSetting.getStartDate())
+                .endDate(drawSetting.getEndDate())
+                .startTime(drawSetting.getStartTime())
+                .endTime(drawSetting.getEndTime())
                 .build();
 
         return EventPageResponseDto.builder()

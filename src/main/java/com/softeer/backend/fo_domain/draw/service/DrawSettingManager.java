@@ -1,28 +1,26 @@
 package com.softeer.backend.fo_domain.draw.service;
 
-import com.softeer.backend.fo_domain.draw.domain.Draw;
+import com.softeer.backend.bo_domain.admin.dto.DrawSettingTestRequestDto;
 import com.softeer.backend.fo_domain.draw.domain.DrawSetting;
 import com.softeer.backend.fo_domain.draw.exception.DrawException;
 import com.softeer.backend.fo_domain.draw.repository.DrawRepository;
 import com.softeer.backend.fo_domain.draw.repository.DrawSettingRepository;
-import com.softeer.backend.fo_domain.user.domain.User;
-import com.softeer.backend.fo_domain.user.exception.UserException;
 import com.softeer.backend.fo_domain.user.repository.UserRepository;
 import com.softeer.backend.global.common.code.status.ErrorStatus;
-import com.softeer.backend.global.common.constant.RedisKeyPrefix;
+import com.softeer.backend.global.util.DrawRedisUtil;
 import com.softeer.backend.global.util.EventLockRedisUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Set;
 
+/**
+ * 추첨 이벤트 설정을 관리하기 위한 클래스
+ */
 @Getter
 @Component
 @RequiredArgsConstructor
@@ -31,6 +29,7 @@ public class DrawSettingManager {
     private final DrawSettingRepository drawSettingRepository;
     private final ThreadPoolTaskScheduler taskScheduler;
     private final EventLockRedisUtil eventLockRedisUtil;
+    private final DrawRedisUtil drawRedisUtil;
     private final UserRepository userRepository;
 
     private LocalDate startDate;
@@ -44,6 +43,9 @@ public class DrawSettingManager {
     // @PostConstruct로 생성됐을 시 세팅정보 가져오기
     // 스케줄러로 01:00:00에 redis 임시 목록 삭제하기
 
+    /**
+     * 서버가 실행되고 인스턴스가 만들어진 직후 DB로부터 해당 설정을 불러와 저장하는 메서드
+     */
     @PostConstruct
     public void initializeDrawSettingManager() {
         DrawSetting drawSetting = drawSettingRepository.findById(1)
@@ -54,60 +56,34 @@ public class DrawSettingManager {
         startTime = drawSetting.getStartTime();
         endTime = drawSetting.getEndTime();
         winnerNum1 = drawSetting.getWinnerNum1();
-        winnerNum2 = drawSetting.getWinnerNum2();
-        winnerNum3 = drawSetting.getWinnerNum3();
-
-        // 매일 01:00:00에 redis 당첨자 목록 데이터베이스에 저장
-        taskScheduler.schedule(this::addWinnerToDatabase, new CronTrigger("0 0 1 * * *"));
-
-        // 매일 01:00:00에 redis 임시 당첨자 목록 삭제하기
-        taskScheduler.schedule(this::deleteTempWinnerSetFromRedis, new CronTrigger("0 0 1 * * *"));
+        winnerNum2 = winnerNum1 + drawSetting.getWinnerNum2();
+        winnerNum3 = winnerNum2 + drawSetting.getWinnerNum3();
     }
 
-    private void deleteTempWinnerSetFromRedis() {
-        String drawTempKey;
-        for (int ranking = 1; ranking < 4; ranking++) {
-            drawTempKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            eventLockRedisUtil.deleteTempWinnerList(drawTempKey);
-        }
-    }
-
-    private void addWinnerToDatabase() {
-        String drawWinnerKey;
-        for (int ranking = 1; ranking < 4; ranking++) {
-            drawWinnerKey = RedisKeyPrefix.DRAW_WINNER_LIST_PREFIX.getPrefix() + ranking;
-            Set<Integer> winnerSet = eventLockRedisUtil.getAllDataAsSet(drawWinnerKey);
-
-            LocalDateTime winningDate = LocalDateTime.now().minusHours(2); // 하루 전 날 오후 11시로 설정
-
-            for (Integer userId : winnerSet) {
-                User user = userRepository.findById(userId).orElseThrow(
-                        () -> new UserException(ErrorStatus._NOT_FOUND));
-
-                Draw draw = Draw.builder()
-                        .user(user)
-                        .rank(ranking)
-                        .winningDate(winningDate)
-                        .build();
-
-                drawRepository.save(draw);
-            }
-        }
-    }
-
-    public void setDrawDate(DrawSetting drawSetting) {
+    /**
+     * 추첨이벤트 정보를 설정하는 메서드
+     */
+    public void setDrawSetting(DrawSetting drawSetting) {
         this.startDate = drawSetting.getStartDate();
         this.endDate = drawSetting.getEndDate();
-    }
-
-    public void setDrawTime(DrawSetting drawSetting) {
         this.startTime = drawSetting.getStartTime();
         this.endTime = drawSetting.getEndTime();
+
+        this.winnerNum1 = drawSetting.getWinnerNum1();
+        this.winnerNum2 = drawSetting.getWinnerNum2();
+        this.winnerNum3 = drawSetting.getWinnerNum3();
     }
 
-    public void setDrawWinnerNum(int winnerNum1, int winnerNum2, int winnerNum3) {
-        this.winnerNum1 = winnerNum1;
-        this.winnerNum2 = winnerNum2;
-        this.winnerNum3 = winnerNum3;
+    public void setDrawSettingByAdmin(DrawSettingTestRequestDto drawSettingTestRequestDto) {
+
+        this.startDate = drawSettingTestRequestDto.getStartDate();
+        this.endDate = drawSettingTestRequestDto.getEndDate();
+        this.startTime = drawSettingTestRequestDto.getStartTime();
+        this.endTime = drawSettingTestRequestDto.getEndTime();
+        this.winnerNum1 = drawSettingTestRequestDto.getWinnerNum1();
+        this.winnerNum2 = drawSettingTestRequestDto.getWinnerNum2();
+        this.winnerNum3 = drawSettingTestRequestDto.getWinnerNum3();
+
     }
+
 }

@@ -35,11 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 인증검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
             "/swagger-ui/**", "/swagger", "/v3/**", "/error/**",
-            "/verification/send", "/verification/confirm",
+            "/verification/send", "/verification/confirm", "/verification/send/test",
             "/login",
-            "/main/event", "/main/car",
+            "/main/event/static", "/main/event/info", "/main/car",
             "/admin/login", "/admin/signup",
-            "/share/**"
+            "/share/**",
+            "/admin/fcfs/test","/admin/draw/test"
     };
 
     // Access Token이 header에 있으면 인증하고 없으면 인증하지 않는 url 설정
@@ -54,6 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        log.info("request uri: {}", request.getRequestURI());
 
         // preflight 요청 또는 whitelist에 있는 요청은 인증 검사 x
         if (CorsUtils.isPreFlightRequest(request) || isUriInWhiteList(request.getRequestURI())) {
@@ -94,39 +97,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * url이 white list에 속하는지를 검사하는 메서드
+     */
     private boolean isUriInWhiteList(String url) {
         return PatternMatchUtils.simpleMatch(whiteListUrls, url);
     }
 
+    /**
+     * url이 optionalAuthUrls에 속하는지를 검사하는 메서드
+     */
     private boolean isUriInOptionalAuthList(String url) {
         return PatternMatchUtils.simpleMatch(optionalAuthUrls, url);
     }
 
+    /**
+     * Access & Refresh Token을 재발급하는 메서드
+     *
+     * 1. refresh token 유효성 검증
+     * 2. access token 유효성 검증(유효하지 않아야 함)
+     * 3. redis refresh 와 일치 여부 확인
+     */
     private void reissueAccessTokenAndRefreshToken(HttpServletResponse response,
                                                    String accessToken, String refreshToken) throws IOException {
-        /**
-         * 1. refresh token 유효성 검증
-         * 2. access token 유효성 검증(유효하지 않아야 함)
-         * 3. redis refresh 와 일치 여부 확인
-         */
+
         checkAllConditions(accessToken, refreshToken);
         String newAccessToken = jwtUtil.createAccessToken(jwtUtil.getJwtClaimsFromRefreshToken(refreshToken));
         String newRefreshToken = reIssueRefreshToken(jwtUtil.getJwtClaimsFromRefreshToken(refreshToken));
         makeAndSendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
     }
 
-    // Access Token + Refresh Token 재발급 메소드
+    /**
+     * Access & Refresh Token을 재발급 해야하는 조건인지를 확인하는 메서드
+     *
+     * 1. access Token 유효하지 않은지 확인
+     * 2. refresh Token 유효한지 확인
+     * 3. refresh Token 일치하는지 확인
+     **/
     private void checkAllConditions(String accessToken, String refreshToken) {
-        /**
-         * 1. access Token 유효하지 않은지 확인
-         * 2. refresh Token 유효한지 확인
-         * 3. refresh Token 일치하는지 확인
-         **/
+
         validateAccessToken(accessToken);
         validateRefreshToken(refreshToken);
         isRefreshTokenMatch(refreshToken);
     }
 
+    /**
+     * accessToken이 유효하지 않는지를 확인하는 메서드
+     *
+     * accessToken이 유효하면 재발급을 하면 안되므로 예외 발생
+     */
     private void validateAccessToken(String accessToken) {
         if (jwtUtil.validateToken(accessToken)) {
             log.error("JWT Access Token is valid during the '/reissue' process.");
@@ -134,6 +153,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * refreshToken이 유효한지를 확인하는 메서드
+     *
+     * refreshToken이 유효하지 않으면 재발급을 할 수 없으므로 예외 발생
+     */
     private void validateRefreshToken(String refreshToken) {
         if (!this.jwtUtil.validateToken(refreshToken)) {
             log.error("JWT Refresh Token is invalid during the '/reissue' process.");
@@ -141,6 +165,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * refreshToken이 redis에 저장된 refreshToken과 일치하는지 확인하는 메서드
+     *
+     * 두 refreshToken이 일치하지 않으면 잘못된 refreshToken이므로 예외 발생
+     */
     private void isRefreshTokenMatch(String refreshToken) {
         JwtClaimsDto jwtClaimsDto = jwtUtil.getJwtClaimsFromRefreshToken(refreshToken);
 
@@ -153,7 +182,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * refresh token 재발급 하는 메소드
+     * refresh token 재발급 하는 메서드
+     *
      * 1. 새로운 Refresh Token 발급
      * 2. 해당 Key 에 해당하는 Redis Value 업데이트
      **/
@@ -167,7 +197,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 재발급한 refresh & access token 응답으로 보내는 메소드
+     * 재발급한 refresh & access token을 응답으로 보내는 메서드
+     *
      * 1. 상태 코드 설정
      * 2. 응답 헤더에 설정 (jwtProperties 에서 정보 가져옴)
      **/
@@ -184,6 +215,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         makeResultResponse(response, jwtTokenResponseDto);
     }
 
+    /**
+     * 재발급한 토큰이 담긴 응답을 client에게 보내는 메서드
+     */
     private void makeResultResponse(HttpServletResponse response,
                                     JwtTokenResponseDto jwtTokenResponseDto) throws IOException {
         response.setStatus(HttpStatus.OK.value());
@@ -198,6 +232,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * accessToken이 유효한지 확인하고 다음 필터로 jwtClaims를 보내는 메서드
+     *
+     * accessToken이 유효하지 않으면 인증 예외 발생
+     */
     private void checkAccessToken(HttpServletRequest request) {
 
         String accessToken = jwtUtil.extractAccessToken(request)

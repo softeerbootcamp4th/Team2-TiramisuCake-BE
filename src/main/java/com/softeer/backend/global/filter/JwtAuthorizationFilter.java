@@ -25,7 +25,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 인가검사를 하지 않는 url 설정
     private final String[] whiteListUrls = {
-            "/admin/login", "/admin/signup"
+            "/admin/login", "/admin/signup",
+            "/admin/fcfs/test", "/admin/draw/test"
     };
 
     @Override
@@ -39,6 +40,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         JwtClaimsDto jwtClaimsDto = (JwtClaimsDto) request.getAttribute("jwtClaims");
 
+        // 인증 정보가 없거나 RoleType이 ADMIN이 아닌경우, 인가 예외 발생
         if (jwtClaimsDto == null || jwtClaimsDto.getRoleType() != RoleType.ROLE_ADMIN) {
 
             log.error("JwtAuthorizationException has occurred");

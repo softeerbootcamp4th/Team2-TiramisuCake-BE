@@ -2,6 +2,42 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'jacoco'
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport // test 작업이 끝나고 jacocoTestReport를 실행
+}
+
+jacoco {
+	toolVersion = '0.8.8'
+}
+
+jacocoTestReport {
+	reports {
+		html.required = true
+		xml.required = false
+		csv.required = false
+
+		html.destination file("jacoco/jacocoHtml")
+		xml.destination file("jacoco/jacoco.xml")
+	}
+
+	// dependsOn : 이 작업에 지정된 종속성을 추가
+	dependsOn test // jacocoTestReport 에 test라는 종속성을 추가
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+
+		rule {
+			enabled = true
+			//코드 버커리지 체크 기준
+			element = 'CLASS'
+		}
+	}
 }
 
 group = 'com.softeer'
@@ -43,99 +79,8 @@ dependencies {
 	//DatatypeConverter
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
 
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
-	// Google Simple JSON
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-
-	//DatatypeConverter
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
-
 	// JPA 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
 
 	// MySql 설정
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -151,6 +96,12 @@ dependencies {
 
 	// Bcrypt 설정
 	implementation 'org.mindrot:jbcrypt:0.4'
+
+	// Spring Cache 설정
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	// Caffeine Cache 설정
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

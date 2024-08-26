@@ -3,6 +3,9 @@ package com.softeer.backend.fo_domain.user.constatnt;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 사용자 인증 속성을 관리하는 enum 클래스
+ */
 @Slf4j
 @Getter
 public enum VerificationProperty {
@@ -16,5 +19,4 @@ public enum VerificationProperty {
     VerificationProperty(int value) {
         this.value = value;
     }
-
 }

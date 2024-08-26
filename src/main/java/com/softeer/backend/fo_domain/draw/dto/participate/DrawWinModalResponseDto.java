@@ -1,23 +1,15 @@
 package com.softeer.backend.fo_domain.draw.dto.participate;
 
-import lombok.AllArgsConstructor;
+import com.softeer.backend.fo_domain.draw.dto.modal.WinModal;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 추첨 이벤트 당첨 시 응답 DTO 클래스
+ * WinModal 반환
+ */
 @Data
 @SuperBuilder
 public class DrawWinModalResponseDto extends DrawModalResponseDto {
-    private DrawWinModalResponseDto.WinModal winModal;
-
-    @Data
-    @SuperBuilder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class WinModal {
-        private String title; // 제목
-        private String subtitle; // 부제목
-        private String img; // 이미지 URL (S3 URL)
-        private String description; // 설명
-    }
+    private WinModal winModal;
 }

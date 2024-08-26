@@ -13,6 +13,9 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 당첨 관리 페이지 정보 응답 Dto 클래스
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
@@ -51,30 +54,30 @@ public class WinnerPageResponseDto {
         private double probability;
     }
 
-    public static WinnerPageResponseDto of(FcfsSettingManager fcfsSettingManager, DrawSettingManager drawSettingManager) {
-        List<FcfsEvent> fcfsEventList = fcfsSettingManager.getFcfsSettingList().stream()
-                .map((fcfsSettingDto) ->
+    public static WinnerPageResponseDto of(List<FcfsSetting> fcfsSettingList, DrawSetting drawSetting) {
+        List<FcfsEvent> fcfsEventList = fcfsSettingList.stream()
+                .map((fcfsSetting) ->
                         FcfsEvent.builder()
-                                .round(fcfsSettingDto.getRound())
-                                .eventDate(LocalDate.from(fcfsSettingDto.getStartTime()))
-                                .winnerNum(fcfsSettingDto.getWinnerNum())
+                                .round(fcfsSetting.getRound())
+                                .eventDate(LocalDate.from(fcfsSetting.getStartTime()))
+                                .winnerNum(fcfsSetting.getWinnerNum())
                                 .build())
                 .toList();
 
         DrawEvent drawEvent1 = DrawEvent.builder()
                 .rank(1)
-                .winnerNum(drawSettingManager.getWinnerNum1())
-                .probability(calculateWinningProbability(drawSettingManager.getWinnerNum1()))
+                .winnerNum(drawSetting.getWinnerNum1())
+                .probability(calculateWinningProbability(drawSetting.getWinnerNum1()))
                 .build();
         DrawEvent drawEvent2 = DrawEvent.builder()
                 .rank(2)
-                .winnerNum(drawSettingManager.getWinnerNum2())
-                .probability(calculateWinningProbability(drawSettingManager.getWinnerNum2()))
+                .winnerNum(drawSetting.getWinnerNum2())
+                .probability(calculateWinningProbability(drawSetting.getWinnerNum2()))
                 .build();
         DrawEvent drawEvent3 = DrawEvent.builder()
                 .rank(3)
-                .winnerNum(drawSettingManager.getWinnerNum3())
-                .probability(calculateWinningProbability(drawSettingManager.getWinnerNum3()))
+                .winnerNum(drawSetting.getWinnerNum3())
+                .probability(calculateWinningProbability(drawSetting.getWinnerNum3()))
                 .build();
 
         List<DrawEvent> drawEventList = Arrays.asList(drawEvent1, drawEvent2, drawEvent3);

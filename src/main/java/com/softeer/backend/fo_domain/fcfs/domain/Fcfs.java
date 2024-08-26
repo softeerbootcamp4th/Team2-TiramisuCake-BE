@@ -9,8 +9,12 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 선착순 당첨 정보를 관리하는 entity 클래스
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,8 +39,7 @@ public class Fcfs {
     @Column(name = "code")
     private String code;
 
-    @CreatedDate
     @Column(name = "winning_date", nullable = false)
-    private LocalDateTime winningDate;
+    private LocalDate winningDate;
 
 }

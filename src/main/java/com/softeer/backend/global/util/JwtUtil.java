@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Jwt 작업을 위한 util 클래스
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -132,7 +135,7 @@ public class JwtUtil {
         return false;
     }
 
-    // 실제 token 생성 로직
+    // Jwt token 생성 로직
     private String createToken(JwtClaimsDto jwtClaimsDto, Long tokenExpiration) {
         Claims claims = Jwts.claims();
         claims.put("id", jwtClaimsDto.getId());

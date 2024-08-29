@@ -98,8 +98,12 @@
 // 예시
 
 label: subject
+- feat : 기능 구현
+- refactor : 구조 개선, 코드 분리 등
+- fix : 사용 함수, 변수 변경 
+- style - 디자인(css, animation) 변경 
+- chore - 환경 설정, 주석 제거, 이미지 파일 추가 등
 
-- label은 issue label과 동일
 - subject은 해당 커밋에 대한 내용을 잘 이해할 수 있게 요약 할 것
 ```
 
